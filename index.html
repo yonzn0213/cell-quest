@@ -254,6 +254,15 @@ const SPECIES = {
     moves:[[1,'돌주먹',50,null],[10,'데드라인 압박',62,'야근'],[18,'기한 엄수 해머',82,'야근']] },
   mondaybeast:{ name:'월요일괴수', type:'야근', hp:65, atk:16,
     moves:[[1,'출근 발톱',52,null],[10,'주말 삭제',64,'야근'],[18,'월요병 브레스',84,'야근']] },
+  /* ── 합성 전용 (이종 합성으로만 획득) ── */
+  cafegriffin:{ name:'카페그리핀', type:'카페인', hp:82, atk:20, fusion:true,
+    moves:[[1,'발톱 할퀴기',48,null],[1,'카페인 윙 커터',60,'카페인'],[18,'더블샷 강하',78,'카페인'],[26,'그리핀 라떼 폭풍',96,'카페인']] },
+  dochydra:{ name:'문서히드라', type:'서류', hp:95, atk:18, fusion:true,
+    moves:[[1,'삼중 물기',48,null],[1,'서류 산사태',60,'서류'],[18,'아홉 머리 결재',78,'서류'],[26,'영구 보존 압사',96,'서류']] },
+  sparkmimic:{ name:'스파크미믹', type:'전자', hp:78, atk:21, fusion:true,
+    moves:[[1,'깜짝 물기',48,null],[1,'스파크 방전',60,'전자'],[18,'합선 폭발',78,'전자'],[26,'천만 볼트 위장',96,'전자']] },
+  overcat:{ name:'야근냥', type:'야근', hp:88, atk:20, fusion:true,
+    moves:[[1,'츄르 어택',48,null],[1,'새벽 울음',60,'야근'],[18,'키보드 점거',78,'야근'],[26,'마감 직전의 발톱',96,'야근']] },
   /* ── 전설 ── */
   dragon:{ name:'부장드래곤', type:'야근', hp:110, atk:17, legend:true,
     moves:[[1,'호통',52,null],[1,'결재 반려 폭풍',64,'서류'],[15,'주말 출근 브레스',80,'야근'],[20,'정신력 운운',96,'야근']] },
@@ -375,7 +384,7 @@ function newGame(){
   G = {
     v:3, screen:'title', name:'',
     party:[], box:[], active:0,
-    items:{ clip:5, goldclip:0, bacchus:3, hotsix:0, coffee:0 },
+    items:{ clip:5, goldclip:0, bacchus:3, hotsix:0, coffee:0, ample:0 },
     money:200, wins:0, story:0,
     dex:{}, rarDex:{}, dexRewards:[],
     battle:null, log:[], floor:0, coolerCd:0,
@@ -390,7 +399,35 @@ const ITEM_DEF = {
   bacchus: { name:'박카스',    desc:'HP 35 회복', price:70 },
   hotsix:  { name:'핫식스',    desc:'HP 완전 회복', price:180 },
   coffee:  { name:'모닝커피',  desc:'기절 회복 (HP 50%)', price:220 },
+  ample:   { name:'수상한 앰플', desc:'도핑 재료 — 성공 시 영구 강화, 실패 시 영구 약화', price:500 },
 };
+
+/* ── 도핑 (v2.0): 수상한 앰플로 영구 강화/약화. 효과는 배율로 누적 ── */
+const DOPE_MAX = 5;
+const DOPE_OUTCOMES = [
+  { p:0.10, mult:1.20, msg:'★ 대성공!! 온몸에서 빛이 난다! (능력치 +20%)' },
+  { p:0.45, mult:1.10, msg:'성공! 힘이 솟구친다. (능력치 +10%)' },
+  { p:0.30, mult:0.92, msg:'…부작용이다. 몸이 비틀거린다. (능력치 -8%)' },
+  { p:0.15, mult:0.80, msg:'!! 심각한 부작용 !! 몸이 크게 망가졌다… (능력치 -20%)' },
+];
+function rollDope(){
+  let r = Math.random();
+  for(const o of DOPE_OUTCOMES){ if(r < o.p) return o; r -= o.p; }
+  return DOPE_OUTCOMES[DOPE_OUTCOMES.length-1];
+}
+function recalcMonStats(m){
+  const st = statsFor(m.sid, m.lv, m.rar);
+  const dope = m.dope||1;
+  const ratio = m.maxhp>0 ? m.hp/m.maxhp : 1;
+  m.maxhp = Math.max(1, Math.round(st.maxhp*dope));
+  m.atk = Math.max(1, Math.round(st.atk*dope));
+  m.hp = m.hp<=0 ? 0 : Math.max(1, Math.round(m.maxhp*ratio));
+}
+function applyDope(m, outcome){
+  m.dope = +(((m.dope||1) * outcome.mult).toFixed(3));
+  m.dopeN = (m.dopeN||0) + 1;
+  recalcMonStats(m);
+}
 
 function activeMon(){ return G.party[G.active]; }
 function aliveMons(){ return G.party.filter(m=>m.hp>0); }
@@ -567,7 +604,7 @@ function render(){
   const map = { title:scrTitle, starter:scrStarter, hub:scrHub, explore:scrExplore,
     battle:scrBattle, bag:scrBag, party:scrParty, box:scrBox, dex:scrDex, shop:scrShop,
     moveFloor:scrMoveFloor, storyBeat:scrStoryBeat, gameover:scrGameover, ending:scrEnding,
-    rank:scrRank };
+    rank:scrRank, dope:scrDope, fusion:scrFusion };
   (map[G.screen]||scrHub)();
 }
 
@@ -581,7 +618,7 @@ function scrTitle(){
     '"야근의 기운이 쌓인 곳에 몬스터가 깨어난다.',
     ' 근원을 끊는 자, 정시퇴근을 얻으리라."',
     '',
-    ['목표: 5명의 보스를 꺾고, 37종의 몬스터 도감을 완성하라.','hl'],
+    [`목표: 보스들을 꺾고, ${ALL_SIDS.length}종의 몬스터 도감을 완성하라.`,'hl'],
     '',
     ['※ 셀 클릭 또는 숫자키로 진행 · ESC = 위장 시트 전환','dim'],
   ];
@@ -704,6 +741,7 @@ function scrHub(){
           render();
         }],
     ['매점 (복지포인트 사용)', ()=>{ G.screen='shop'; render(); }],
+    ['합성 실험실 (등급 도전 / 신종 창조)', ()=>{ G.screen='fusion'; render(); }],
     ['가방', ()=>{ G.screen='bag'; render(); }],
     ['파티 관리', ()=>{ G.screen='party'; render(); }],
     ['몬스터 도감', ()=>{ G.screen='dex'; render(); }],
@@ -776,6 +814,7 @@ function scrParty(){
   G.party.forEach((m,i)=>{
     if(i!==G.active && m.hp>0) choices.push([`${monName(m)}을(를) 선두로`, ()=>{ G.active=i; render(); }]);
   });
+  choices.push([`도핑 실험 (수상한 앰플 ×${G.items.ample||0})`, ()=>{ G.screen='dope'; render(); }]);
   if(G.party.length>1){
     choices.push(['몬스터를 보관함으로 보낸다', ()=>{ boxMode='deposit'; boxSel=-1; G.screen='box'; render(); }]);
   }
@@ -853,6 +892,124 @@ function scrBox(){
   if(totalPages>1) choices.push([`다음 페이지 ▶ (${(boxPage+1)%totalPages+1}/${totalPages})`,
     ()=>{ boxPage=(boxPage+1)%totalPages; render(); }]);
   choices.push(['돌아간다', ()=>{ boxSel=-1; boxPage=0; G.screen='party'; render(); }]);
+  paint(lines, choices);
+}
+
+/* ── 도핑 실험 ── */
+let dopeMsg = '';
+function scrDope(){
+  const lines = [['― 도핑 실험 ―','bold'],'',
+    [`수상한 앰플 ×${G.items.ample}`,'hl'],
+    '대성공 10% (+20%) · 성공 45% (+10%) · 부작용 30% (-8%) · 심각 15% (-20%)',
+    ['효과는 영구적이며 되돌릴 수 없다! (몬스터당 최대 5회, 이후 내성)','dim'],''];
+  if(dopeMsg){ lines.push([dopeMsg,'hl'],''); dopeMsg=''; }
+  const choices = [];
+  if(G.items.ample>0){
+    G.party.forEach(m=>{
+      const n = m.dopeN||0;
+      if(n>=DOPE_MAX) lines.push([`${monName(m)} — 도핑 내성 (한계 도달, 배율 ×${(m.dope||1).toFixed(2)})`,'dim']);
+      else choices.push([`${monName(m)} LV${m.lv} (HP ${m.maxhp} · 공격 ${m.atk} · ${n}/${DOPE_MAX}회)에게 주사`, ()=>{
+        G.items.ample--;
+        const o = rollDope();
+        applyDope(m, o);
+        dopeMsg = `${monName(m)}: ${o.msg}`;
+        render();
+      }]);
+    });
+  } else lines.push('수상한 앰플이 없다. 매점에서 구할 수 있다. (500P)');
+  choices.push(['돌아간다', ()=>{ G.screen='party'; render(); }]);
+  paint(lines, choices);
+}
+
+/* ── 합성 실험실: 동종 = 등급 도전(저확률) / 이종 = 레시피 신종 ── */
+const FUSE_COST = { normal:500, gold:1500, prism:4000 };
+const FUSE_RATE = { normal:0.10, gold:0.12, prism:0.15 };
+const NEXT_RAR  = { normal:'gold', gold:'prism', prism:'legend' };
+const RECIPE_COST = 2000;
+const FUSION_RECIPES = [
+  { mats:['latte','gian'],            to:'cafegriffin' },
+  { mats:['slimeking','shredgator'],  to:'dochydra' },
+  { mats:['beambat','vending'],       to:'sparkmimic' },
+  { mats:['americano','nightghost'],  to:'overcat' },
+];
+function allMons(){ return [...G.party, ...G.box]; }
+function removeMon(m){
+  let i = G.party.indexOf(m);
+  if(i>=0){ G.party.splice(i,1); if(G.active>=G.party.length) G.active=Math.max(0,G.party.length-1); return; }
+  i = G.box.indexOf(m);
+  if(i>=0) G.box.splice(i,1);
+}
+function addMon(m){
+  if(G.party.length<4) G.party.push(m); else G.box.push(m);
+  if(G.active>=G.party.length) G.active=0;
+}
+let fuseMsg = '';
+function scrFusion(){
+  const lines = [['― 합성 실험실 ―','bold'],'',
+    ['동종 합성: 같은 종·같은 등급 2마리 → 낮은 확률로 등급 상승. 실패해도 부재료는 소멸!','dim'],
+    ['이종 합성: 특정 조합 2마리 → 새로운 종 탄생 (재료 모두 소멸, 항상 성공)','dim'],''];
+  if(fuseMsg){ lines.push([fuseMsg,'hl'],''); fuseMsg=''; }
+  lines.push(`복지포인트: ${G.money.toLocaleString()}P`);
+  const choices = [];
+  /* 동종 후보 */
+  const groups = {};
+  for(const m of allMons()){
+    const rar = m.rar||'normal';
+    if(rar==='legend') continue;
+    const k = m.sid+'|'+rar;
+    (groups[k]=groups[k]||[]).push(m);
+  }
+  for(const k of Object.keys(groups)){
+    const g = groups[k];
+    if(g.length<2) continue;
+    g.sort((a,b)=>b.lv-a.lv);
+    let main = g[0];
+    let sub = g.slice(1).find(x=>G.box.includes(x)) || g[1];
+    /* 파티가 비지 않도록: 부재료가 파티의 마지막 1마리면 역할 교환 */
+    if(G.party.length===1 && G.party[0]===sub){ const t=main; main=sub; sub=t; }
+    const rar = main.rar||'normal';
+    choices.push([`[동종] ${monName(main)} LV${main.lv} + LV${sub.lv} → ${RARITY[NEXT_RAR[rar]].prefix.trim()} 도전 ${Math.round(FUSE_RATE[rar]*100)}% · ${FUSE_COST[rar]}P`, ()=>{
+      if(G.money<FUSE_COST[rar]){ fuseMsg='복지포인트가 부족하다…'; render(); return; }
+      G.money -= FUSE_COST[rar];
+      removeMon(sub);
+      if(Math.random()<FUSE_RATE[rar]){
+        main.rar = NEXT_RAR[rar];
+        if(main.rar==='legend' && !main.trait){
+          const keys = Object.keys(TRAITS);
+          main.trait = keys[Math.floor(Math.random()*keys.length)];
+        }
+        recalcMonStats(main); main.hp = main.maxhp;
+        dexCatch(main.sid, main.rar);
+        fuseMsg = `✨ 합성 대성공!! ${monName(main)}(으)로 다시 태어났다!`;
+      } else {
+        fuseMsg = `합성 실패… 부재료가 빛이 되어 사라졌다. (${monName(main)}은(는) 무사하다)`;
+      }
+      render();
+    }]);
+  }
+  /* 이종 후보 */
+  for(const rc of FUSION_RECIPES){
+    const a  = allMons().find(m=>m.sid===rc.mats[0]);
+    const b2 = allMons().find(m=>m.sid===rc.mats[1] && m!==a);
+    if(a && b2){
+      choices.push([`[이종] ${SPECIES[rc.mats[0]].name} + ${SPECIES[rc.mats[1]].name} → ??? · ${RECIPE_COST}P`, ()=>{
+        if(G.money<RECIPE_COST){ fuseMsg='복지포인트가 부족하다…'; render(); return; }
+        G.money -= RECIPE_COST;
+        const lv = Math.max(3, Math.round((a.lv+b2.lv)/2));
+        const rar = RARITY[a.rar||'normal'].rank >= RARITY[b2.rar||'normal'].rank ? (a.rar||'normal') : (b2.rar||'normal');
+        removeMon(a); removeMon(b2);
+        const nm = makeMon(rc.to, lv, rar);
+        addMon(nm);
+        dexCatch(rc.to, rar);
+        fuseMsg = `🧬 이종 합성!! 새로운 종 [${monName(nm)}]이(가) 탄생했다!!`;
+        render();
+      }]);
+    } else if(G.dex[rc.mats[0]] && G.dex[rc.mats[1]]){
+      lines.push([`레시피 발견: ${SPECIES[rc.mats[0]].name} + ${SPECIES[rc.mats[1]].name} → ??? (재료 부족)`,'dim']);
+    }
+  }
+  if(choices.length===0) lines.push('','지금 합성 가능한 조합이 없다. (같은 종·같은 등급 2마리, 또는 레시피 재료 2마리)');
+  choices.push(['돌아간다', ()=>{ G.screen='hub'; render(); }]);
   paint(lines, choices);
 }
 
@@ -1026,9 +1183,11 @@ function grantExpAndMoney(e, moneyMult){
     me.exp -= expNeed(me.lv);
     me.lv++;
     const before = knownMoves(me).map(m=>m[1]);
+    const dope = me.dope||1;
     const st = statsFor(me.sid, me.lv, me.rar);
-    const gain = st.maxhp - me.maxhp;
-    me.maxhp = st.maxhp; me.atk = st.atk;
+    const newMax = Math.round(st.maxhp*dope);
+    const gain = Math.max(0, newMax - me.maxhp);
+    me.maxhp = newMax; me.atk = Math.round(st.atk*dope);
     me.hp = Math.min(me.maxhp, me.hp+gain);
     pushLog(`${monName(me)} 레벨 업! → LV${me.lv}`);
     const evo = SPECIES[me.sid].evo;
@@ -1037,7 +1196,7 @@ function grantExpAndMoney(e, moneyMult){
       me.sid = evo.to;
       const st2 = statsFor(me.sid, me.lv, me.rar);
       const ratio = me.hp/me.maxhp;
-      me.maxhp = st2.maxhp; me.atk = st2.atk;
+      me.maxhp = Math.round(st2.maxhp*dope); me.atk = Math.round(st2.atk*dope);
       me.hp = Math.max(1, Math.round(me.maxhp*ratio));
       pushLog(`!! ${oldName}이(가) ${monName(me)}(으)로 진화했다 !!`);
       dexCatch(me.sid, me.rar);
@@ -1274,6 +1433,7 @@ function migrateSave(obj){
   }
   if(!obj.rarDex) obj.rarDex = {};
   if(!obj.coolerCd) obj.coolerCd = 0;
+  if(obj.items && obj.items.ample===undefined) obj.items.ample = 0;
   return obj;
 }
 function decodeSave(code){
