@@ -597,6 +597,15 @@ function localLoadCheck(){
     if(obj && (obj.v===2||obj.v===3) && Array.isArray(obj.party)) cloudSaveData = migrateSave(obj);
   }catch(e){ /* 손상된 캐시는 무시 */ }
 }
+/* 저장 데이터를 현재 게임으로 복원 (이어하기 / 부팅 자동 복원 공용) */
+function resumeSave(d){
+  G = d;
+  if(!G.name) G.name = '사원'+Math.floor(Math.random()*900+100);
+  if(['battle','storyBeat','rank','isekai','gameover','title','starter'].includes(G.screen)) G.screen='hub';
+  G.battle = null;
+  pendingMsg.push('자동 저장된 진행 상황을 불러왔다!');
+  render();
+}
 
 async function cloudSave(force){
   if(!hasCloud || !G.name) return;
@@ -752,16 +761,10 @@ function scrTitle(){
   if(cloudSaveData){
     const d = cloudSaveData;
     const dexN = Object.values(d.dex||{}).filter(v=>v===2).length;
-    choices.push([`이어하기 — ${d.name||'사원'} (${PROG_LABEL[Math.min((d.story||0)+(d.isekai?1:0),PROG_LABEL.length-1)]} · 도감 ${dexN} · 승수 ${d.wins||0})`, ()=>{
-      G = d;
-      if(!G.name) G.name = '사원'+Math.floor(Math.random()*900+100);
-      if(G.screen==='battle'||G.screen==='storyBeat'||G.screen==='rank') G.screen='hub';
-      G.battle = null;
-      pendingMsg.push('자동 저장된 진행 상황을 불러왔다!');
-      render();
-    }]);
+    choices.push([`이어하기 — ${d.name||'사원'} (${PROG_LABEL[Math.min((d.story||0)+(d.isekai?1:0),PROG_LABEL.length-1)]} · 도감 ${dexN} · 승수 ${d.wins||0})`, ()=>resumeSave(d)]);
   }
-  choices.push(['새 게임 시작', hasCloud?openNameDlg:()=>{ G.screen='starter'; render(); }]);
+  choices.push([cloudSaveData?'새 게임 시작 (※ 기존 자동 저장을 덮어씁니다)':'새 게임 시작',
+    hasCloud?openNameDlg:()=>{ newGame(); G.screen='starter'; render(); }]);
   if(hasCloud) choices.push(['랭킹 보드 보기', ()=>{ G.screen='rank'; render(); }]);
   choices.push(['백업 코드 불러오기', openLoadDlg]);
   paint(lines, choices, '=GAME.START()');
@@ -907,6 +910,10 @@ function scrHub(){
   );
   if(hasCloud) choices.push(['사내 랭킹 보드', ()=>{ G.screen='rank'; render(); }]);
   choices.push([canAutoSave?'백업 코드 (저장/불러오기 · 기기 이동용)':'백업 코드 (저장/불러오기) — ⚠ 유일한 저장 수단', openSaveDlg]);
+  choices.push(['타이틀 화면으로 (새 게임은 여기서)', ()=>{
+    localSave(); localLoadCheck(); /* 현재 진행을 저장하고 이어하기 데이터 갱신 */
+    G.screen='title'; render();
+  }]);
   paint(lines, choices, `=NOW() · ${fl.name}`);
 }
 
@@ -1732,9 +1739,14 @@ document.addEventListener('keydown', e=>{
   }
 });
 
-render();
+/* 부팅: 로컬 캐시가 있으면 타이틀 없이 즉시 이어서 실행 */
+function bootLoad(){
+  localLoadCheck();
+  if(!hasCloud && cloudSaveData){ resumeSave(cloudSaveData); return; }
+  render();
+}
+bootLoad();
 cloudLoadCheck();
-localLoadCheck();
 </script>
 </body>
 </html>
