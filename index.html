@@ -1742,7 +1742,9 @@ function scrBattle(){
     G.party.forEach((m,i)=>{ if(m.hp>0) choices.push([`${monName(m)} 교체 투입 (HP ${m.hp})`, ()=>switchMon(i,true)]); });
   } else if(b.menu==='moves'){
     knownMoves(me).forEach((mv,i)=>{
-      choices.push([`${mv[1]} (위력 ${mv[2]}${mv[3]?', '+mv[3]:''})`, ()=>playerMove(i)]);
+      /* 위력은 기술 고유값이라 불변 — 레벨업(공격력) 반영 데미지를 함께 보여준다 */
+      const est = Math.max(1, Math.round(me.atk*mv[2]/40));
+      choices.push([`${mv[1]} (위력 ${mv[2]}${mv[3]?', '+mv[3]:''} · 예상 데미지 ${est}±)`, ()=>playerMove(i)]);
     });
     choices.push(['← 뒤로', ()=>{ b.menu='main'; render(); }]);
   } else if(b.menu==='bag'){
