@@ -703,7 +703,7 @@ const hasCloud = (typeof window!=='undefined') && !!window.storage;
 /* GitHub Pages 등 정적 배포용 공유 랭킹 — Firebase Realtime Database REST.
    본인 프로젝트의 DB URL을 채우면 랭킹 보드가 활성화된다. 비워 두면 보드는 숨겨진다.
    예: 'https://cell-quest-xxxxx-default-rtdb.asia-southeast1.firebasedatabase.app' */
-const FIREBASE_DB_URL = '';
+const FIREBASE_DB_URL = 'https://cell-quest-5c949-default-rtdb.asia-southeast1.firebasedatabase.app';
 const hasBoard = hasCloud || !!FIREBASE_DB_URL;
 const BOARD_THROTTLE_MS = 8000;   /* 도배 방지: 보드 기록 최소 간격 */
 const RANK_MAX_ROWS = 20;

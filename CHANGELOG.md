@@ -5,6 +5,10 @@
 
 ---
 
+## v4.1.1 — 랭킹 보드 활성화 (2026-06-10, `FIREBASE_DB_URL` 연결)
+### 변경
+- Firebase Realtime Database URL 연결 — GitHub Pages에서 사내 랭킹 보드 실제 가동 시작
+
 ## v4.1 — 공유 랭킹·편의 개선 (2026-06-10 18:29, `f090133`)
 ### 추가
 - **사내 랭킹 보드 GitHub Pages 지원**: Firebase Realtime Database REST 연동
