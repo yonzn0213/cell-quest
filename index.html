@@ -366,7 +366,8 @@ function monType(m){ return SPECIES[m.sid].type; }
 function knownMoves(m){
   return SPECIES[m.sid].moves.filter(mv=>mv[0]<=m.lv).slice(-4);
 }
-function expNeed(lv){ return lv*22; }
+/* 비선형 성장 곡선: 초반은 기존과 비슷, 중후반은 확연히 느리게 (v2.0 밸런싱) */
+function expNeed(lv){ return Math.round(lv*16 + lv*lv*1.5); }
 
 /* ════════════════ 게임 상태 ════════════════ */
 let G = null;
@@ -377,9 +378,10 @@ function newGame(){
     items:{ clip:5, goldclip:0, bacchus:3, hotsix:0, coffee:0 },
     money:200, wins:0, story:0,
     dex:{}, rarDex:{}, dexRewards:[],
-    battle:null, log:[], floor:0,
+    battle:null, log:[], floor:0, coolerCd:0,
   };
 }
+const COOLER_RECHARGE_WINS = 3;
 newGame();
 
 const ITEM_DEF = {
@@ -690,11 +692,17 @@ function scrHub(){
   }
   choices.push(
     ['다른 층으로 이동', ()=>{ G.screen='moveFloor'; render(); }],
-    ['정수기에서 회복 (무료, 전원 완전 회복)', ()=>{
-      G.party.forEach(m=>m.hp=m.maxhp);
-      pendingMsg.push('시원한 물과 함께 파티가 모두 회복되었다!');
-      render();
-    }],
+    G.coolerCd>0
+      ? [`정수기 — 생수통 교체 중 (전투 ${G.coolerCd}승 후 재사용)`, ()=>{
+          pendingMsg.push('생수통이 비어 있다. 전투에서 이기다 보면 새 생수통이 도착한다.');
+          render();
+        }]
+      : ['정수기에서 회복 (무료, 전원 완전 회복)', ()=>{
+          G.party.forEach(m=>m.hp=m.maxhp);
+          G.coolerCd = COOLER_RECHARGE_WINS;
+          pendingMsg.push(`시원한 물과 함께 파티가 모두 회복되었다! (생수통 교체 중 — ${COOLER_RECHARGE_WINS}승 후 재사용 가능)`);
+          render();
+        }],
     ['매점 (복지포인트 사용)', ()=>{ G.screen='shop'; render(); }],
     ['가방', ()=>{ G.screen='bag'; render(); }],
     ['파티 관리', ()=>{ G.screen='party'; render(); }],
@@ -975,12 +983,22 @@ function fxTag(mult, crit){
   return s;
 }
 
+/* 적 AI: 상성·위력 기대값이 높은 기술 선택. 보스는 항상, 야생은 35% 확률로 똑똑하게 */
+function pickEnemyMove(e, target, smart){
+  const mvs = knownMoves(e);
+  if(!smart) return mvs[Math.floor(Math.random()*mvs.length)];
+  let best = mvs[0], bestScore = -1;
+  for(const mv of mvs){
+    const score = mv[2] * (mv[3] ? typeMult(mv[3], monType(target)) : 1);
+    if(score > bestScore){ bestScore = score; best = mv; }
+  }
+  return best;
+}
 function enemyTurn(){
   const b=G.battle; if(b.over) return;
   const e=b.enemy, me=activeMon();
   if(e.hp<=0) return;
-  const mvs = knownMoves(e);
-  const mv = mvs[Math.floor(Math.random()*mvs.length)];
+  const mv = pickEnemyMove(e, me, !b.wild || Math.random()<0.35);
   const {val,mult,crit} = dmgCalc(e, mv[2], mv[3], me);
   me.hp = Math.max(0, me.hp - val);
   pushLog(`${monName(e)}의 ${mv[1]}! ${val} 데미지${fxTag(mult,crit)}`);
@@ -1029,8 +1047,14 @@ function grantExpAndMoney(e, moneyMult){
   }
 }
 
+function countCoolerWin(){
+  if(G.coolerCd>0){
+    G.coolerCd--;
+    if(G.coolerCd===0) pushLog('🚰 새 생수통이 도착했다! 정수기를 다시 쓸 수 있다.');
+  }
+}
 function winWild(){
-  const b=G.battle; b.over=true; G.wins++;
+  const b=G.battle; b.over=true; G.wins++; countCoolerWin();
   pushLog(`${monName(b.enemy)}을(를) 쓰러뜨렸다!`);
   grantExpAndMoney(b.enemy, 1);
   if(Math.random()<0.4){
@@ -1049,7 +1073,7 @@ function onTrainerMonDown(){
     b.enemy = b.enemyParty[b.eIdx];
     pushLog(`${B.name}이(가) ${monName(b.enemy)}을(를) 내보냈다!`);
   } else {
-    b.over=true; G.wins++;
+    b.over=true; G.wins++; countCoolerWin();
     G.money += B.reward;
     pushLog(`★ ${B.name}에게 승리! 보상 ${B.reward}P!`);
     if(!canAutoSave) pushLog('💾 큰 진행을 했다! [백업 코드]를 발급해 보관해 두자.');
@@ -1188,11 +1212,11 @@ function scrBattle(){
 }
 
 function scrGameover(){
-  G.money = Math.max(0, G.money - Math.floor(G.money*0.1));
+  G.money = Math.max(0, G.money - Math.floor(G.money*0.2));
   paint([
     ['― 의식이 흐려진다… ―','bold'],'',
     '정신을 차려 보니 탕비실 소파였다.',
-    '누군가 이온음료를 머리맡에 두고 갔다. (복지포인트 10% 분실)',
+    '누군가 이온음료를 머리맡에 두고 갔다. (복지포인트 20% 분실)',
     '파티가 모두 회복되었다. 다시 가 보자.',
   ],[
     ['일어난다', ()=>{ G.party.forEach(m=>m.hp=m.maxhp); G.screen='hub'; render(); }],
@@ -1249,6 +1273,7 @@ function migrateSave(obj){
     obj.v = 3;
   }
   if(!obj.rarDex) obj.rarDex = {};
+  if(!obj.coolerCd) obj.coolerCd = 0;
   return obj;
 }
 function decodeSave(code){
