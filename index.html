@@ -263,11 +263,70 @@ const SPECIES = {
     moves:[[1,'깜짝 물기',48,null],[1,'스파크 방전',60,'전자'],[18,'합선 폭발',78,'전자'],[26,'천만 볼트 위장',96,'전자']] },
   overcat:{ name:'야근냥', type:'야근', hp:88, atk:20, fusion:true,
     moves:[[1,'츄르 어택',48,null],[1,'새벽 울음',60,'야근'],[18,'키보드 점거',78,'야근'],[26,'마감 직전의 발톱',96,'야근']] },
+  /* ── 이세계 (2부) — 2단 진화 / 돌연변이(mut) / 합성 전용종 ── */
+  manaslime:{ name:'마나슬라임', type:'카페인', hp:50, atk:14, evo:{lv:28,to:'kingslime'},
+    moves:[[1,'마나 점액',50,null],[1,'마나 에스프레소 샷',62,'카페인'],[24,'각성의 물결',78,'카페인'],[27,'대마나 분출',92,'카페인']] },
+  kingslime:{ name:'킹슬라임', type:'카페인', hp:72, atk:18, evo:{lv:34,to:'slimemperor',mut:{p:0.12,to:'chaosslime'}},
+    moves:[[1,'킹 프레스',56,null],[1,'로열 마나 샷',70,'카페인'],[30,'왕의 카페인 파동',88,'카페인'],[33,'그란데 로열 블렌드',104,'카페인']] },
+  slimemperor:{ name:'슬라임황제', type:'카페인', hp:100, atk:21,
+    moves:[[1,'황제의 점프 프레스',60,null],[1,'임페리얼 블렌드',74,'카페인'],[36,'천년 숙성 원두 파동',94,'카페인'],[40,'슬라임 제국의 위엄',110,'카페인']] },
+  chaosslime:{ name:'카오스슬라임', type:'야근', hp:90, atk:24,
+    moves:[[1,'혼돈의 점액',60,null],[1,'새벽 3시의 속삭임',74,'야근'],[36,'무정형 폭주',94,'야근'],[40,'카오스 디비전',112,'야근']] },
+  fairybarista:{ name:'요정바리스타', type:'카페인', hp:52, atk:16, evo:{lv:31,to:'seraphista'},
+    moves:[[1,'요정 가루',50,null],[1,'플랫화이트 빔',64,'카페인'],[26,'라떼아트 환영진',82,'카페인'],[30,'성스러운 디카페인',96,'카페인']] },
+  seraphista:{ name:'세라피스타', type:'카페인', hp:80, atk:20,
+    moves:[[1,'성스러운 스팀',56,null],[1,'세라핌 라떼아트',70,'카페인'],[33,'천상의 모닝브루',88,'카페인'],[37,'최후의 디카페인 심판',104,'카페인']] },
+  dryadlatte:{ name:'드라이어드라떼', type:'카페인', hp:76, atk:18,
+    moves:[[1,'가지 후리기',52,null],[1,'수액 라떼 분사',66,'카페인'],[34,'숲의 카페인 축복',84,'카페인'],[38,'개화 폭발',98,'카페인']] },
+  contractimp:{ name:'계약임프', type:'서류', hp:54, atk:15, evo:{lv:30,to:'devilbroker'},
+    moves:[[1,'꼬리 후리기',50,null],[1,'독소 조항',64,'서류'],[25,'위약금 폭탄',80,'서류'],[29,'영혼 계약서',94,'서류']] },
+  devilbroker:{ name:'데빌브로커', type:'서류', hp:76, atk:19, evo:{lv:36,to:'dukebroker',mut:{p:0.12,to:'angelbroker'}},
+    moves:[[1,'지옥의 흥정',56,null],[1,'이면 계약',70,'서류'],[32,'복리 이자 폭풍',90,'서류'],[35,'영혼 압류 집행',106,'서류']] },
+  dukebroker:{ name:'계약대공', type:'서류', hp:100, atk:22,
+    moves:[[1,'대공의 인장',60,null],[1,'차원 계약서',74,'서류'],[38,'영혼 채권 발행',94,'서류'],[42,'파산 선고',112,'서류']] },
+  angelbroker:{ name:'천사브로커', type:'카페인', hp:92, atk:21,
+    moves:[[1,'회개의 빛',58,null],[1,'천사의 재계약',72,'카페인'],[38,'구원의 환급',92,'카페인'],[42,'성스러운 정산',108,'카페인']] },
+  mimicdesk:{ name:'미믹책상', type:'서류', hp:80, atk:15,
+    moves:[[1,'서랍 물기',52,null],[1,'위장 결재함',66,'서류'],[27,'책상 뒤집기',84,'서류'],[32,'무한 서류 폭식',98,'서류']] },
+  wyvernfax:{ name:'와이번팩스', type:'서류', hp:84, atk:19,
+    moves:[[1,'급강하 발톱',54,null],[1,'팩스 폭격',68,'서류'],[34,'음속 송신',86,'서류'],[38,'서류 폭풍 강하',100,'서류']] },
+  lichcfo:{ name:'리치경리부장', type:'서류', hp:102, atk:20,
+    moves:[[1,'서늘한 손길',58,null],[1,'불사의 결재',72,'서류'],[38,'언데드 감사',92,'서류'],[42,'영구 동결 자산',108,'서류']] },
+  golemknight:{ name:'골렘기사', type:'전자', hp:82, atk:16, evo:{lv:33,to:'fortressgolem',mut:{p:0.12,to:'gildedgolem'}},
+    moves:[[1,'강철 주먹',52,null],[1,'마도 회로 충격',66,'전자'],[28,'성벽 돌진',84,'전자'],[32,'고대 코어 방출',100,'전자']] },
+  fortressgolem:{ name:'요새골렘', type:'전자', hp:122, atk:19,
+    moves:[[1,'성채 강타',58,null],[1,'수호 회로 방출',72,'전자'],[35,'공성 모드 전환',90,'전자'],[39,'난공불락 압쇄',106,'전자']] },
+  gildedgolem:{ name:'황금골렘', type:'전자', hp:105, atk:23,
+    moves:[[1,'황금 주먹',60,null],[1,'금화 산탄',74,'전자'],[35,'도금 회로 과부하',94,'전자'],[39,'황금기의 일격',110,'전자']] },
+  elfintern:{ name:'엘프인턴', type:'전자', hp:56, atk:17, evo:{lv:30,to:'elfmage'},
+    moves:[[1,'재빠른 타이핑',50,null],[1,'정령 단축키',64,'전자'],[26,'엘프식 매크로',82,'전자'],[29,'세계수 와이파이 폭풍',96,'전자']] },
+  elfmage:{ name:'엘프마도사', type:'전자', hp:76, atk:20, evo:{lv:36,to:'worldsage',mut:{p:0.12,to:'darkelf'}},
+    moves:[[1,'마력 타이핑',54,null],[1,'정령 회로 소환',68,'전자'],[32,'고대 룬 컴파일',86,'전자'],[35,'세계수 데이터링크',100,'전자']] },
+  worldsage:{ name:'세계수현자', type:'전자', hp:94, atk:23,
+    moves:[[1,'현자의 일침',60,null],[1,'세계수 신탁',74,'전자'],[38,'천년 지혜 방출',94,'전자'],[42,'세계수 최종 백업',110,'전자']] },
+  darkelf:{ name:'다크엘프', type:'야근', hp:86, atk:25,
+    moves:[[1,'그림자 화살',60,null],[1,'영혼 잠식',74,'야근'],[38,'심야의 저격',96,'야근'],[42,'어둠의 마감 집행',112,'야근']] },
+  spiritlamp:{ name:'정령램프', type:'전자', hp:70, atk:19,
+    moves:[[1,'램프 섬광',52,null],[1,'정령 방전',66,'전자'],[36,'소원의 역류',84,'전자'],[40,'천일야화 폭발',100,'전자']] },
+  orcforeman:{ name:'오크십장', type:'야근', hp:85, atk:19, evo:{lv:35,to:'orcwarlord'},
+    moves:[[1,'곤봉 내리치기',54,null],[1,'함성 갈굼',68,'야근'],[30,'철야 채찍질',86,'야근'],[34,'대족장의 마감 명령',102,'야근']] },
+  orcwarlord:{ name:'오크대족장', type:'야근', hp:112, atk:22,
+    moves:[[1,'대족장의 도끼',60,null],[1,'전쟁 함성',74,'야근'],[37,'부족 총동원령',94,'야근'],[41,'대지를 가르는 야근',110,'야근']] },
+  minotaurclerk:{ name:'미노타우로스총무', type:'야근', hp:92, atk:18,
+    moves:[[1,'뿔 들이받기',56,null],[1,'미궁의 발걸음',70,'야근'],[34,'장부 박치기',88,'야근'],[37,'미노스의 분노',102,'야근']] },
+  archgolem:{ name:'아크골렘', type:'전자', hp:112, atk:24, fusion:true,
+    moves:[[1,'고대 철권',56,null],[1,'룬 회로 폭격',70,'전자'],[30,'마나 코어 과부하',90,'전자'],[36,'천년 병기 기동',108,'전자']] },
+  halforc:{ name:'하프오크용병', type:'야근', hp:102, atk:23, fusion:true,
+    moves:[[1,'용병의 일격',58,null],[1,'혼혈의 분노',72,'야근'],[36,'전장의 본능',92,'야근'],[40,'두 종족의 함성',108,'야근']] },
+  paperdragon:{ name:'종이용', type:'서류', hp:110, atk:24, fusion:true,
+    moves:[[1,'종이 발톱',58,null],[1,'천 장의 날개',74,'서류'],[36,'기밀문서 브레스',94,'서류'],[40,'서고의 종언',112,'서류']] },
   /* ── 전설 ── */
   dragon:{ name:'부장드래곤', type:'야근', hp:110, atk:17, legend:true,
     moves:[[1,'호통',52,null],[1,'결재 반려 폭풍',64,'서류'],[15,'주말 출근 브레스',80,'야근'],[20,'정신력 운운',96,'야근']] },
   phoenix:{ name:'회장봉황', type:'야근', hp:130, atk:19, legend:true,
     moves:[[1,'경영 철학 설파',56,null],[1,'창업 정신 화염',70,'야근'],[20,'구조조정 날개',88,'야근'],[24,'레거시의 불꽃',100,'야근']] },
+  burnoutlord:{ name:'마왕 번아웃', type:'야근', hp:160, atk:24, legend:true,
+    moves:[[1,'마왕의 위압',62,null],[1,'영혼 갈아넣기',76,'야근'],[40,'심야의 업무 지옥불',96,'야근'],[44,'번아웃 노바',114,'야근']] },
 };
 const ALL_SIDS = Object.keys(SPECIES);
 
@@ -296,6 +355,26 @@ const FLOORS = [
       { name:'야근차원 입구', lv:[16,19], pool:['nightghost','deadlinegolem'], flavor:'시계가 전부 밤 11시에 멈춰 있다. 형광등이 윙윙거린다.' },
       { name:'야근차원 심층부', lv:[19,23], pool:['mondaybeast','nightghost','deadlinegolem'], flavor:'달력이 전부 월요일이다. 이곳의 몬스터는 강하다.' },
     ], boss:5 },
+  /* ── 이세계 (2부, G.isekai 전용) ── */
+  { name:'이세계 — 시작의 초원', areas:[
+      { name:'마나 초원', lv:[24,27], pool:['manaslime','fairybarista'], flavor:'풀잎마다 마나가 맺혀 있다. 커피 향이 나는 슬라임이 굴러다닌다.' },
+      { name:'계약의 숲', lv:[26,29], pool:['contractimp','mimicdesk'], flavor:'나무에 양피지 계약서가 주렁주렁 열려 있다. 함부로 서명하지 말 것.' },
+    ], boss:6 },
+  { name:'이세계 — 마도왕국', areas:[
+      { name:'마도공방 거리', lv:[28,32], pool:['golemknight','elfintern'], flavor:'골렘들이 분주히 일한다. 어딘가 사무실 풍경과 닮아 있다…' },
+      { name:'왕립 대도서관', lv:[30,33], pool:['wyvernfax','spiritlamp','contractimp'], flavor:'책장 사이로 팩스 날개가 퍼덕인다. 사서가 "정숙"이라고 외친다.' },
+    ], boss:7 },
+  { name:'이세계 — 황혼 미궁', areas:[
+      { name:'미궁 입구', lv:[32,35], pool:['minotaurclerk','dryadlatte'], flavor:'벽이 스스로 움직이는 미궁. 어디선가 장부 넘기는 소리가 난다.' },
+      { name:'와이번 둥지 절벽', lv:[34,37], pool:['wyvernfax','golemknight','dryadlatte'], flavor:'절벽 위 둥지마다 미발송 팩스가 쌓여 있다. 바람이 거세다.' },
+    ], boss:8 },
+  { name:'이세계 — 마왕성 가도', areas:[
+      { name:'망자의 평원', lv:[36,39], pool:['lichcfo','spiritlamp'], flavor:'결재받지 못한 영혼들이 떠도는 평원. 차가운 정산의 기운이 감돈다.' },
+      { name:'마왕군 야영지', lv:[38,41], pool:['orcforeman','lichcfo','minotaurclerk'], flavor:'모닥불 너머로 마왕성이 보인다. 오크들이 야간 작업을 하고 있다.' },
+    ], boss:9 },
+  { name:'이세계 — 마왕성', areas:[
+      { name:'마왕성 회랑', lv:[40,44], pool:['dukebroker','fortressgolem','orcwarlord'], flavor:'검은 첨탑 안. 공기가 무겁다. 전생의 야근차원과 똑같은 기운이다.' },
+    ], boss:10 },
 ];
 
 const BOSSES = [
@@ -317,6 +396,22 @@ const BOSSES = [
   { name:'회장봉황', pre:'야근차원 가장 깊은 곳. 황금빛 날개가 펼쳐진다. "젊은 친구, 회사가 뭐라고 생각하나."',
     party:[['deadlinegolem',22],['mondaybeast',22],['phoenix',24]], reward:9999,
     win:'회장봉황이 고개를 끄덕였다. "…자네 같은 사원이 있어 회사가 돌아가는 거였군. 졌네."' },
+  /* ── 이세계 보스 (2부) ── */
+  { name:'관문기사 가더론', pre:'"이방인이여, 초원 너머로 가려면 힘을 증명하라!" 거대한 골렘 기사가 길을 막는다.',
+    party:[['golemknight',27],['mimicdesk',26]], reward:5000,
+    win:'"…훌륭하다. 마왕성 가도를 열겠다. 허나 그 길의 마법사는 나와 격이 다르다."' },
+  { name:'대마법사 펜타그램', pre:'"호오, 다른 세계의 영혼이군. 네 안의 \'야근의 기운\'… 연구 재료로 딱이야!"',
+    party:[['devilbroker',31],['fairybarista',30],['kingslime',32]], reward:8000,
+    win:'"내 오망성진이 깨지다니…! 인정하지. 황혼 미궁으로 가는 길을 열어 주겠네."' },
+  { name:'미궁지기 미노스', pre:'미궁 가장 깊은 방. 거대한 그림자가 장부를 덮는다. "침입자… 퇴실 기록이 없군. 여기서 영원히 잔업이다."',
+    party:[['minotaurclerk',35],['fortressgolem',34]], reward:12000,
+    win:'"퇴실… 승인. 미궁 너머는 마왕성 가도다. 망자들의 평원을 조심해라."' },
+  { name:'마왕군 총사령 발키리아', pre:'"마왕님의 영지에 온 것을 환영한다, 이방인. 허나 여기서부터는 내 전장이다!" 창끝이 빛난다.',
+    party:[['orcwarlord',39],['dukebroker',38],['seraphista',38]], reward:18000,
+    win:'"…완패다. 마왕성의 문을 열겠다. 부디… 마왕님을 그 고통에서 해방해 다오."' },
+  { name:'마왕 번아웃', pre:'옥좌의 어둠이 일어선다. "잘 왔다, 과로사한 영혼이여. 나는 모든 세계의 야근이 모여 태어난 존재… 너의 마지막 상사다."',
+    party:[['darkelf',41],['dukebroker',42],['burnoutlord',44]], reward:50000,
+    win:'마왕이 무너지며 속삭였다. "…쉬어라. 두 세계 모두… 이제 정시에 잠들 것이다."' },
 ];
 
 const STORY = [
@@ -327,7 +422,18 @@ const STORY = [
   ['최종장 — 야근의 근원','엘리베이터가 꼭대기층으로 향한다. 모든 야근의 근원, 부장드래곤이 기다린다.','파티를 정비하고 도전하자.'],
   ['에필로그 — 야근차원','부장드래곤이 정화되자 사무실 한구석에 균열이 열렸다. 그 안은… 야근차원.','강력한 몬스터들과 전설의 존재가 잠들어 있다. (부장드래곤도 야생에서 드물게 출현!)'],
   ['진엔딩 달성!','회장봉황까지 인정한 전설의 사원. 이제 남은 것은 도감 완성과 황금 몬스터 수집뿐.','당신의 정시퇴근을 응원합니다.'],
+  /* ── 2부 (isekai 진입 후: storyIdx()가 story+1로 매핑) ── */
+  ['제2부 1장 — 낯선 초원','눈을 뜨니 푸른 초원. 과로로 쓰러진 당신은 이세계에 전생했다.','놀랍게도 몬스터들과 집게클립은 이 세계에서도 통한다. 초원과 숲을 조사하자.'],
+  ['제2부 2장 — 마도왕국','관문기사를 꺾고 왕국의 문이 열렸다. 이 세계에도 "야근의 기운"이 흐르고 있다.','마도공방과 대도서관을 조사하자. 이 세계의 몬스터는 2단 진화한다고 한다.'],
+  ['제2부 3장 — 황혼 미궁','대마법사가 길을 열어 주었다. 미궁의 주인은 퇴실 기록에 집착하는 괴물.','진화 시 아주 드물게 돌연변이 개체가 태어난다는 소문도 들려온다.'],
+  ['제2부 4장 — 마왕성 가도','미궁을 돌파했다. 마왕성으로 향하는 가도에는 마왕군 총사령이 버티고 있다.','망자의 평원을 지나 야영지를 돌파하자. 합성 실험실의 신종 레시피도 늘었다.'],
+  ['제2부 최종장 — 마왕성','총사령마저 길을 비켰다. 모든 세계의 야근이 모인 존재, 마왕 번아웃.','이번 상대는 차원이 다르다. 도핑과 합성 없이는 어려울 것이다.'],
+  ['제2부 엔딩 — 두 세계의 평온','마왕 번아웃이 토벌되었다. 사무실에도, 이세계에도 평온이 찾아왔다.','남은 목표: 도감 완성. 마왕성 회랑에는 마왕 번아웃이 야생 개체로 드물게 출현한다.'],
 ];
+/* 2부 진입 후에는 STORY 7~10(2부 챕터)을 story+1로 가리킨다 */
+function storyIdx(){
+  return G.isekai ? Math.min(G.story+1, STORY.length-1) : Math.min(G.story, 6);
+}
 
 /* ════════════════ 몬스터 생성/성장 ════════════════ */
 /* 개체 희귀도 (종족 legend 플래그와 별개) */
@@ -385,7 +491,7 @@ function newGame(){
     v:3, screen:'title', name:'',
     party:[], box:[], active:0,
     items:{ clip:5, goldclip:0, bacchus:3, hotsix:0, coffee:0, ample:0 },
-    money:200, wins:0, story:0,
+    money:200, wins:0, story:0, isekai:false,
     dex:{}, rarDex:{}, dexRewards:[],
     battle:null, log:[], floor:0, coolerCd:0,
   };
@@ -507,7 +613,7 @@ async function updateBoard(force){
   try{
     await window.storage.set('lb:'+G.name, JSON.stringify({
       name:G.name, wins:G.wins, dex:dexCaughtCount(),
-      gold:Object.keys(G.rarDex||{}).length, story:G.story, ts:Date.now()
+      gold:Object.keys(G.rarDex||{}).length, story:G.isekai?G.story+1:G.story, ts:Date.now()
     }), true);
   }catch(e){}
 }
@@ -529,7 +635,7 @@ async function loadRank(){
   }catch(e){ rankCache = []; }
   if(G.screen==='rank' && !bossMode) paintRank();
 }
-const PROG_LABEL = ['1장','2장','3장','4장','최종장','엔딩','진엔딩 ★'];
+const PROG_LABEL = ['1장','2장','3장','4장','최종장','엔딩','진엔딩 ★','이세계 1장','이세계 2장','이세계 3장','이세계 4장','이세계 최종장','이세계 클리어 ★★'];
 function paintRank(){
   clearGrid();
   setCell(2,1,'― 사내 랭킹 보드 ―  (함께 플레이하는 전원에게 공개)','bold');
@@ -539,7 +645,7 @@ function paintRank(){
     const r = 5+i;
     setCell(r,1,String(i+1),'num');
     setCell(r,2,p.name, p.name===G.name?'bold':'');
-    setCell(r,3,PROG_LABEL[Math.min(p.story||0,6)]);
+    setCell(r,3,PROG_LABEL[Math.min(p.story||0,PROG_LABEL.length-1)]);
     setCell(r,4,`${p.dex||0}/${ALL_SIDS.length}`,'num');
     setCell(r,5,String(p.gold||0),'num');
     setCell(r,6,String(p.wins||0),'num');
@@ -604,7 +710,7 @@ function render(){
   const map = { title:scrTitle, starter:scrStarter, hub:scrHub, explore:scrExplore,
     battle:scrBattle, bag:scrBag, party:scrParty, box:scrBox, dex:scrDex, shop:scrShop,
     moveFloor:scrMoveFloor, storyBeat:scrStoryBeat, gameover:scrGameover, ending:scrEnding,
-    rank:scrRank, dope:scrDope, fusion:scrFusion };
+    rank:scrRank, dope:scrDope, fusion:scrFusion, isekai:scrIsekai };
   (map[G.screen]||scrHub)();
 }
 
@@ -635,7 +741,7 @@ function scrTitle(){
   if(cloudSaveData){
     const d = cloudSaveData;
     const dexN = Object.values(d.dex||{}).filter(v=>v===2).length;
-    choices.push([`이어하기 — ${d.name||'사원'} (${PROG_LABEL[Math.min(d.story||0,6)]} · 도감 ${dexN} · 승수 ${d.wins||0})`, ()=>{
+    choices.push([`이어하기 — ${d.name||'사원'} (${PROG_LABEL[Math.min((d.story||0)+(d.isekai?1:0),PROG_LABEL.length-1)]} · 도감 ${dexN} · 승수 ${d.wins||0})`, ()=>{
       G = d;
       if(!G.name) G.name = '사원'+Math.floor(Math.random()*900+100);
       if(G.screen==='battle'||G.screen==='storyBeat'||G.screen==='rank') G.screen='hub';
@@ -695,11 +801,36 @@ function scrStarter(){
 /* ── 스토리 비트 ── */
 let storyBeatNext = 'hub';
 function scrStoryBeat(){
-  const ch = STORY[Math.min(G.story, STORY.length-1)];
+  const ch = STORY[storyIdx()];
   const lines = [[ch[0],'bold'],'', ...ch.slice(1)];
   pendingMsg.forEach(m=>lines.push('',[m,'hl']));
   pendingMsg = [];
   paint(lines,[['계속한다', ()=>{ G.screen=storyBeatNext; render(); }]]);
+}
+
+/* ── 2부 진입 (과로사 전생) ── */
+function scrIsekai(){
+  paint([
+    ['― 제2부: 과로사 전생 ―','bold'],'',
+    '진엔딩을 본 다음 날에도, 당신은 평소처럼 출근했다.',
+    '몬스터와 함께한 모험도, 회장봉황의 인정도… 일은 일이었다.','',
+    '어느 늦은 밤, 모니터 앞. 가슴이 조여 온다.',
+    '시야가 하얗게 물든다. …아, 이게 말로만 듣던…','',
+    ['― 눈을 뜨자, 낯선 하늘. 푸른 초원. ―','hl'],
+    '품 안에는 익숙한 집게클립과… 몬스터들이 그대로 있다!','',
+    ['※ 이세계의 몬스터는 강하다. 도핑·합성 없이는 살아남기 어렵다.','dim'],
+    ['※ 이 세계의 몬스터는 2단 진화하며, 진화 시 드물게 돌연변이 개체가 태어난다.','dim'],
+    ['※ 사무실에는 [차원 이동] 메뉴로 언제든 돌아갈 수 있다.','dim'],
+  ],[
+    ['새로운 삶을 시작한다 (이세계 진입)', ()=>{
+      G.isekai = true; G.floor = 6;
+      G.party.forEach(m=>m.hp=m.maxhp);
+      storyBeatNext = 'hub';
+      G.screen = 'storyBeat';
+      render();
+    }],
+    ['아직 마음의 준비가… (돌아간다)', ()=>{ G.screen='hub'; render(); }],
+  ],'=REBIRTH(나, "이세계")');
 }
 
 /* ── 허브 ── */
@@ -707,10 +838,11 @@ function scrHub(){
   setStatus('준비');
   cloudSave(); updateBoard();
   if(G.floor > G.story && G.floor < 5) G.floor = Math.min(G.floor, G.story);
+  if(G.floor >= 6 && (!G.isekai || G.floor > G.story)) G.floor = G.isekai ? Math.min(G.floor, G.story) : 0;
   const fl = FLOORS[G.floor];
-  const ch = STORY[Math.min(G.story, STORY.length-1)];
+  const ch = STORY[storyIdx()];
   const lines = [
-    [`― ${fl.name} · 내 자리 ―`,'bold'],
+    [`― ${fl.name} · ${G.floor>=6?'모험 거점':'내 자리'} ―`,'bold'],
     [ch[0],'dim'],
     '',
   ];
@@ -727,17 +859,24 @@ function scrHub(){
   if(G.story>=6 && G.floor===5){
     choices.push(['★ 회장봉황과 재대결 (포획 불가)', ()=>startBossBattle(5)]);
   }
+  if(G.story>=6 && !G.isekai){
+    choices.push(['★★ …요즘 가슴이 답답하다. (제2부 시작)', ()=>{ G.screen='isekai'; render(); }]);
+  }
   choices.push(
     ['다른 층으로 이동', ()=>{ G.screen='moveFloor'; render(); }],
     G.coolerCd>0
-      ? [`정수기 — 생수통 교체 중 (전투 ${G.coolerCd}승 후 재사용)`, ()=>{
-          pendingMsg.push('생수통이 비어 있다. 전투에서 이기다 보면 새 생수통이 도착한다.');
+      ? [G.floor>=6
+          ? `마나샘 — 마나가 고이는 중 (전투 ${G.coolerCd}승 후 재사용)`
+          : `정수기 — 생수통 교체 중 (전투 ${G.coolerCd}승 후 재사용)`, ()=>{
+          pendingMsg.push(G.floor>=6
+            ? '마나샘이 말라 있다. 전투에서 이기다 보면 마나가 다시 고인다.'
+            : '생수통이 비어 있다. 전투에서 이기다 보면 새 생수통이 도착한다.');
           render();
         }]
-      : ['정수기에서 회복 (무료, 전원 완전 회복)', ()=>{
+      : [G.floor>=6 ? '마나샘에서 회복 (무료, 전원 완전 회복)' : '정수기에서 회복 (무료, 전원 완전 회복)', ()=>{
           G.party.forEach(m=>m.hp=m.maxhp);
           G.coolerCd = COOLER_RECHARGE_WINS;
-          pendingMsg.push(`시원한 물과 함께 파티가 모두 회복되었다! (생수통 교체 중 — ${COOLER_RECHARGE_WINS}승 후 재사용 가능)`);
+          pendingMsg.push(`${G.floor>=6?'맑은 마나':'시원한 물'}와 함께 파티가 모두 회복되었다! (${COOLER_RECHARGE_WINS}승 후 재사용 가능)`);
           render();
         }],
     ['매점 (복지포인트 사용)', ()=>{ G.screen='shop'; render(); }],
@@ -753,13 +892,20 @@ function scrHub(){
 
 function scrMoveFloor(){
   const unlocked = Math.min(G.story, 4);
-  const lines = [['― 엘리베이터 ―','bold'],'', '어느 층으로 갈까?',''];
+  const lines = [[G.isekai?'― 차원 이동 ―':'― 엘리베이터 ―','bold'],'', '어디로 갈까?',''];
   const choices = [];
   FLOORS.forEach((f,i)=>{
     if(i<=unlocked) choices.push([f.name + (i===G.floor?' (현재)':''), ()=>{ G.floor=i; G.screen='hub'; render(); }]);
     else if(i<5) choices.push([f.name+' — 잠김 (보스를 꺾어야 함)', ()=>{}]);
   });
   if(G.story>=5) choices.push(['?? 야근차원 — 사무실 구석의 균열', ()=>{ G.floor=5; G.screen='hub'; render(); }]);
+  if(G.isekai){
+    FLOORS.forEach((f,i)=>{
+      if(i<6) return;
+      if(i<=G.story) choices.push([f.name + (i===G.floor?' (현재)':''), ()=>{ G.floor=i; G.screen='hub'; render(); }]);
+      else choices.push([f.name+' — 잠김 (이세계 보스를 꺾어야 함)', ()=>{}]);
+    });
+  }
   choices.push(['돌아간다', ()=>{ G.screen='hub'; render(); }]);
   paint(lines, choices);
 }
@@ -931,6 +1077,10 @@ const FUSION_RECIPES = [
   { mats:['slimeking','shredgator'],  to:'dochydra' },
   { mats:['beambat','vending'],       to:'sparkmimic' },
   { mats:['americano','nightghost'],  to:'overcat' },
+  /* 이세계 레시피 (2부) */
+  { mats:['manaslime','golemknight'], to:'archgolem' },
+  { mats:['elfintern','orcforeman'],  to:'halforc' },
+  { mats:['wyvernfax','mimicdesk'],   to:'paperdragon' },
 ];
 function allMons(){ return [...G.party, ...G.box]; }
 function removeMon(m){
@@ -1018,10 +1168,11 @@ function scrDex(){
   clearGrid();
   setCell(2,1,`― 오피스 몬스터 도감 ―  등록 ${dexCaughtCount()} / ${ALL_SIDS.length}`,'bold');
   setCell(3,1,'─ 미확인 / 👁 목격 / ✔ 포획 / ★ 황금 / ◆ 프리즘 / 👑 레전드','dim');
-  const half = Math.ceil(ALL_SIDS.length/2);
+  /* 종 수 증가로 3열 배치 (2열은 32행 그리드를 넘친다) */
+  const perCol = Math.ceil(ALL_SIDS.length/3);
   ALL_SIDS.forEach((sid,i)=>{
-    const col = i<half ? 1 : 4;
-    const r = 5 + (i%half);
+    const col = 1 + Math.floor(i/perCol)*3;
+    const r = 5 + (i%perCol);
     const st = G.dex[sid]||0;
     const no = String(i+1).padStart(2,'0');
     let mark = '─', name='?????', cls='dim';
@@ -1047,14 +1198,16 @@ function startExplore(area){
   const roll = Math.random();
   if(roll < 0.74){
     let pool = area.pool.slice();
-    /* 야근차원: 전설 출현 */
+    /* 야근차원/마왕성: 전설 출현 */
     if(G.floor===5){
       if(G.story>=5 && Math.random()<0.05) pool=['dragon'];
       if(G.story>=6 && Math.random()<0.03) pool=['phoenix'];
     }
+    if(G.floor===10 && G.story>=11 && Math.random()<0.04) pool=['burnoutlord'];
     const sid = pool[Math.floor(Math.random()*pool.length)];
+    const LEGEND_WILD_LV = { dragon:18, phoenix:24, burnoutlord:40 };
     const lv = SPECIES[sid].legend
-      ? (sid==='dragon'?18:24)
+      ? (LEGEND_WILD_LV[sid]||24)
       : area.lv[0] + Math.floor(Math.random()*(area.lv[1]-area.lv[0]+1));
     const rar = SPECIES[sid].legend ? 'normal' : rollRarity();
     startWildBattle(makeMon(sid, lv, rar));
@@ -1155,7 +1308,7 @@ function enemyTurn(){
   const b=G.battle; if(b.over) return;
   const e=b.enemy, me=activeMon();
   if(e.hp<=0) return;
-  const mv = pickEnemyMove(e, me, !b.wild || Math.random()<0.35);
+  const mv = pickEnemyMove(e, me, !b.wild || Math.random() < (G.floor>=6 ? 0.7 : 0.35));
   const {val,mult,crit} = dmgCalc(e, mv[2], mv[3], me);
   me.hp = Math.max(0, me.hp - val);
   pushLog(`${monName(e)}의 ${mv[1]}! ${val} 데미지${fxTag(mult,crit)}`);
@@ -1193,12 +1346,15 @@ function grantExpAndMoney(e, moneyMult){
     const evo = SPECIES[me.sid].evo;
     if(evo && me.lv>=evo.lv){
       const oldName = monName(me);
-      me.sid = evo.to;
+      /* 돌연변이: 진화 순간 낮은 확률로 별개의 특별종이 된다 */
+      const mutated = evo.mut && Math.random()<evo.mut.p;
+      me.sid = mutated ? evo.mut.to : evo.to;
       const st2 = statsFor(me.sid, me.lv, me.rar);
       const ratio = me.hp/me.maxhp;
       me.maxhp = Math.round(st2.maxhp*dope); me.atk = Math.round(st2.atk*dope);
       me.hp = Math.max(1, Math.round(me.maxhp*ratio));
-      pushLog(`!! ${oldName}이(가) ${monName(me)}(으)로 진화했다 !!`);
+      if(mutated) pushLog(`!!! 돌연변이 진화 !!! ${oldName}이(가) 특별한 개체 ${monName(me)}(으)로 다시 태어났다!!`);
+      else pushLog(`!! ${oldName}이(가) ${monName(me)}(으)로 진화했다 !!`);
       dexCatch(me.sid, me.rar);
     }
     const after = knownMoves(me).map(m=>m[1]);
@@ -1238,8 +1394,7 @@ function onTrainerMonDown(){
     if(!canAutoSave) pushLog('💾 큰 진행을 했다! [백업 코드]를 발급해 보관해 두자.');
     if(b.bossIdx===G.story){
       G.story++;
-      if(G.story===5){ setTimeout(()=>{ G.screen='ending'; render(); },40); return; }
-      if(G.story===6){ setTimeout(()=>{ G.screen='ending'; render(); },40); return; }
+      if(G.story===5 || G.story===6 || G.story===11){ setTimeout(()=>{ G.screen='ending'; render(); },40); return; }
       b.afterStory = true;
     }
   }
@@ -1384,8 +1539,16 @@ function scrGameover(){
 
 function scrEnding(){
   cloudSave(true); updateBoard(true);
+  const isekaiClear = G.story>=11;
   const final = G.story>=6;
-  const lines = final ? [
+  const lines = isekaiClear ? [
+    ['★★★ 제2부 클리어 — 두 세계의 영웅 ★★★','bold'],'',
+    '마왕 번아웃이 토벌되었다. 이세계의 하늘에서 야근의 구름이 걷혔다.',
+    '왕국에는 "주 4일 모험제"가 선포되었고, 사무실 차원과의 균열은 평화의 문이 되었다.','',
+    [`최종 기록 — 승수 ${G.wins} / 도감 ${dexCaughtCount()}/${ALL_SIDS.length} / 희귀 ${Object.keys(G.rarDex).length}종`,'hl'],'',
+    '남은 목표: 도감 완성 — 돌연변이 진화종, 합성 신종, 그리고 마왕 번아웃 포획',
+    '(마왕 번아웃은 마왕성 회랑에서 야생 개체로 드물게 출현한다)',
+  ] : final ? [
     ['★★★ 진엔딩 — 전설의 사원 ★★★','bold'],'',
     '회장봉황마저 당신을 인정했다. 회사 역사상 최초의 일이다.',
     '게시판에 공지가 붙었다. "전 직원 주 4일제 시범 도입."','',
@@ -1434,6 +1597,7 @@ function migrateSave(obj){
   if(!obj.rarDex) obj.rarDex = {};
   if(!obj.coolerCd) obj.coolerCd = 0;
   if(obj.items && obj.items.ample===undefined) obj.items.ample = 0;
+  if(obj.isekai===undefined) obj.isekai = false;
   return obj;
 }
 function decodeSave(code){
