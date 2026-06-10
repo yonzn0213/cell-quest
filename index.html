@@ -320,6 +320,17 @@ const SPECIES = {
     moves:[[1,'용병의 일격',58,null],[1,'혼혈의 분노',72,'야근'],[36,'전장의 본능',92,'야근'],[40,'두 종족의 함성',108,'야근']] },
   paperdragon:{ name:'종이용', type:'서류', hp:110, atk:24, fusion:true,
     moves:[[1,'종이 발톱',58,null],[1,'천 장의 날개',74,'서류'],[36,'기밀문서 브레스',94,'서류'],[40,'서고의 종언',112,'서류']] },
+  /* ── 패치 보상 특별 캐릭터 (야생 미출현, 전원 지급) ── */
+  leejunseok:{ name:'무승복서 이준석', type:'카페인', hp:45, atk:9, legend:true,
+    moves:[[1,'잽잽',30,null],[1,'무승부 클린치',40,'카페인'],[12,'노 데미지 위빙',55,'카페인'],[18,'판정 끝까지 간다',70,'카페인']] },
+  parksangkyu:{ name:'박치기 박상규', type:'야근', hp:50, atk:8, legend:true,
+    moves:[[1,'들이받기',32,null],[1,'기습 박치기',42,'야근'],[12,'이마 단련',55,'야근'],[18,'풀파워 박치기',72,'야근']] },
+  wontaebo:{ name:'대머리 원태보', type:'야근', hp:35, atk:7, legend:true, fusion:true, evo:{lv:20,to:'wontaebo2'},
+    moves:[[1,'반사 광채',28,null],[1,'머리 쓸어넘기기(헛손질)',38,'야근'],[14,'두피 단련',52,'야근'],[19,'빛나는 정수리 빔',66,'야근']] },
+  wontaebo2:{ name:'가발 원태보', type:'야근', hp:60, atk:12, legend:true, evo:{lv:32,to:'wontaebo3'},
+    moves:[[1,'가발 휘두르기',44,null],[1,'스타일 변신',56,'야근'],[24,'가발 부메랑',74,'야근'],[28,'정체불명의 헤어',88,'야근']] },
+  wontaebo3:{ name:'모발이식 원태보', type:'야근', hp:125, atk:26, legend:true,
+    moves:[[1,'풍성함의 위엄',62,null],[1,'머릿결 채찍',76,'야근'],[34,'모근 각성',96,'야근'],[38,'풍성 폭발 헤어밤',114,'야근']] },
   /* ── 전설 ── */
   dragon:{ name:'부장드래곤', type:'야근', hp:110, atk:17, legend:true,
     moves:[[1,'호통',52,null],[1,'결재 반려 폭풍',64,'서류'],[15,'주말 출근 브레스',80,'야근'],[20,'정신력 운운',96,'야근']] },
@@ -491,7 +502,7 @@ function newGame(){
     v:3, screen:'title', name:'',
     party:[], box:[], active:0,
     items:{ clip:5, goldclip:0, bacchus:3, hotsix:0, coffee:0, ample:0 },
-    money:200, wins:0, story:0, isekai:false,
+    money:200, wins:0, story:0, isekai:false, gifts:{},
     dex:{}, rarDex:{}, dexRewards:[],
     battle:null, log:[], floor:0, coolerCd:0,
   };
@@ -837,6 +848,15 @@ function scrIsekai(){
 function scrHub(){
   setStatus('준비');
   cloudSave(); updateBoard();
+  if(!G.gifts) G.gifts = {};
+  if(!G.gifts.patch1){
+    G.gifts.patch1 = true;
+    const gift1 = makeMon('leejunseok', 5, 'legend');
+    const gift2 = makeMon('parksangkyu', 5, 'legend');
+    addMon(gift1); addMon(gift2);
+    dexCatch('leejunseok','legend'); dexCatch('parksangkyu','legend');
+    pendingMsg.push('🎁 패치 기념 보상! 특별 캐릭터 [무승복서 이준석] · [박치기 박상규] 합류! (합성 실험실에서 둘을 합치면…?)');
+  }
   if(G.floor > G.story && G.floor < 5) G.floor = Math.min(G.floor, G.story);
   if(G.floor >= 6 && (!G.isekai || G.floor > G.story)) G.floor = G.isekai ? Math.min(G.floor, G.story) : 0;
   const fl = FLOORS[G.floor];
@@ -1081,6 +1101,8 @@ const FUSION_RECIPES = [
   { mats:['manaslime','golemknight'], to:'archgolem' },
   { mats:['elfintern','orcforeman'],  to:'halforc' },
   { mats:['wyvernfax','mimicdesk'],   to:'paperdragon' },
+  /* 패치 보상 캐릭터 합성 */
+  { mats:['leejunseok','parksangkyu'], to:'wontaebo' },
 ];
 function allMons(){ return [...G.party, ...G.box]; }
 function removeMon(m){
@@ -1598,6 +1620,7 @@ function migrateSave(obj){
   if(!obj.coolerCd) obj.coolerCd = 0;
   if(obj.items && obj.items.ample===undefined) obj.items.ample = 0;
   if(obj.isekai===undefined) obj.isekai = false;
+  if(!obj.gifts) obj.gifts = {};
   return obj;
 }
 function decodeSave(code){
