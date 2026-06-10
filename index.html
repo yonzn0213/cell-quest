@@ -600,15 +600,29 @@ function expNeed(lv){ return Math.round(lv*16 + lv*lv*1.5); }
 
 /* ════════════════ 게임 상태 ════════════════ */
 let G = null;
+/* ── 플레이 타임 추적: 저장 시점마다 경과분을 G.playMs에 누적 ── */
+let playSessionStart = Date.now();
+function flushPlayTime(){
+  const now = Date.now();
+  if(G && typeof G.playMs==='number') G.playMs += now - playSessionStart;
+  playSessionStart = now;
+}
+function totalPlayMs(){ return (G.playMs||0) + (Date.now()-playSessionStart); }
+function fmtPlayTime(ms){
+  const min = Math.floor(ms/60000);
+  return min<60 ? `${min}분` : `${Math.floor(min/60)}시간 ${min%60}분`;
+}
+
 function newGame(){
   G = {
-    v:3, screen:'title', name:'',
+    v:3, screen:'title', name:'', pid:makePid(),
     party:[], box:[], active:0,
     items:{ clip:5, goldclip:0, prismclip:0, dimclip:0, bacchus:3, hotsix:0, coffee:0, ample:0 },
     money:200, wins:0, story:0, isekai:false, gifts:{},
     dex:{}, rarDex:{}, dexRewards:[],
-    battle:null, log:[], floor:0, coolerCd:0,
+    battle:null, log:[], floor:0, coolerCd:0, playMs:0,
   };
+  playSessionStart = Date.now();
 }
 const COOLER_RECHARGE_WINS = 3;
 const COOLER_REFILL_COST = 300;
@@ -683,9 +697,25 @@ function checkDexRewards(){
 }
 let pendingMsg = [];
 
-/* ════════════════ 클라우드 저장 + 공유 랭킹 (아티팩트 배포 시) ════════════════ */
+/* ════════════════ 클라우드 저장 + 공유 랭킹 ════════════════ */
 const hasCloud = (typeof window!=='undefined') && !!window.storage;
+
+/* GitHub Pages 등 정적 배포용 공유 랭킹 — Firebase Realtime Database REST.
+   본인 프로젝트의 DB URL을 채우면 랭킹 보드가 활성화된다. 비워 두면 보드는 숨겨진다.
+   예: 'https://cell-quest-xxxxx-default-rtdb.asia-southeast1.firebasedatabase.app' */
+const FIREBASE_DB_URL = '';
+const hasBoard = hasCloud || !!FIREBASE_DB_URL;
+const BOARD_THROTTLE_MS = 8000;   /* 도배 방지: 보드 기록 최소 간격 */
+const RANK_MAX_ROWS = 20;
 let cloudSaveData = null, lastCloudSave = 0, lastBoardSave = 0;
+
+/* 닉네임 정리: 공백·따옴표·HTML 문자와 Firebase 키 금지 문자(. # $ [ ] /)를 제거하고 12자 제한 */
+function sanitizeName(raw){
+  return (raw||'').trim().replace(/[\s'"\/\\.#$\[\]<>&=?]/g,'').slice(0,12);
+}
+/* 같은 닉네임끼리 서로 기록을 덮어쓰지 않도록 저장 키에 붙이는 플레이어 식별자 */
+function makePid(){ return Math.random().toString(36).slice(2,8); }
+function boardKey(){ return G.name + '_' + (G.pid||'0'); }
 
 /* ── 로컬 캐시 자동 저장 (GitHub Pages 등 클라우드 없는 환경) ──
    브라우저 localStorage에 기록을 남긴다. 기기 간 이동은 여전히 백업 코드 사용. */
@@ -695,6 +725,7 @@ const canAutoSave = hasCloud || hasLocal;
 function localSave(){
   /* party가 비어 있으면 아직 시작 전(타이틀) — 기존 저장을 덮어쓰지 않는다 */
   if(!hasLocal || G.party.length===0) return;
+  flushPlayTime();
   try{ localStorage.setItem(LOCAL_KEY, JSON.stringify(G)); }catch(e){}
 }
 function localLoadCheck(){
@@ -709,6 +740,7 @@ function localLoadCheck(){
 /* 저장 데이터를 현재 게임으로 복원 (이어하기 / 부팅 자동 복원 공용) */
 function resumeSave(d){
   G = d;
+  playSessionStart = Date.now();
   if(!G.name) G.name = '사원'+Math.floor(Math.random()*900+100);
   if(['battle','storyBeat','rank','isekai','gameover','title','starter'].includes(G.screen)) G.screen='hub';
   G.battle = null;
@@ -721,6 +753,7 @@ async function cloudSave(force){
   const now = Date.now();
   if(!force && now-lastCloudSave<4000) return;
   lastCloudSave = now;
+  flushPlayTime();
   try{ await window.storage.set('savegame', JSON.stringify(G)); }catch(e){}
 }
 async function cloudLoadCheck(){
@@ -735,32 +768,44 @@ async function cloudLoadCheck(){
   if(G.screen==='title' && !bossMode) render();
 }
 async function updateBoard(force){
-  if(!hasCloud || !G.name || G.party.length===0) return;
+  if(!hasBoard || !G.name || G.party.length===0) return;
   const now = Date.now();
-  if(!force && now-lastBoardSave<8000) return;
+  if(!force && now-lastBoardSave<BOARD_THROTTLE_MS) return;
   lastBoardSave = now;
+  const entry = {
+    name:G.name, wins:G.wins, dex:dexCaughtCount(),
+    gold:Object.keys(G.rarDex||{}).length, story:G.isekai?G.story+1:G.story, ts:Date.now()
+  };
   try{
-    await window.storage.set('lb:'+G.name, JSON.stringify({
-      name:G.name, wins:G.wins, dex:dexCaughtCount(),
-      gold:Object.keys(G.rarDex||{}).length, story:G.isekai?G.story+1:G.story, ts:Date.now()
-    }), true);
+    if(hasCloud){
+      await window.storage.set('lb:'+G.name, JSON.stringify(entry), true);
+    } else {
+      await fetch(FIREBASE_DB_URL+'/lb/'+encodeURIComponent(boardKey())+'.json',
+        { method:'PUT', body:JSON.stringify(entry) });
+    }
   }catch(e){}
 }
 
 let rankCache = null;
 async function loadRank(){
-  if(!hasCloud){ rankCache=[]; if(G.screen==='rank') paintRank(); return; }
+  if(!hasBoard){ rankCache=[]; if(G.screen==='rank') paintRank(); return; }
   try{
-    const res = await window.storage.list('lb:', true);
-    const rows = [];
-    for(const k of (res && res.keys ? res.keys : []).slice(0,20)){
-      try{
-        const r = await window.storage.get(k, true);
-        if(r && r.value) rows.push(JSON.parse(r.value));
-      }catch(e){}
+    let rows = [];
+    if(hasCloud){
+      const res = await window.storage.list('lb:', true);
+      for(const k of (res && res.keys ? res.keys : []).slice(0,RANK_MAX_ROWS)){
+        try{
+          const r = await window.storage.get(k, true);
+          if(r && r.value) rows.push(JSON.parse(r.value));
+        }catch(e){}
+      }
+    } else {
+      const res = await fetch(FIREBASE_DB_URL+'/lb.json');
+      const data = await res.json();
+      rows = Object.values(data||{}).filter(p=>p && typeof p.name==='string');
     }
     rows.sort((a,b)=>(b.story-a.story)||(b.dex-a.dex)||(b.wins-a.wins));
-    rankCache = rows;
+    rankCache = rows.slice(0,RANK_MAX_ROWS);
   }catch(e){ rankCache = []; }
   if(G.screen==='rank' && !bossMode) paintRank();
 }
@@ -770,7 +815,7 @@ function paintRank(){
   setCell(2,1,'― 사내 랭킹 보드 ―  (함께 플레이하는 전원에게 공개)','bold');
   ['순위','이름','진행도','도감','황금','승수'].forEach((h,i)=>setCell(4,1+i,h,'hdr'));
   const rows = rankCache||[];
-  rows.slice(0,20).forEach((p,i)=>{
+  rows.slice(0,RANK_MAX_ROWS).forEach((p,i)=>{
     const r = 5+i;
     setCell(r,1,String(i+1),'num');
     setCell(r,2,p.name, p.name===G.name?'bold':'');
@@ -781,6 +826,7 @@ function paintRank(){
   });
   if(rows.length===0) setCell(5,1, rankCache===null?'불러오는 중…':'아직 기록이 없다. 첫 번째 전설의 사원이 되자!','dim');
   setCell(ROWS-1,1,'1. 돌아간다','choice',()=>{ G.screen = G.party.length?'hub':'title'; render(); });
+  if(G.party.length) setCell(ROWS-1,3,'2. 내 이름 변경','choice',openRenameDlg);
   if(G.party.length) paintPartyPanel();
   setFx('=RANK(나, 사내랭킹)');
 }
@@ -788,6 +834,29 @@ function scrRank(){
   rankCache = null;
   paintRank();
   loadRank();
+}
+function openRenameDlg(){
+  document.getElementById('dlgtitle').textContent = '시트 사용자 이름 변경';
+  document.getElementById('dlgdesc').textContent = '랭킹 보드에 표시될 이름을 입력하세요. (12자 이내, 모두에게 공개됩니다)';
+  dlgText.value = G.name; dlgText.onfocus = null;
+  dlgOk.textContent = '변경';
+  dlgOk.onclick = ()=>{
+    const n = sanitizeName(dlgText.value);
+    if(n && n!==G.name){
+      /* Firebase에는 이름이 키에 들어가므로, 옛 이름의 기록을 지우고 새 키로 다시 올린다 */
+      const oldKey = boardKey();
+      G.name = n;
+      if(!hasCloud && FIREBASE_DB_URL){
+        try{ fetch(FIREBASE_DB_URL+'/lb/'+encodeURIComponent(oldKey)+'.json',{method:'DELETE'}); }catch(e){}
+      }
+      updateBoard(true);
+      localSave();
+    }
+    closeDlg();
+    if(G.screen==='rank') scrRank(); else render();
+  };
+  dlg.classList.add('show');
+  dlgText.focus();
 }
 
 /* ════════════════ 렌더링 공통 ════════════════ */
@@ -803,6 +872,7 @@ function paintPartyPanel(){
   let r = 3+G.party.length+1;
   setCell(r,7,'■ 자산','hdr'); setCell(r,8,'수량','hdr'); r++;
   setCell(r,7,'복지포인트'); setCell(r,8,G.money.toLocaleString()+'P','num hl'); r++;
+  setCell(r,7,'플레이 타임'); setCell(r,8,fmtPlayTime(totalPlayMs()),'num'); r++;
   for(const k of ['clip','goldclip','bacchus','hotsix','coffee']){
     if(G.items[k]>0 || k==='clip' || k==='bacchus'){
       setCell(r,7,ITEM_DEF[k].name); setCell(r,8,String(G.items[k]),'num'); r++;
@@ -862,6 +932,7 @@ function scrTitle(){
   } else if(hasLocal){
     lines.push(['✔ 진행 상황은 이 브라우저의 로컬 캐시에 자동 저장됩니다.','dim']);
     lines.push(['  (캐시 삭제·다른 기기로 이동할 때를 대비해 [백업 코드]도 가끔 발급해 보관하세요)','dim']);
+    if(hasBoard) lines.push(['※ 사내 랭킹 보드: 입력한 이름과 진행 기록이 모든 플레이어에게 공개됩니다.','dim']);
   } else {
     lines.push(['⚠ 이 게임은 자동 저장되지 않습니다! 메뉴의 [백업 코드]가 유일한 저장 수단입니다.','hl']);
     lines.push(['  (새로고침·창 닫기 시 진행이 사라지니, 수시로 코드를 발급해 메모장에 보관하세요)','dim']);
@@ -870,11 +941,11 @@ function scrTitle(){
   if(cloudSaveData){
     const d = cloudSaveData;
     const dexN = Object.values(d.dex||{}).filter(v=>v===2).length;
-    choices.push([`이어하기 — ${d.name||'사원'} (${PROG_LABEL[Math.min((d.story||0)+(d.isekai?1:0),PROG_LABEL.length-1)]} · 도감 ${dexN} · 승수 ${d.wins||0})`, ()=>resumeSave(d)]);
+    choices.push([`이어하기 — ${d.name||'사원'} (${PROG_LABEL[Math.min((d.story||0)+(d.isekai?1:0),PROG_LABEL.length-1)]} · 도감 ${dexN} · 승수 ${d.wins||0} · ${fmtPlayTime(d.playMs||0)})`, ()=>resumeSave(d)]);
   }
   choices.push([cloudSaveData?'새 게임 시작 (※ 기존 자동 저장을 덮어씁니다)':'새 게임 시작',
-    hasCloud?openNameDlg:()=>{ newGame(); G.screen='starter'; render(); }]);
-  if(hasCloud) choices.push(['랭킹 보드 보기', ()=>{ G.screen='rank'; render(); }]);
+    hasBoard?openNameDlg:()=>{ newGame(); G.screen='starter'; render(); }]);
+  if(hasBoard) choices.push(['랭킹 보드 보기', ()=>{ G.screen='rank'; render(); }]);
   choices.push(['백업 코드 불러오기', openLoadDlg]);
   paint(lines, choices, '=GAME.START()');
 }
@@ -885,7 +956,7 @@ function openNameDlg(){
   dlgText.value=''; dlgText.onfocus=null;
   dlgOk.textContent = '입력 후 시작';
   dlgOk.onclick = ()=>{
-    let n = dlgText.value.trim().replace(/[\s'"\/\\]/g,'').slice(0,12);
+    let n = sanitizeName(dlgText.value);
     if(!n) n = '사원'+Math.floor(Math.random()*900+100);
     const had = cloudSaveData;
     newGame();
@@ -1034,7 +1105,7 @@ function scrHub(){
     ['파티 관리', ()=>{ G.screen='party'; render(); }],
     ['몬스터 도감', ()=>{ G.screen='dex'; render(); }],
   );
-  if(hasCloud) choices.push(['사내 랭킹 보드', ()=>{ G.screen='rank'; render(); }]);
+  if(hasBoard) choices.push(['사내 랭킹 보드', ()=>{ G.screen='rank'; render(); }]);
   choices.push([canAutoSave?'백업 코드 (저장/불러오기 · 기기 이동용)':'백업 코드 (저장/불러오기) — ⚠ 유일한 저장 수단', openSaveDlg]);
   choices.push(['타이틀 화면으로 (새 게임은 여기서)', ()=>{
     localSave(); localLoadCheck(); /* 현재 진행을 저장하고 이어하기 데이터 갱신 */
@@ -1406,11 +1477,17 @@ function ensureAliveLead(){
     if(idx>=0) G.active = idx;
   }
 }
+/* 전투 시작 시 기록해 둔 선두를 전투 종료 후 되돌린다 (파티 관리에서 정한 선두 유지) */
+function restoreLead(){
+  const b = G.battle;
+  if(b && b.lead!==undefined && b.lead<G.party.length) G.active = b.lead;
+}
 
 function startWildBattle(enemy){
+  const lead = G.active; /* 기절로 임시 교체돼도 전투 후 원래 선두로 복귀 */
   ensureAliveLead();
   dexSee(enemy.sid);
-  G.battle = { enemy, wild:true, over:false, menu:'main' };
+  G.battle = { enemy, wild:true, over:false, menu:'main', lead };
   G.log = [`야생의 ${monName(enemy)}(LV${enemy.lv})이(가) 나타났다!`];
   if(enemy.rar==='gold') G.log.push('황금빛으로 빛나고 있다…! (희귀 개체)');
   if(enemy.rar==='prism') G.log.push('공기가 일렁이며 무지갯빛으로 빛난다…!! (초희귀 개체)');
@@ -1420,12 +1497,13 @@ function startWildBattle(enemy){
 }
 
 function startBossBattle(idx){
+  const lead = G.active; /* 기절로 임시 교체돼도 전투 후 원래 선두로 복귀 */
   ensureAliveLead();
   if(aliveMons().length===0){ pendingMsg.push('싸울 수 있는 몬스터가 없다. 먼저 회복하자.'); render(); return; }
   const B = BOSSES[idx];
   const party = B.party.map(([sid,lv])=>makeMon(sid,lv));
   party.forEach(m=>dexSee(m.sid));
-  G.battle = { enemyParty:party, eIdx:0, enemy:party[0], wild:false, bossIdx:idx, over:false, menu:'main' };
+  G.battle = { enemyParty:party, eIdx:0, enemy:party[0], wild:false, bossIdx:idx, over:false, menu:'main', lead };
   G.log = [B.pre, `${B.name}이(가) ${monName(party[0])}을(를) 내보냈다!`];
   G.screen='battle'; render();
 }
@@ -1657,8 +1735,8 @@ function scrBattle(){
   let choices = [];
   if(b.over){
     const next = b.afterStory
-      ? ()=>{ pendingMsg.push(BOSSES[b.bossIdx].win); G.screen='storyBeat'; storyBeatNext='hub'; render(); }
-      : ()=>{ G.screen='hub'; render(); };
+      ? ()=>{ restoreLead(); pendingMsg.push(BOSSES[b.bossIdx].win); G.screen='storyBeat'; storyBeatNext='hub'; render(); }
+      : ()=>{ restoreLead(); G.screen='hub'; render(); };
     if(aliveMons().length>0) choices=[['전투 종료 — 돌아간다', next]];
   } else if(b.menu==='forceSwitch'){
     G.party.forEach((m,i)=>{ if(m.hp>0) choices.push([`${monName(m)} 교체 투입 (HP ${m.hp})`, ()=>switchMon(i,true)]); });
@@ -1702,11 +1780,12 @@ function scrGameover(){
     '누군가 이온음료를 머리맡에 두고 갔다. (복지포인트 20% 분실)',
     '파티가 모두 회복되었다. 다시 가 보자.',
   ],[
-    ['일어난다', ()=>{ G.party.forEach(m=>m.hp=m.maxhp); G.screen='hub'; render(); }],
+    ['일어난다', ()=>{ G.party.forEach(m=>m.hp=m.maxhp); restoreLead(); G.screen='hub'; render(); }],
   ]);
 }
 
 function scrEnding(){
+  restoreLead();
   cloudSave(true); updateBoard(true);
   const dimensionClear = G.story>=15;
   const isekaiClear = G.story>=11;
@@ -1756,6 +1835,7 @@ const dlgOk = document.getElementById('dlgok');
 function closeDlg(){ dlg.classList.remove('show'); }
 
 function encodeSave(){
+  flushPlayTime();
   return btoa(unescape(encodeURIComponent(JSON.stringify(G))));
 }
 /* v2(황금 boolean) 백업 코드 → v3(rar 등급) 변환 */
@@ -1779,6 +1859,8 @@ function migrateSave(obj){
   if(obj.items && obj.items.dimclip===undefined) obj.items.dimclip = 0;
   if(obj.isekai===undefined) obj.isekai = false;
   if(!obj.gifts) obj.gifts = {};
+  if(!obj.pid) obj.pid = makePid();
+  if(typeof obj.playMs!=='number') obj.playMs = 0;
   return obj;
 }
 function decodeSave(code){

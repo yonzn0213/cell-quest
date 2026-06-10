@@ -29,3 +29,20 @@ GitHub Pages 주소로 접속하면 바로 플레이할 수 있습니다.
 - **도핑**: 수상한 앰플로 영구 강화 도전 (실패 시 영구 약화 — 도박!)
 - **합성 실험실**: 동종 합성(등급 상승 도전) / 이종 합성(레시피로 신종 창조)
 - 상점, 보관함(페이지·풀어주기), 도감 페이지, 타입 상성 (카페인 > 서류 > 전자 > 카페인 / 야근)
+- **플레이 타임** 누적 기록 (허브 자산 패널 · 이어하기에 표시)
+- **사내 랭킹 보드**: 모든 플레이어의 진행도/도감/승수 비교 (아래 설정 필요)
+
+## 사내 랭킹 보드 설정 (선택)
+GitHub Pages 배포에서 랭킹 보드를 켜려면 무료 Firebase Realtime Database가 필요합니다.
+1. [Firebase 콘솔](https://console.firebase.google.com)에서 새 프로젝트 생성
+2. 빌드 → **Realtime Database** → 데이터베이스 만들기
+3. 규칙 탭에 아래 입력 (랭킹 경로 `lb`만 공개):
+   ```json
+   { "rules": { ".read": false, ".write": false, "lb": { ".read": true, ".write": true } } }
+   ```
+4. `index.html`의 `FIREBASE_DB_URL` 상수에 데이터베이스 URL을 입력
+   ```js
+   const FIREBASE_DB_URL = 'https://<프로젝트>-default-rtdb.<리전>.firebasedatabase.app';
+   ```
+- URL을 비워 두면 랭킹 보드 메뉴는 표시되지 않습니다 (기존과 동일).
+- 닉네임은 12자 제한 + 특수문자 제거, 같은 닉네임이라도 플레이어 식별자로 기록이 분리됩니다.
