@@ -892,6 +892,13 @@ function knownMoves(m){
 }
 /* 비선형 성장 곡선: 초반은 기존과 비슷, 중후반은 확연히 느리게 (v2.0 밸런싱) */
 function expNeed(lv){ return Math.round(lv*16 + lv*lv*1.5); }
+/* 경험치 진행 바 (텍스트 셀용) */
+function expPct(m){ return Math.min(99, Math.floor(m.exp/expNeed(m.lv)*100)); }
+function expBar(m, width){
+  width = width||8;
+  const filled = Math.min(width, Math.floor(m.exp/expNeed(m.lv)*width));
+  return '▓'.repeat(filled).padEnd(width,'░');
+}
 
 /* ════════════════ 게임 상태 ════════════════ */
 let G = null;
@@ -1086,7 +1093,7 @@ function localLoadCheck(){
 }
 /* 복원 직후 안전하게 그릴 수 있는 화면 화이트리스트.
    explore처럼 휘발 변수(curArea)에 의존하는 화면은 복원하면 크래시하므로 허브로 보낸다. */
-const RESUME_SAFE_SCREENS = ['hub','bag','party','box','dex','ldex','shop','moveFloor','dope','fusion','academy','wiki'];
+const RESUME_SAFE_SCREENS = ['hub','bag','party','box','dex','ldex','shop','moveFloor','dope','fusion','academy','wiki','gacha'];
 /* 저장 데이터를 현재 게임으로 복원 (이어하기 / 부팅 자동 복원 공용) */
 function resumeSave(d){
   G = d;
@@ -1280,7 +1287,7 @@ function paintPartyPanel(){
   G.party.forEach((m,i)=>{
     const r = 3+i;
     setCell(r,7,(i===G.active?'▶ ':'')+monName(m), monCls(m)||(i===G.active?'bold':''));
-    setCell(r,8,String(m.lv),'num');
+    setCell(r,8,`${m.lv} ·${expPct(m)}%`,'num');
     setCell(r,9,`${m.hp}/${m.maxhp}`,'num');
     setCell(r,10, m.hp<=0?'기절': m.hp<m.maxhp*0.3?'위험':'정상', m.hp<=0?'dim':'');
   });
@@ -1326,7 +1333,7 @@ function render(){
     battle:scrBattle, bag:scrBag, party:scrParty, box:scrBox, dex:scrDex, shop:scrShop,
     moveFloor:scrMoveFloor, storyBeat:scrStoryBeat, gameover:scrGameover, ending:scrEnding,
     rank:scrRank, dope:scrDope, fusion:scrFusion, isekai:scrIsekai, ldex:scrLegendDex,
-    academy:scrAcademy, wiki:scrWiki };
+    academy:scrAcademy, wiki:scrWiki, gacha:scrGacha };
   (map[G.screen]||scrHub)();
 }
 
@@ -1523,6 +1530,7 @@ function scrHub(){
     ...coolerChoices,
     ['매점 (복지포인트 사용)', ()=>{ G.screen='shop'; render(); }],
     ['사내 연수원 (포인트 → 레벨)', ()=>{ G.screen='academy'; render(); }],
+    [`사내 경품 응모 — 뽑기 (${GACHA_COST.toLocaleString()}P)`, ()=>{ G.screen='gacha'; render(); }],
     ['합성 실험실 (등급 도전 / 신종 창조)', ()=>{ G.screen='fusion'; render(); }],
     ['가방', ()=>{ G.screen='bag'; render(); }],
     ['파티 관리', ()=>{ G.screen='party'; render(); }],
@@ -1628,7 +1636,7 @@ function scrParty(){
   G.party.forEach((m,i)=>{
     const evo = SPECIES[m.sid].evo;
     const evoTag = evo ? `  · 진화 LV${evo.lv}${evo.mut?' (돌연변이 가능)':''}` : '';
-    lines.push([`${i===G.active?'▶':' '} ${monName(m)}  LV${m.lv} [${monType(m)}]  HP ${m.hp}/${m.maxhp}  공격 ${m.atk}  EXP ${m.exp}/${expNeed(m.lv)}${evoTag}`, monCls(m)]);
+    lines.push([`${i===G.active?'▶':' '} ${monName(m)}  LV${m.lv} [${monType(m)}]  HP ${m.hp}/${m.maxhp}  공격 ${m.atk}  EXP ${expBar(m)} ${expPct(m)}%${evoTag}`, monCls(m)]);
     lines.push(['    기술: '+knownMoves(m).map(mv=>mv[1]).join(', '),'dim']);
     if(m.trait) lines.push([`    특성: ${m.trait} — ${TRAITS[m.trait]}`,'dim']);
   });
@@ -1788,6 +1796,121 @@ function scrAcademy(){
   });
   choices.push(['돌아간다', ()=>{ G.screen='hub'; render(); }]);
   paint(lines, choices, '=EDU(파티, 복지포인트)');
+}
+
+/* ── 사내 경품 응모(뽑기): 잉여 포인트 소비처.
+   대부분 꽝/클립(해금 차원까지만), 아주 낮은 확률로 특별한 몬스터 ── */
+const GACHA_COST = 1000;
+/* 가중치 합 1000 = 0.1% 단위. 미해금 클립은 해금된 최고 등급 클립으로 대체 지급 */
+const GACHA_TABLE = [
+  [380, 'miss',  null],
+  [250, 'item',  ['clip', 2]],
+  [150, 'item',  ['goldclip', 1]],
+  [80,  'item',  ['prismclip', 1]],
+  [50,  'item',  ['dimclip', 1]],
+  [25,  'item',  ['godclip', 1]],
+  [50,  'item',  ['bacchus', 3]],
+  [12,  'legendMon', null],        /* 1.2%  — 야생 기본종 1마리 (LV1 · 레전드 등급) */
+  [2.5, 'specialMon', null],       /* 0.25% — 합성·돌연변이 특별종 (LV1) */
+  [0.5, 'specialLegendMon', null], /* 0.05% — 특별종 + 레전드 등급 */
+];
+function clipUnlocked(key){
+  if(key==='prismclip') return G.isekai;
+  if(key==='dimclip') return G.story>=11;
+  if(key==='godclip') return G.story>=15;
+  return true;
+}
+function bestUnlockedClip(key){
+  const order = ['godclip','dimclip','prismclip','goldclip','clip'];
+  let i = Math.max(0, order.indexOf(key));
+  while(i<order.length-1 && !clipUnlocked(order[i])) i++;
+  return order[i];
+}
+/* 당첨 몬스터 풀: 해금한 차원의 야생 기본종 / 거기서 도달 가능한 합성·돌연변이 특별종 */
+function gachaPools(){
+  const reach = new Set();
+  FLOORS.forEach((f,i)=>{ if(floorUnlocked(i)) f.areas.forEach(a=>a.pool.forEach(s=>reach.add(s))); });
+  const base = [...reach].filter(s=>!SPECIES[s].legend);
+  let grew = true;
+  while(grew){
+    grew = false;
+    for(const s of [...reach]){
+      const e = SPECIES[s].evo;
+      if(!e) continue;
+      if(!reach.has(e.to)){ reach.add(e.to); grew=true; }
+      if(e.mut && !reach.has(e.mut.to)){ reach.add(e.mut.to); grew=true; }
+    }
+  }
+  const special = [];
+  for(const s of ALL_SIDS){
+    if(SPECIES[s].legend || !reach.has(s)) continue;
+    const isMut = ALL_SIDS.some(x=>SPECIES[x].evo && SPECIES[x].evo.mut && SPECIES[x].evo.mut.to===s);
+    if(isMut) special.push(s);
+  }
+  for(const rc of FUSION_RECIPES){
+    if(rc.mats.every(mat=>reach.has(mat)) && !SPECIES[rc.to].legend && !special.includes(rc.to)) special.push(rc.to);
+  }
+  return { base, special };
+}
+function drawGachaOnce(pools){
+  let r = Math.random()*1000;
+  let pick = GACHA_TABLE[0];
+  for(const row of GACHA_TABLE){ if(r < row[0]){ pick = row; break; } r -= row[0]; }
+  const type = pick[1];
+  if(type==='miss') return '꽝… 다음 기회에.';
+  if(type==='item'){
+    let key = pick[2][0]; const n = pick[2][1];
+    if(CLIP_MULT[key]) key = bestUnlockedClip(key);
+    G.items[key] += n;
+    return `${ITEM_DEF[key].name} ×${n} 당첨!`;
+  }
+  if(type==='legendMon'){
+    const sid = pools.base[Math.floor(Math.random()*pools.base.length)];
+    const mon = makeMon(sid, 1, 'legend');
+    addMon(mon); dexCatch(sid, 'legend');
+    return `🎉 대박!! [${monName(mon)}] (LV1 · 레전드 등급 · 특성 ${mon.trait}) 당첨!!`;
+  }
+  /* specialMon / specialLegendMon */
+  if(pools.special.length===0){
+    G.items.goldclip += 3;
+    return '특별 경품이 아직 입고 전이라 골드클립 ×3으로 대체! (차원을 더 해금하면 입고된다)';
+  }
+  const sid = pools.special[Math.floor(Math.random()*pools.special.length)];
+  const rar = type==='specialLegendMon' ? 'legend' : 'normal';
+  const mon = makeMon(sid, 1, rar);
+  addMon(mon); dexCatch(sid, rar);
+  return `🌟 초대박!!! 특별 몬스터 [${monName(mon)}]${rar==='legend'?' (레전드 등급!!)':''} 당첨!!!`;
+}
+let gachaMsg = '';
+function scrGacha(){
+  const lines = [['― 사내 경품 응모 (뽑기) ―','bold'],'',
+    [`1회 ${GACHA_COST.toLocaleString()}P · 10연속 ${(GACHA_COST*10).toLocaleString()}P`,'hl'],
+    '경품: 클립류(지금까지 해금한 차원의 클립만) · 박카스 · 그리고…',
+    ['초저확률: 레전드 등급 몬스터 1.2% / 특별종 0.25% / 레전드 특별종 0.05% (전부 LV1)','dim'],
+    ['(특별종 = 합성·돌연변이로만 얻을 수 있는 종)','dim'],''];
+  if(gachaMsg){ gachaMsg.split('\n').forEach(s=>lines.push([s,'hl'])); lines.push(''); gachaMsg=''; }
+  lines.push(`보유 복지포인트: ${G.money.toLocaleString()}P`);
+  const doDraw = n => () => {
+    const cost = GACHA_COST*n;
+    if(G.money<cost){ gachaMsg='복지포인트가 부족하다…'; render(); return; }
+    G.money -= cost;
+    const pools = gachaPools();
+    const results = [];
+    for(let i=0;i<n;i++) results.push(drawGachaOnce(pools));
+    if(n===1) gachaMsg = results[0];
+    else {
+      const misses = results.filter(s=>s.startsWith('꽝')).length;
+      const hits = results.filter(s=>!s.startsWith('꽝'));
+      gachaMsg = [`[10연속 결과] 꽝 ${misses}회`, ...hits].join('\n');
+    }
+    render();
+  };
+  const choices = [
+    [`응모한다 (1회 · ${GACHA_COST.toLocaleString()}P)`, doDraw(1)],
+    [`10연속 응모 (${(GACHA_COST*10).toLocaleString()}P)`, doDraw(10)],
+    ['돌아간다', ()=>{ G.screen='hub'; render(); }],
+  ];
+  paint(lines, choices, '=RAND() · 사내복권');
 }
 
 /* ── 사내 위키: 게임 내 도움말 (상성/포획/희귀도/성장 규칙) ── */
@@ -2392,6 +2515,7 @@ function scrBattle(){
   const lines = [
     [`⚔ ${monName(e)}  LV${e.lv}  [${monType(e)}]${bossLabel}`, monCls(e)||'bold'],
     [`   HP ${e.hp}/${e.maxhp}  ${'█'.repeat(Math.ceil(e.hp/e.maxhp*10)).padEnd(10,'░')}`, e.hp<e.maxhp*0.3?'hl':''],
+    [`▼ ${monName(me)}  LV${me.lv}  HP ${me.hp}/${me.maxhp}  EXP ${expBar(me)} ${expPct(me)}%`, 'dim'],
     '',
     ...G.log,
     '',

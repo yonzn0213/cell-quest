@@ -346,6 +346,47 @@ T('normalizeEntry: 악성 랭킹 항목 정규화', () => {
     && e.party.length === 1 && e.party[0].l === 0 && e.party[0].r === 'normal' && e.party[0].t === null && e.party[0].d === 1;
 });
 T('박카스: 최대 HP 비율 회복 (정의 갱신)', () => ITEM_DEF.bacchus.desc.includes('35%'));
+
+/* ── v5.4: 경험치 바 + 사내 경품 응모(뽑기) ── */
+T('경험치 바: 진행률 표시', () => {
+  const m = makeMon('espresso', 10); m.exp = Math.floor(expNeed(10) / 2);
+  const bar = expBar(m, 8);
+  return bar.length === 8 && bar.includes('▓') && bar.includes('░')
+    && expPct(m) === Math.floor(m.exp / expNeed(10) * 100);
+});
+T('뽑기 가중치 합 = 1000 (0.1% 단위)', () => GACHA_TABLE.reduce((s, r) => s + r[0], 0) === 1000);
+T('뽑기: 미해금 클립은 해금된 최고 클립으로 대체', () => {
+  newGame(); /* story 0 — 사무실만 해금 */
+  if (bestUnlockedClip('godclip') !== 'goldclip' || bestUnlockedClip('prismclip') !== 'goldclip') return false;
+  G.isekai = true;
+  if (bestUnlockedClip('prismclip') !== 'prismclip' || bestUnlockedClip('godclip') !== 'prismclip') return false;
+  G.story = 15;
+  return bestUnlockedClip('godclip') === 'godclip';
+});
+T('뽑기: 꽝·레전드 등급 몬스터 당첨 (확률 구간 검증)', () => {
+  newGame(); G.party = [makeMon('espresso', 5)];
+  const pools = gachaPools();
+  const orig = Math.random;
+  let seq = [0.1]; Math.random = () => (seq.length ? seq.shift() : 0.5);
+  const miss = drawGachaOnce(pools);
+  seq = [0.99, 0];
+  const legend = drawGachaOnce(pools);
+  Math.random = orig;
+  const won = [...G.party, ...G.box].pop();
+  return miss.startsWith('꽝') && legend.includes('레전드 등급') && won.rar === 'legend' && won.lv === 1 && !!won.trait;
+});
+T('뽑기: 특별종 풀 — 초반엔 비어 대체 지급, 전해금 시 합성·돌연변이종만', () => {
+  newGame(); G.party = [makeMon('espresso', 5)];
+  const early = gachaPools();
+  newGame(); G.party = [makeMon('espresso', 99)]; G.isekai = true; G.story = 27;
+  const late = gachaPools();
+  return early.special.length === 0 && late.special.length >= 15
+    && late.special.every(s => !SPECIES[s].legend)
+    && late.base.every(s => !SPECIES[s].legend);
+});
+T('뽑기 화면 렌더 (스모크)', () => {
+  newGame(); G.party = [makeMon('espresso', 5)]; G.money = 5000; G.screen = 'gacha'; render(); return true;
+});
 `;
 vm.runInContext(TESTS, ctx, { filename: 'tests' });
 
