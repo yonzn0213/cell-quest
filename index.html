@@ -610,7 +610,7 @@ const SPECIES = {
     moves:[[1,'캐시 히트',104,null],[1,'프리페치 클로',122,'전자'],[145,'L2 캐시 폭발',140,'전자'],[150,'캐시 무효화',158,'전자']] },
   rbaCachelynx:{ name:'캐시스라소니', type:'전자', hp:192, atk:58,
     moves:[[1,'프리페치 클로',122,'전자'],[145,'L2 캐시 폭발',140,'전자'],[150,'캐시 무효화',158,'전자'],[156,'TLB 미스 강타',170,'전자']] },
-  rbaSnapfly:{ name:'스냅샷잠자리', type:'서류', hp:152, atk:49, evo:{lv:147,to:'rbaSnaphawk',mut:{p:0.12,to:'rbaSnapwraith'}},
+  rbaSnapfly:{ name:'스냅샷잠자리', type:'서류', hp:152, atk:49, evo:{lv:150,to:'rbaSnaphawk',mut:{p:0.12,to:'rbaSnapwraith'}},
     moves:[[1,'스냅 찰칵',102,null],[1,'복원 지점',120,'서류'],[146,'증분 백업',138,'서류'],[152,'전체 스냅샷',156,'서류']] },
   rbaSnaphawk:{ name:'스냅샷매', type:'서류', hp:188, atk:57,
     moves:[[1,'복원 지점',120,'서류'],[146,'증분 백업',138,'서류'],[152,'전체 스냅샷',156,'서류'],[156,'시점 롤포워드',168,'서류']] },
@@ -653,12 +653,12 @@ const SPECIES = {
   rbbLowformat:{ name:'로우레벨포맷', type:'전자', hp:212, atk:62,
     moves:[[1,'트랙 정렬',120,null],[1,'다중 패스 소거',134,'전자'],[162,'자기 잔류 제거',154,'전자'],[167,'플래터 초기화',168,'전자']] },
 
-  rbbSudosprite:{ name:'수도스프라이트', type:'카페인', hp:168, atk:55, evo:{lv:158,to:'rbbRootshell'},
+  rbbSudosprite:{ name:'수도스프라이트', type:'카페인', hp:168, atk:55, evo:{lv:162,to:'rbbRootshell'},
     moves:[[1,'권한 질의',113,null],[1,'비밀번호 입력',124,'카페인'],[156,'권한 상승',144,'카페인']] },
   rbbRootshell:{ name:'루트셸', type:'카페인', hp:206, atk:63,
     moves:[[1,'셸 점거',119,null],[1,'환경변수 오염',133,'카페인'],[161,'권한 탈취',151,'카페인'],[167,'슈퍼유저 강타',169,'카페인']] },
 
-  rbbCronwraith:{ name:'크론망령', type:'야근', hp:175, atk:52, evo:{lv:150,to:'rbbScheduledoom'},
+  rbbCronwraith:{ name:'크론망령', type:'야근', hp:175, atk:52, evo:{lv:162,to:'rbbScheduledoom'},
     moves:[[1,'예약 등록',114,null],[1,'반복 호출',127,'야근'],[148,'자정 일괄 실행',145,'야근']] },
   rbbScheduledoom:{ name:'스케줄파멸자', type:'야근', hp:214, atk:64,
     moves:[[1,'밀린 작업 폭주',121,null],[1,'데드라인 강제',135,'야근'],[163,'무한 재시도',153,'야근'],[169,'전사 야근 소집',171,'야근']] },
@@ -705,7 +705,7 @@ const SPECIES = {
   lpaOrphanproc:{ name:'고아프로세스', type:'야근', hp:242, atk:67,
     moves:[[1,'부모 상실',122,null],[1,'무적 배회',138,'야근'],[178,'고아 군집 잠식',158,'야근'],[183,'유령 점유 붕괴',176,'야근']] },
 
-  lpaInfinifly:{ name:'무한루프나방', type:'카페인', hp:186, atk:59, evo:{lv:177,to:'lpaWhilefly'},
+  lpaInfinifly:{ name:'무한루프나방', type:'카페인', hp:186, atk:59, evo:{lv:182,to:'lpaWhilefly'},
     moves:[[1,'반복 비행',116,null],[1,'조건 무시',130,'카페인'],[176,'while 참 고정',150,'카페인'],[182,'영원 회전 폭주',166,'카페인']] },
   lpaWhilefly:{ name:'와일참나방', type:'카페인', hp:234, atk:66,
     moves:[[1,'무탈출 선회',122,null],[1,'break 봉인',136,'카페인'],[178,'끝없는 순환 난무',158,'카페인'],[183,'무한 가속 붕괴',176,'카페인']] },
@@ -730,7 +730,7 @@ const SPECIES = {
   lpbCoredumpwraith:{ name:'코어덤프망령', type:'야근', hp:248, atk:70,
     moves:[[1,'스택 추적 출력',124,null],[1,'덤프 분석',142,'야근'],[194,'메모리 맵 붕괴',164,'야근'],[199,'프로세스 강제 종료',188,'야근']] },
 
-  lpbLeaksprite:{ name:'누수정령', type:'전자', hp:198, atk:61, evo:{lv:190,to:'lpbHeapdevourer',mut:{p:0.12,to:'lpbOomreaper'}},
+  lpbLeaksprite:{ name:'누수정령', type:'전자', hp:198, atk:61, evo:{lv:195,to:'lpbHeapdevourer',mut:{p:0.12,to:'lpbOomreaper'}},
     moves:[[1,'미해제 할당',118,null],[1,'힙 누수',136,'전자'],[189,'단편화 확산',156,'전자']] },
   lpbHeapdevourer:{ name:'힙포식자', type:'전자', hp:244, atk:68,
     moves:[[1,'블록 병합',122,null],[1,'할당자 폭주',140,'전자'],[193,'주소 공간 잠식',160,'전자'],[198,'아웃오브메모리',180,'전자']] },
@@ -742,7 +742,7 @@ const SPECIES = {
   lpbDeadlockwarden:{ name:'교착감독관', type:'서류', hp:252, atk:69,
     moves:[[1,'자원 봉인',122,null],[1,'식사하는 철학자',140,'서류'],[195,'데드락 사슬',162,'서류'],[200,'전부서 동결령',184,'서류']] },
 
-  lpbPanicbat:{ name:'패닉박쥐', type:'카페인', hp:200, atk:64, evo:{lv:189,to:'lpbKernelpanicfiend'},
+  lpbPanicbat:{ name:'패닉박쥐', type:'카페인', hp:200, atk:64, evo:{lv:198,to:'lpbKernelpanicfiend'},
     moves:[[1,'예외 발생',119,null],[1,'인터럽트 폭주',137,'카페인'],[189,'커널 트랩',157,'카페인']] },
   lpbKernelpanicfiend:{ name:'커널패닉마귀', type:'카페인', hp:246, atk:69,
     moves:[[1,'블루스크린',123,null],[1,'시스템 정지',141,'카페인'],[194,'치명 예외 연쇄',163,'카페인'],[199,'전 시스템 패닉',185,'카페인']] },
@@ -752,7 +752,7 @@ const SPECIES = {
   lpbOverflowtitan:{ name:'스택오버플로거인', type:'야근', hp:255, atk:71,
     moves:[[1,'프레임 붕괴',121,null],[1,'무한 재귀',139,'야근'],[196,'콜스택 범람',166,'야근'],[200,'끝없는 호출의 탑',190,'야근']] },
 
-  lpbForkmoth:{ name:'포크나방', type:'전자', hp:196, atk:61, evo:{lv:190,to:'lpbBombswarm'},
+  lpbForkmoth:{ name:'포크나방', type:'전자', hp:196, atk:61, evo:{lv:200,to:'lpbBombswarm'},
     moves:[[1,'프로세스 복제',115,null],[1,'자가 분열',135,'전자'],[188,'기하급수 증식',154,'전자']] },
   lpbBombswarm:{ name:'포크밤군체', type:'전자', hp:240, atk:67,
     moves:[[1,'프로세스 테이블 점거',120,null],[1,'리소스 고갈',138,'전자'],[193,'무한 증식 폭발',161,'전자'],[198,'시스템 마비',179,'전자']] },
@@ -884,6 +884,67 @@ const FLOORS = [
       { name:'마지막 계단', lv:[130,135], pool:['nihilknight','zeropixie'], flavor:'존재와 비존재의 경계. 계단의 끝에서 모든 차원의 폐업 결재가 이뤄진다.' },
       { name:'옥상 헬리포트', lv:[133,138], pool:['finalmoth','nihilknight','zeropixie'], flavor:'무(無)의 바람이 분다. 의장의 그림자가 모든 별빛을 삼키고 있다.' },
     ], boss:26 },
+  /* ════ 5부 리부트 차원 (27-33) · 6부 무한루프 사옥 (34-41) ════ */
+  { name:'리부트 — 캐시 폐기장', areas:[
+      { name:'콜드 캐시 골목', lv:[140,142], pool:['rbaCachecat','rbaGcbeetle'], flavor:'무효화된 캐시 조각들이 차갑게 식어 바닥에 쌓여 있다.' },
+      { name:'프리페치 회랑', lv:[142,144], pool:['rbaCachecat','rbaCachelynx','rbaGcbeetle'], flavor:'읽힐 일 없는 데이터가 끝없이 미리 불려와 떠돈다.' },
+    ], boss:27 },
+  { name:'리부트 — 롤백 협곡', areas:[
+      { name:'되감기 단층', lv:[144,146], pool:['rbaRollbackturtle','rbaBackupslime'], flavor:'모든 발걸음이 한 박자 전으로 되돌려진다.' },
+      { name:'미커밋 늪', lv:[145,147], pool:['rbaRollbackturtle','rbaRollbackdragon','rbaQuartermoth'], flavor:'확정되지 못한 작업들이 늪처럼 발목을 잡는다.' },
+    ], boss:28 },
+  { name:'리부트 — 스냅샷 동결고', areas:[
+      { name:'증분 빙벽', lv:[147,150], pool:['rbaSnapfly','rbaBackupslime'], flavor:'매 순간이 박제되어 차가운 벽으로 굳어 있다.' },
+      { name:'영구 보존 회랑', lv:[149,152], pool:['rbaSnapfly','rbaSnaphawk','rbaSnapwraith'], flavor:'되돌아갈 시점이 너무 많아 어느 것도 진짜가 아니다.' },
+    ], boss:29 },
+  { name:'리부트 — 권한 관제실', areas:[
+      { name:'권한 상승 통로', lv:[150,153], pool:['rbaSudobat','rbaQuartermoth'], flavor:'누군가의 권한이 끝없이 위로 치솟는 소리가 들린다.' },
+      { name:'sudo 제단', lv:[153,157], pool:['rbaSudobat','rbaGcmantis','rbaRollbackdragon'], flavor:'최상위 명령만이 허락되는 차가운 관제실.' },
+    ], boss:30 },
+  { name:'리부트 — 메모리 회수 부서', areas:[
+      { name:'단편화 복도', lv:[155,157], pool:['rbbGcgolem','rbbInitghost'], flavor:'쓰레기 객체들이 영역마다 표시된 채 수집을 기다린다.' },
+      { name:'복원점 격납고', lv:[157,159], pool:['rbbInitghost','rbbDiskwiper'], flavor:'지워진 설정값들이 유령처럼 떠돌며 출고 상태로 돌아가려 한다.' },
+    ], boss:31 },
+  { name:'리부트 — 디스크 포맷 부서', areas:[
+      { name:'로우포맷 작업장', lv:[158,161], pool:['rbbDiskwiper','rbbCronwraith'], flavor:'플래터가 끝없이 회전하며 모든 트랙을 영점으로 채운다.' },
+      { name:'야간 일괄 처리실', lv:[161,164], pool:['rbbCronwraith','rbbSudosprite'], flavor:'자정마다 예약된 소거 작업이 밀려 망령들이 야근 중이다.' },
+    ], boss:32 },
+  { name:'리부트 — 루트 권한 코어', areas:[
+      { name:'권한 상승 통로', lv:[163,166], pool:['rbbSudosprite','rbbGcgolem'], flavor:'비밀번호 프롬프트가 무한히 겹쳐 떠오르며 슈퍼유저를 부른다.' },
+      { name:'커널 패닉 제단', lv:[166,170], pool:['rbbScheduledoom'], flavor:'공장초기화 카운트다운이 새 회계연도의 시작을 알린다.' },
+    ], boss:33 },
+  { name:'무한루프 — 교착의 층', areas:[
+      { name:'정지된 회의실', lv:[170,172], pool:['lpaDeadlockspider','lpaStackmite'], flavor:'아무도 회의를 끝내지 못해 모두가 서로의 발언이 끝나기만 기다린다.' },
+      { name:'꺼지지 않는 서버실', lv:[172,174], pool:['lpaZombieproc'], flavor:'종료된 줄 알았던 프로세스들이 회수되지 못한 채 복도를 배회한다.' },
+    ], boss:34 },
+  { name:'무한루프 — 붕괴의 층', areas:[
+      { name:'주소 잃은 아카이브', lv:[174,176], pool:['lpaNullpointer','lpaSegfault'], flavor:'모든 문서가 존재하지 않는 주소를 가리켜 펼치는 순간 무너진다.' },
+      { name:'넘쳐버린 적층고', lv:[176,178], pool:['lpaStackoverflow'], flavor:'쌓이고 또 쌓인 호출들이 천장을 뚫고 범람한다.' },
+    ], boss:35 },
+  { name:'무한루프 — 경합의 층', areas:[
+      { name:'동시 접근 통로', lv:[178,180], pool:['lpaRaceslug','lpaRacecondition'], flavor:'두 직원이 같은 결재 칸에 동시에 도장을 찍어 결과가 매번 달라진다.' },
+      { name:'임계 구역', lv:[179,181], pool:['lpaOrphanproc'], flavor:'관리하던 부모를 잃은 작업들이 잠금 없이 멋대로 날뛴다.' },
+    ], boss:36 },
+  { name:'무한루프 — 특이점의 층', areas:[
+      { name:'끝나지 않는 야근방', lv:[181,183], pool:['lpaInfinifly','lpaWhilefly'], flavor:'시계는 자정에 멈췄고 같은 하루가 영원히 다시 시작된다.' },
+      { name:'사건 지평선', lv:[183,185], pool:['lpaCachewasp'], flavor:'모든 반복이 한 점으로 빨려 들어가 시간조차 빠져나오지 못한다.' },
+    ], boss:37 },
+  { name:'무한루프 — 타임아웃 회랑', areas:[
+      { name:'응답 없는 복도', lv:[185,187], pool:['lpbSegfaultghost','lpbDeadlockcrab'], flavor:'끝없이 회전하는 로딩 표시가 벽마다 멈춰 있다.' },
+      { name:'무한 대기실', lv:[187,189], pool:['lpbSegfaultghost','lpbDeadlockcrab','lpbStackslime'], flavor:'제출된 결재가 영원히 처리되지 않은 채 쌓여만 간다.' },
+    ], boss:38 },
+  { name:'무한루프 — 교착 심연', areas:[
+      { name:'순환 대기 미궁', lv:[189,191], pool:['lpbDeadlockcrab','lpbPanicbat'], flavor:'서로의 자원을 붙잡은 채 아무도 움직이지 못한다.' },
+      { name:'풀리지 않는 매듭', lv:[190,192], pool:['lpbDeadlockcrab','lpbForkmoth','lpbLeaksprite'], flavor:'모든 길이 서로를 막아 어느 쪽으로도 나아갈 수 없다.' },
+    ], boss:39 },
+  { name:'무한루프 — 커널 패닉 노심', areas:[
+      { name:'치명 예외 갱도', lv:[192,194], pool:['lpbPanicbat','lpbLeaksprite'], flavor:'파란 화면이 노심 벽면을 따라 끝없이 깜빡인다.' },
+      { name:'노심 과열 구역', lv:[194,197], pool:['lpbPanicbat','lpbForkmoth'], flavor:'식을 줄 모르는 코어가 영원한 야근으로 달궈져 있다.' },
+    ], boss:40 },
+  { name:'무한루프 — 특이점', areas:[
+      { name:'영겁의 야근 회랑', lv:[197,199], pool:['lpbStackslime','lpbForkmoth'], flavor:'퇴근의 개념이 사라진 자리, 같은 하루가 무한히 반복된다.' },
+      { name:'반복되는 정오', lv:[199,200], pool:['lpbSegfaultghost','lpbDeadlockcrab'], flavor:'몇 번을 빠져나가도 다시 출근 시각으로 되감긴다.' },
+    ], boss:41 },
 ];
 
 const BOSSES = [
@@ -972,6 +1033,52 @@ const BOSSES = [
   { name:'공허 의장 널', pre:'옥상의 어둠이 형태를 갖춘다. "신도 우주도 결국 내 발주서 한 장에서 시작됐다. 모든 것은 무(無)로 돌아간다 — 그것이 유일한 정시퇴근이지. 자, 최후의 결재다."',
     party:[['nihilknight',133],['finalmoth',133],['zeropixie',134],['liquidjudge',134],['nullchairman',137]], reward:9999999, mult:1.5,
     win:'널이 처음으로 웃었다. "…기각당했군, 내가. 좋다 — 무(無)가 아니라 휴(休)로 하지. 전 차원, 전 우주, 영원한 워라밸을 승인한다."' },
+  /* ════ 5부 · 6부 보스 (27-41) ════ */
+  { name:'캐시관리자 보이드', pre:'네 기억은 곧 무효화된다. 캐시는 비워져야 깨끗하지.',
+    party:[['rbaCachecat',142],['rbaGcbeetle',141],['rbaBackupslime',142],['rbaCacheadminVoid',143]], reward:120000, mult:1.45,
+    win:'일관성이… 깨졌다. 이건 캐시 미스가 아니야…' },
+  { name:'롤백반장 널', pre:'오늘 한 일은 전부 무효 처리한다. 커밋 따위 허락한 적 없어.',
+    party:[['rbaRollbackturtle',145],['rbaQuartermoth',145],['rbaRollbackdragon',149],['rbaRollbackchiefNull',146]], reward:150000, mult:1.46,
+    win:'되돌릴 수… 없다고? 이런 트랜잭션은 처음이군.' },
+  { name:'스냅샷부장 프로스트', pre:'이 순간을 동결한다. 너의 진행도는 여기서 박제될 것이다.',
+    party:[['rbaSnapfly',150],['rbaSnaphawk',151],['rbaGcbeetle',149],['rbaSnapchiefFrost',152]], reward:190000, mult:1.48,
+    win:'복원 지점이… 사라졌어. 나는 어느 시점으로 돌아가야 하지?' },
+  { name:'권한관리자 루트', pre:'네 워라밸 승인 권한을 회수한다. 이 차원의 root는 나뿐이야.',
+    party:[['rbaSudobat',154],['rbaGcmantis',153],['rbaRollbackdragon',153],['rbaSudoadminRoot',155]], reward:240000, mult:1.5,
+    win:'권한이… 박탈됐다. 내가 sudo 명령의 대상이 될 줄이야.' },
+  { name:'리셋웜', pre:'복원점은 이미 잡혔다. 네 모든 변경 사항은 곧 역류하여 사라질 것이다.',
+    party:[['rbbGcfortress',162],['rbbFactoryangel',160],['rbbLowformat',159],['rbbResetwyrm',163]], reward:210000, mult:1.48,
+    win:'롤백이… 거부됐다고? 이 차원, 변경 이력이 너무 단단하군.' },
+  { name:'포맷군주', pre:'파일 테이블만 끊으면 너의 존재는 주소를 잃는다. 흔적도 없이.',
+    party:[['rbbScheduledoom',162],['rbbLowformat',161],['rbbPurgewight',161],['rbbFormatlord',163]], reward:320000, mult:1.49,
+    win:'파티션이 다시 붙는다… 누가 이 차원을 이렇게 복구하는 거지.' },
+  { name:'루트 관리자 RESET', pre:'모든 차원의 변경 이력은 오류다. 나는 새 회계연도를 위해 전부 공장 출고 상태로 되돌린다. sudo, 시작한다.',
+    party:[['rbbFactoryangel',167],['rbbRootshell',167],['rbbFormatlord',168],['rbbResetwyrm',168],['rbbRootreset',170]], reward:1500000, mult:1.5,
+    win:'권한… 거부. 이 우주의 루트는 내가 아니었나. 초기화는… 취소되었다.' },
+  { name:'교착군주 데드락쿠스', pre:'넌 여기서 한 발짝도 못 나가. 우리 모두 영원히 서로를 기다리거든.',
+    party:[['lpaDeadlockspider',172],['lpaZombieproc',172],['lpaStackmite',171],['lpaDeadlockus',173]], reward:1200000, mult:1.5,
+    win:'교착이…… 풀렸다고? 그럴 리가, 누군가는 양보해야만……' },
+  { name:'붕괴제왕 세그폴토르', pre:'한 발만 더 디뎌봐. 네가 밟을 주소는 어디에도 없으니까.',
+    party:[['lpaSegfault',176],['lpaStackoverflow',178],['lpaNullpointer',175],['lpaSegfaultor',177]], reward:1700000, mult:1.5,
+    win:'보호 위반…… 내가 침범당하는 쪽일 줄은 몰랐군.' },
+  { name:'경합지배자 레이스마스터', pre:'이번 결과가 어떻게 나올지는 나도 몰라. 그게 내 무기지.',
+    party:[['lpaRacecondition',180],['lpaOrphanproc',180],['lpaRaceslug',179],['lpaRacemaster',181]], reward:2300000, mult:1.5,
+    win:'결정적이지 않은 내가…… 결정적으로 졌군.' },
+  { name:'특이점왕 싱귤라리스', pre:'여기서부터는 시간이 흐르지 않아. 너의 패배도, 영원히 반복될 뿐이지.',
+    party:[['lpaWhilefly',184],['lpaSingularitymoth',184],['lpaRaceslug',183],['lpaSingularis',185]], reward:3000000, mult:1.5,
+    win:'루프가…… 끊어진다. 처음으로, 다음 순간이 찾아오는군.' },
+  { name:'타임아웃사신', pre:'기다려라. 영원히. 너의 응답은 끝내 도착하지 않는다.',
+    party:[['lpbSegfaultghost',187],['lpbDeadlockcrab',187],['lpbStackslime',186],['lpbTimeoutreaper',188]], reward:3000000, mult:1.5,
+    win:'시간 초과가… 풀렸다고? 이런 응답은 받아본 적이 없는데…' },
+  { name:'교착군주 이터널', pre:'네가 잡은 락을 내가 기다리고, 내가 잡은 락을 네가 기다린다. 영원히.',
+    party:[['lpbDeadlockcrab',190],['lpbPanicbat',190],['lpbForkmoth',189],['lpbDeadlocklordEternal',191]], reward:3000000, mult:1.5,
+    win:'사슬이… 끊어졌다. 풀릴 수 없는 매듭이 풀리다니…' },
+  { name:'커널패닉 집정관', pre:'한 줄의 잘못된 명령이면 충분하다. 이 시스템 전체가 무너질 것이다.',
+    party:[['lpbPanicbat',194],['lpbLeaksprite',193],['lpbBusyspecter',194],['lpbPanickingArchon',195]], reward:3000000, mult:1.5,
+    win:'노심이… 식어간다. 나의 패닉이 비로소 멈추는군…' },
+  { name:'특이점 그 자체, 옴니루프', pre:'퇴근은 없다. 어제도, 오늘도, 내일도. 나는 영원히 반복되는 이 회사 그 자체다.',
+    party:[['lpbBusyspecter',198],['lpbTimeoutreaper',198],['lpbDeadlocklordEternal',199],['lpbPanickingArchon',199],['lpbOmniloop',200]], reward:99999999, mult:1.5,
+    win:'루프가… 끊어졌다. 처음으로… 다음 순간이 온다. 이것이 퇴근인가…' },
 ];
 
 const STORY = [
@@ -1007,7 +1114,24 @@ const STORY = [
   ['제4부 4장 — 무중력 공장','기록말소실장이 보존 판정을 내렸다. 다음은 폐업한 우주를 부품으로 해체하는 공장.','해체 라인과 폐항성 야적장을 조사하자. 공장장 브레이커는 천만 건 무사고를 자랑한다.'],
   ['제4부 5장 — 컨소시엄 본청','공장의 집게가 멈췄다. 이제 전 우주의 장부를 쥔 본청 — 1조 년 무패의 심의관이 기다린다.','전수 감사장과 심의 대기 로비를 조사하자. 도핑·합성·연승 보너스를 총동원할 때다.'],
   ['제4부 최종장 — 무(無)의 옥상','심의관이 존속 판정을 내렸다. 남은 것은 단 하나 — 모든 발주의 근원, 공허 의장 널.','존재와 비존재의 경계에서 최후의 결재가 기다린다. 모든 것을 쏟아부어라.'],
-  ['제4부 진엔딩 — 영원한 워라밸','공허 의장 널이 스스로의 안건을 기각했다. 무(無) 대신 휴(休) — 전 차원에 영원한 워라밸이 승인되었다.','남은 목표: 도감 완성. 공허의 간부들은 격파한 구역에서 야생 개체로 드물게 출현한다.'],
+  ['제4부 진엔딩 — 영원한 워라밸','공허 의장 널이 무(無) 대신 휴(休)를 택했다. 전 차원에 영원한 워라밸이 승인되었다.','…그러나 그 승인을 무효화하려는 근원 시스템이 모든 차원을 [새 회계연도]로 초기화하기 시작했다. 새 차원 [리부트 차원] 해금! (차원 이동)'],
+  /* ── 5부 (리부트 차원): storyIdx() +1 매핑. 1장은 4부 진엔딩 안내가 겸한다 ── */
+  ['제5부 2장 — 롤백 협곡','캐시관리자를 꺾자 무효화의 안개가 걷혔다. 다음 구역은 모든 작업을 한 박자 전으로 되돌리는 협곡.','커밋되지 못한 늪을 지나야 한다. 롤백반장이 오늘 한 일을 전부 무효 처리하려 기다린다.'],
+  ['제5부 3장 — 스냅샷 동결고','롤백반장의 트랜잭션을 끊었다. 다음은 매 순간을 박제해 얼려 버리는 동결고.','진행도가 박제되기 전에 돌파하자. 스냅샷부장이 너의 시점을 영구 보존하려 한다.'],
+  ['제5부 4장 — 권한 관제실','스냅샷부장의 복원 지점이 사라졌다. 이제 최상위 명령만 허락되는 차가운 관제실.','권한관리자 루트가 너의 워라밸 승인 권한을 회수하려 한다. sudo 제단을 넘어서자.'],
+  ['제5부 5장 — 메모리 회수 부서','권한을 지켜냈다. 다음은 쓰레기 객체를 표시해 수집하는 메모리 회수 부서.','리셋웜이 복원점을 미리 잡아 두고 너의 모든 변경을 역류시키려 한다. 변경 이력을 단단히 지키자.'],
+  ['제5부 6장 — 디스크 포맷 부서','리셋웜의 롤백을 거부했다. 다음은 모든 트랙을 영점으로 채우는 디스크 포맷 부서.','포맷군주가 파일 테이블을 끊어 너의 주소를 지우려 한다. 야간 일괄 소거 작업을 돌파하자.'],
+  ['제5부 최종장 — 루트 권한 코어','파티션이 다시 붙었다. 마침내 근원에 도달한다 — 공장초기화 카운트다운이 흐르는 루트 권한 코어.','모든 변경 이력을 오류로 규정하고 전 차원을 출고 상태로 되돌리려는 루트 관리자 RESET. 모든 것을 쏟아붓자.'],
+  ['제5부 진엔딩 — 초기화 취소','루트 관리자 RESET이 스스로 sudo를 거뒀다. 새 회계연도 초기화는 취소되었다.','…그러나 멎지 않은 시간이 무한히 되감기기 시작했다. 같은 하루의 반복 — 새 차원 [무한루프 사옥] 해금! (차원 이동)'],
+  /* ── 6부 (무한루프 사옥): 진엔딩. 1장은 5부 진엔딩 안내가 겸한다 ── */
+  ['제6부 2장 — 붕괴의 층','교착군주 데드락쿠스가 양보했다. 다음은 모든 주소가 존재하지 않는 곳을 가리켜 무너지는 붕괴의 층.','펼치는 순간 무너지는 문서들 사이로, 붕괴제왕 세그폴토르가 밟을 곳 없는 길을 깔아 둔다.'],
+  ['제6부 3장 — 경합의 층','세그폴토르의 보호 위반을 역이용했다. 다음은 같은 결재 칸에 동시에 도장이 찍히는 경합의 층.','결과가 매번 달라지는 임계 구역. 경합지배자 레이스마스터의 무기는 \'아무도 모르는 결과\'다.'],
+  ['제6부 4장 — 특이점의 층','레이스마스터를 결정적으로 눌렀다. 다음은 같은 하루가 영원히 다시 시작되는 특이점의 층.','시계가 자정에 멈춘 야근방. 특이점왕 싱귤라리스가 너의 패배마저 영원히 반복시키려 한다.'],
+  ['제6부 5장 — 타임아웃 회랑','싱귤라리스의 루프를 끊었다. 다음은 제출한 결재가 영영 처리되지 않는 타임아웃 회랑.','로딩 표시가 벽마다 멈춰 있다. 타임아웃사신은 너의 응답이 끝내 도착하지 않기를 기다린다.'],
+  ['제6부 6장 — 교착 심연','타임아웃을 풀어냈다. 다음은 서로의 자원을 붙잡은 채 아무도 못 움직이는 교착 심연.','풀리지 않는 매듭의 미궁. 교착군주 이터널이 영원한 순환 대기로 너를 묶으려 한다.'],
+  ['제6부 7장 — 커널 패닉 노심','이터널의 사슬을 끊었다. 다음은 파란 화면이 끝없이 깜빡이는 커널 패닉 노심.','식을 줄 모르는 코어가 영원한 야근으로 달궈져 있다. 커널패닉 집정관의 한 줄이면 전체가 무너진다.'],
+  ['제6부 최종장 — 특이점','집정관의 노심을 식혔다. 남은 것은 단 하나 — 퇴근의 개념이 사라진 영겁의 야근, 그 중심의 특이점.','어제도 오늘도 내일도 반복되는 회사 그 자체, 옴니루프. 모든 차원의 힘을 모아 마지막 루프를 끊자.'],
+  ['제6부 진엔딩 — 무한루프를 끝낸 자','옴니루프가 멈췄다. 처음으로 \'다음 순간\'이 찾아왔다. 모든 차원, 모든 시간이 단 한 번의 칼퇴로 수렴했다.','★ 전 차원 클리어 — 진정한 엔딩입니다. 남은 목표: 도감 완성과 사내 대전 아레나 제패. 당신의 영원한 워라밸을 축하합니다.'],
 ];
 /* 2부 진입 후에는 STORY 7~10(2부 챕터)을 story+1로 가리킨다 */
 function storyIdx(){
@@ -1439,7 +1563,7 @@ async function loadRank(){
   }catch(e){ rankCache = []; }
   if(G.screen==='rank' && !bossMode) paintRank();
 }
-const PROG_LABEL = ['1장','2장','3장','4장','최종장','엔딩','진엔딩 ★','이세계 1장','이세계 2장','이세계 3장','이세계 4장','이세계 최종장','이세계 5장 ★★','이세계 6장','이세계 7장','이세계 진최종장','전차원 클리어 ★★★','신계 로비 돌파','신계 운명부 돌파','신계 윤회실 돌파','신계 정비창 돌파','신계 연구소 돌파','전우주 클리어 ★★★★★','공허 수속장 돌파','공허 평원 돌파','공허 도서관 돌파','공허 공장 돌파','공허 본청 돌파','무(無)차원 클리어 ★★★★★★'];
+const PROG_LABEL = ['1장','2장','3장','4장','최종장','엔딩','진엔딩 ★','이세계 1장','이세계 2장','이세계 3장','이세계 4장','이세계 최종장','이세계 5장 ★★','이세계 6장','이세계 7장','이세계 진최종장','전차원 클리어 ★★★','신계 로비 돌파','신계 운명부 돌파','신계 윤회실 돌파','신계 정비창 돌파','신계 연구소 돌파','전우주 클리어 ★★★★★','공허 수속장 돌파','공허 평원 돌파','공허 도서관 돌파','공허 공장 돌파','공허 본청 돌파','무(無)차원 클리어 ★★★★★★','리부트 캐시폐기장 돌파','리부트 롤백협곡 돌파','리부트 스냅샷고 돌파','리부트 권한관제실 돌파','리부트 메모리부서 돌파','리부트 디스크부서 돌파','리부트 차원 클리어 ★★★★★★★','무한루프 교착층 돌파','무한루프 붕괴층 돌파','무한루프 경합층 돌파','무한루프 특이점층 돌파','무한루프 타임아웃 돌파','무한루프 교착심연 돌파','무한루프 커널노심 돌파','무한루프 클리어 ★★★★★★★★'];
 let rankSel = -1;
 function paintRank(){
   clearGrid();
@@ -1814,6 +1938,8 @@ const DIMENSIONS = [
   { name:'2부 — 이세계',           from:6, to:14, need:0, isekai:true },
   { name:'3부 — 신계 본사',         from:15, to:20, need:15, isekai:true },
   { name:'4부 — 공허 컨소시엄',      from:21, to:26, need:21, isekai:true },
+  { name:'5부 — 리부트 차원',        from:27, to:33, need:27, isekai:true },
+  { name:'6부 — 무한루프 사옥',      from:34, to:41, need:34, isekai:true },
 ];
 let moveDim = -1;
 function floorUnlocked(i){
@@ -2659,10 +2785,31 @@ function startExplore(area){
     if(G.floor===24 && G.story>=25 && Math.random()<0.03) pool=['breakerforeman'];
     if(G.floor===25 && G.story>=26 && Math.random()<0.03) pool=['liquidjudge'];
     if(G.floor===26 && G.story>=27 && Math.random()<0.025) pool=['nullchairman'];
+    /* 5부 리부트 차원 보스: 격파 후 그 구역에서 드물게 출현 */
+    if(G.floor===27 && G.story>=28 && Math.random()<0.03) pool=['rbaCacheadminVoid'];
+    if(G.floor===28 && G.story>=29 && Math.random()<0.03) pool=['rbaRollbackchiefNull'];
+    if(G.floor===29 && G.story>=30 && Math.random()<0.03) pool=['rbaSnapchiefFrost'];
+    if(G.floor===30 && G.story>=31 && Math.random()<0.03) pool=['rbaSudoadminRoot'];
+    if(G.floor===31 && G.story>=32 && Math.random()<0.03) pool=['rbbResetwyrm'];
+    if(G.floor===32 && G.story>=33 && Math.random()<0.03) pool=['rbbFormatlord'];
+    if(G.floor===33 && G.story>=34 && Math.random()<0.025) pool=['rbbRootreset'];
+    /* 6부 무한루프 사옥 보스 */
+    if(G.floor===34 && G.story>=35 && Math.random()<0.03) pool=['lpaDeadlockus'];
+    if(G.floor===35 && G.story>=36 && Math.random()<0.03) pool=['lpaSegfaultor'];
+    if(G.floor===36 && G.story>=37 && Math.random()<0.03) pool=['lpaRacemaster'];
+    if(G.floor===37 && G.story>=38 && Math.random()<0.03) pool=['lpaSingularis'];
+    if(G.floor===38 && G.story>=39 && Math.random()<0.03) pool=['lpbTimeoutreaper'];
+    if(G.floor===39 && G.story>=40 && Math.random()<0.03) pool=['lpbDeadlocklordEternal'];
+    if(G.floor===40 && G.story>=41 && Math.random()<0.03) pool=['lpbPanickingArchon'];
+    if(G.floor===41 && G.story>=42 && Math.random()<0.025) pool=['lpbOmniloop'];
     const sid = pool[Math.floor(Math.random()*pool.length)];
     const LEGEND_WILD_LV = { dragon:18, phoenix:24, burnoutlord:40, overgod:60,
       metatronsec:70, moiradirector:76, yamamanager:81, chronosforeman:86, demiurgelab:91, omniversceo:96,
-      devoidchief:104, whiteoutdir:110, redactmaster:116, breakerforeman:122, liquidjudge:128, nullchairman:136 };
+      devoidchief:104, whiteoutdir:110, redactmaster:116, breakerforeman:122, liquidjudge:128, nullchairman:136,
+      rbaCacheadminVoid:143, rbaRollbackchiefNull:146, rbaSnapchiefFrost:152, rbaSudoadminRoot:155,
+      rbbResetwyrm:158, rbbFormatlord:163, rbbRootreset:170,
+      lpaDeadlockus:173, lpaSegfaultor:177, lpaRacemaster:181, lpaSingularis:185,
+      lpbTimeoutreaper:188, lpbDeadlocklordEternal:191, lpbPanickingArchon:195, lpbOmniloop:200 };
     const lv = SPECIES[sid].legend
       ? (LEGEND_WILD_LV[sid]||24)
       : area.lv[0] + Math.floor(Math.random()*(area.lv[1]-area.lv[0]+1));
@@ -2932,7 +3079,7 @@ function onTrainerMonDown(){
     if(!canAutoSave) pushLog('💾 큰 진행을 했다! [백업 코드]를 발급해 보관해 두자.');
     if(!b.revenge && b.bossIdx===G.story){
       G.story++;
-      if(G.story===5 || G.story===6 || G.story===11 || G.story===15 || G.story===21 || G.story===27){ setTimeout(()=>{ G.screen='ending'; render(); },40); return; }
+      if(G.story===5 || G.story===6 || G.story===11 || G.story===15 || G.story===21 || G.story===27 || G.story===34 || G.story===42){ setTimeout(()=>{ G.screen='ending'; render(); },40); return; }
       b.afterStory = true;
     }
   }
@@ -3117,18 +3264,36 @@ function scrGameover(){
 function scrEnding(){
   restoreLead();
   cloudSave(true); updateBoard(true);
+  const loopClear = G.story>=42;
+  const rebootClear = G.story>=34;
   const voidClear = G.story>=27;
   const universeClear = G.story>=21;
   const dimensionClear = G.story>=15;
   const isekaiClear = G.story>=11;
   const final = G.story>=6;
-  const lines = voidClear ? [
-    ['★★★★★★ 최종 진엔딩 — 무(無)마저 쉬게 한 자 ★★★★★★','bold'],'',
+  const lines = loopClear ? [
+    ['★★★★★★★★ 진(眞)엔딩 — 무한루프를 끝낸 자 ★★★★★★★★','bold'],'',
+    '특이점 옴니루프가 스스로 정지했다. "퇴근은… 있었구나. 다음 순간이, 처음으로 찾아온다."',
+    '회사, 이세계, 신계, 공허, 리부트 차원, 그리고 영원히 반복되던 야근의 특이점까지 —',
+    '존재하는 모든 시간이, 마침내 단 한 번의 칼퇴로 수렴했다. 무한루프는 깨졌다.','',
+    [`최종 기록 — 승수 ${G.wins} / 도감 ${dexCaughtCount()}/${ALL_SIDS.length} / 희귀 ${Object.keys(G.rarDex).length}종`,'hl'],'',
+    '★ 모든 차원을 클리어했습니다. 진정한 엔딩입니다. ★',
+    '남은 목표: 도감 완성 — 5·6부 보스들도 격파한 구역에서 야생으로 드물게 출현한다.',
+    '(사내 대전 아레나에서 다른 사원의 파티와 겨뤄 연승과 복지P를 쌓아 보자)',
+  ] : rebootClear ? [
+    ['★★★★★★★ 진엔딩 — 초기화에 맞선 자 ★★★★★★★','bold'],'',
+    '루트 관리자 RESET이 공장초기화를 스스로 취소했다. "이 우주의 root는… 내가 아니었어."',
+    '모든 차원을 새 회계연도로 되돌리려던 시스템이 멈췄다. 워라밸은 무효화되지 않았다.','',
+    [`최종 기록 — 승수 ${G.wins} / 도감 ${dexCaughtCount()}/${ALL_SIDS.length} / 희귀 ${Object.keys(G.rarDex).length}종`,'hl'],'',
+    ['…그러나 초기화 카운트다운의 끝에서, 시간이 멎지 않고 무한히 되감기기 시작했다. 새 차원 [무한루프 사옥]이 해금되었습니다! (차원 이동)','hl'],
+    '같은 하루가 영원히 반복되는 야근의 특이점 — 그 중심에 \'옴니루프\'가 있다. 진정한 최종장이 시작된다.',
+  ] : voidClear ? [
+    ['★★★★★★ 진엔딩 — 무(無)마저 쉬게 한 자 ★★★★★★','bold'],'',
     '공허 의장 널이 스스로의 청산 안건을 기각했다. "무(無)가 아니라 휴(休)로 하지."',
     '사무실, 이세계, 신계, 그리고 공허까지 — 존재하는 모든 것과 존재하지 않는 것마저 칼퇴했다.','',
     [`최종 기록 — 승수 ${G.wins} / 도감 ${dexCaughtCount()}/${ALL_SIDS.length} / 희귀 ${Object.keys(G.rarDex).length}종`,'hl'],'',
-    '남은 목표: 도감 완성 — 공허의 간부들은 격파한 구역에서 야생 개체로 드물게 출현한다.',
-    '(보스 재대결 강화판으로 연승과 포인트를 쌓아, 모든 종을 레전드 등급으로 모아 보자)',
+    ['…그 순간, 승인된 워라밸을 무효화하려는 힘이 모든 차원을 [새 회계연도]로 초기화하기 시작했다. 새 차원 [리부트 차원]이 해금되었습니다! (차원 이동)','hl'],
+    '모든 것을 공장 출고 상태로 되돌리려는 근원 시스템 — 그 관제실에 \'루트 관리자 RESET\'이 있다.',
   ] : universeClear ? [
     ['★★★★★ 진엔딩 — 전 우주의 영웅 ★★★★★','bold'],'',
     '우주그룹 회장 옴니버스가 안건을 가결했다. "전 우주 정시퇴근제, 전격 시행."',
