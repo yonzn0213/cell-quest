@@ -467,6 +467,27 @@ T('합성 조합표 화면 렌더 (스모크)', () => {
   newGame(); G.party = [makeMon('espresso', 5)]; G.dex.latte = 1; G.dex.gian = 2;
   G.screen = 'recipe'; render(); return true;
 });
+
+/* ── v5.8: 클라우드 계정 코드 (UUID) ── */
+T('UUID 생성: 36자 형식·매번 다름', () => {
+  const a = makeUUID(), b = makeUUID();
+  return /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/.test(a) && a !== b;
+});
+T('코드 set/clear: localStorage 연동', () => {
+  setCloudCode('test-uuid-1234567890abcdef');
+  const saved = localStorage.getItem('cellquest_cloudcode');
+  setCloudCode(null);
+  return saved === 'test-uuid-1234567890abcdef' && cloudCode === null
+    && localStorage.getItem('cellquest_cloudcode') === null;
+});
+T('클라우드 계정 화면 렌더 — 미로그인/로그인 양쪽 (스모크)', () => {
+  newGame(); G.party = [makeMon('espresso', 5)];
+  setCloudCode(null); G.screen = 'cloud'; render();
+  setCloudCode('zzzz-uuid-abcdefghijklmnop'); render();
+  setCloudCode(null); return true;
+});
+T('클라우드 코드는 RESUME_SAFE_SCREENS에 포함 (복원 안전)', () =>
+  RESUME_SAFE_SCREENS.includes('cloud'));
 `;
 vm.runInContext(TESTS, ctx, { filename: 'tests' });
 

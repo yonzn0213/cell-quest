@@ -1062,6 +1062,43 @@ function sanitizeName(raw){
 function makePid(){ return Math.random().toString(36).slice(2,8); }
 function boardKey(){ return G.name + '_' + (G.pid||'0'); }
 
+/* ════════════════ 클라우드 계정 코드 (UUID) — 코드 하나로 어느 기기·주소에서도 이어하기 ════════════════
+   ID/PW 대신 추측 불가능한 UUID를 비밀 코드로 사용. RTDB saves/$code 에 저장하고,
+   코드를 아는 사람만 그 세이브를 읽고 쓸 수 있다 (보안 규칙으로 목록 조회는 차단). */
+const hasCloudSave = !!FIREBASE_DB_URL;
+const CLOUD_CODE_KEY = 'cellquest_cloudcode';
+let cloudCode = (()=>{ try{ return localStorage.getItem(CLOUD_CODE_KEY) || null; }catch(e){ return null; } })();
+let cloudSaving = false;
+function makeUUID(){
+  if(typeof crypto!=='undefined' && crypto.randomUUID) return crypto.randomUUID();
+  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g,c=>{
+    const r = Math.random()*16|0; return (c==='x'?r:(r&0x3|0x8)).toString(16);
+  });
+}
+function setCloudCode(code){
+  cloudCode = code || null;
+  try{ if(cloudCode) localStorage.setItem(CLOUD_CODE_KEY, cloudCode); else localStorage.removeItem(CLOUD_CODE_KEY); }catch(e){}
+}
+async function saveToCloud(){
+  if(!hasCloudSave || !cloudCode) return false;
+  flushPlayTime();
+  try{
+    const r = await fetch(FIREBASE_DB_URL+'/saves/'+encodeURIComponent(cloudCode)+'.json',
+      { method:'PUT', body: JSON.stringify(G, saveReplacer) });
+    return r.ok;
+  }catch(e){ return false; }
+}
+async function loadFromCloud(code){
+  if(!hasCloudSave || !code) return null;
+  try{
+    const r = await fetch(FIREBASE_DB_URL+'/saves/'+encodeURIComponent(code.trim())+'.json');
+    if(!r.ok) return null;
+    const obj = await r.json();
+    if(obj && (obj.v===2||obj.v===3||obj.v===4) && Array.isArray(obj.party)) return migrateSave(obj);
+  }catch(e){}
+  return null;
+}
+
 /* ── 로컬 캐시 자동 저장 (GitHub Pages 등 클라우드 없는 환경) ──
    브라우저 localStorage에 기록을 남긴다. 기기 간 이동은 여전히 백업 코드 사용. */
 const LOCAL_KEY = 'cellquest_save';
@@ -1093,7 +1130,7 @@ function localLoadCheck(){
 }
 /* 복원 직후 안전하게 그릴 수 있는 화면 화이트리스트.
    explore처럼 휘발 변수(curArea)에 의존하는 화면은 복원하면 크래시하므로 허브로 보낸다. */
-const RESUME_SAFE_SCREENS = ['hub','bag','party','box','dex','ldex','shop','moveFloor','dope','fusion','academy','wiki','gacha','recipe'];
+const RESUME_SAFE_SCREENS = ['hub','bag','party','box','dex','ldex','shop','moveFloor','dope','fusion','academy','wiki','gacha','recipe','cloud'];
 /* 저장 데이터를 현재 게임으로 복원 (이어하기 / 부팅 자동 복원 공용) */
 function resumeSave(d){
   G = d;
@@ -1336,7 +1373,7 @@ function render(){
     battle:scrBattle, bag:scrBag, party:scrParty, box:scrBox, dex:scrDex, shop:scrShop,
     moveFloor:scrMoveFloor, storyBeat:scrStoryBeat, gameover:scrGameover, ending:scrEnding,
     rank:scrRank, dope:scrDope, fusion:scrFusion, isekai:scrIsekai, ldex:scrLegendDex,
-    academy:scrAcademy, wiki:scrWiki, gacha:scrGacha, recipe:scrRecipe };
+    academy:scrAcademy, wiki:scrWiki, gacha:scrGacha, recipe:scrRecipe, cloud:scrCloud };
   (map[G.screen]||scrHub)();
 }
 
@@ -1373,6 +1410,7 @@ function scrTitle(){
   choices.push([cloudSaveData?'새 게임 시작 (※ 기존 자동 저장을 덮어씁니다)':'새 게임 시작',
     hasBoard?openNameDlg:()=>{ newGame(); G.screen='starter'; render(); }]);
   if(hasBoard) choices.push(['랭킹 보드 보기', ()=>{ G.screen='rank'; render(); }]);
+  if(hasCloudSave) choices.push([cloudCode?'☁ 클라우드 계정 (코드)':'☁ 클라우드 코드로 불러오기', ()=>{ G.screen='cloud'; render(); }]);
   choices.push(['백업 코드 불러오기', openLoadDlg]);
   paint(lines, choices, '=GAME.START()');
 }
@@ -1541,6 +1579,18 @@ function scrHub(){
   );
   if(hasBoard) choices.push(['사내 랭킹 보드', ()=>{ G.screen='rank'; render(); }]);
   choices.push(['사내 위키 (도움말)', ()=>{ G.screen='wiki'; render(); }]);
+  if(hasCloudSave){
+    if(cloudCode){
+      choices.push(['💾 클라우드 저장 (한 번에 저장)', async ()=>{
+        if(cloudSaving) return; cloudSaving=true; pendingMsg.push('☁ 클라우드에 저장 중…'); render();
+        const ok = await saveToCloud(); cloudSaving=false;
+        pendingMsg.push(ok?'✅ 클라우드 저장 완료!':'클라우드 저장 실패 — 잠시 후 다시 시도하세요.'); render();
+      }]);
+      choices.push(['☁ 클라우드 계정 (코드 보기/전환)', ()=>{ G.screen='cloud'; render(); }]);
+    } else {
+      choices.push(['☁ 클라우드 계정 (코드 발급/불러오기)', ()=>{ G.screen='cloud'; render(); }]);
+    }
+  }
   choices.push([canAutoSave?'백업 코드 (저장/불러오기 · 기기 이동용)':'백업 코드 (저장/불러오기) — ⚠ 유일한 저장 수단', openSaveDlg]);
   choices.push(['타이틀 화면으로 (새 게임은 여기서)', ()=>{
     localSave(); localLoadCheck(); /* 현재 진행을 저장하고 이어하기 데이터 갱신 */
@@ -1990,6 +2040,77 @@ function scrRecipe(){
   setCell(ROWS-1,3,'2. 돌아간다','choice',()=>{ G.screen='hub'; render(); });
   if(total>1) setCell(ROWS-1,5,'3. 다음 페이지 →','choice',()=>{ recipePage=(recipePage+1)%total; render(); });
   setFx(`=조합표 (${FUSION_RECIPES.length}종 레시피)`);
+}
+
+/* ── 클라우드 계정 (UUID 코드) 화면 ── */
+let cloudMsg = '';
+function scrCloud(){
+  const lines = [['― 클라우드 저장 (계정 코드) ―','bold'],''];
+  if(cloudMsg){ cloudMsg.split('\n').forEach(s=>lines.push([s,'hl'])); lines.push(''); cloudMsg=''; }
+  const choices = [];
+  if(!hasCloudSave){
+    lines.push('이 배포에서는 클라우드 저장을 사용할 수 없습니다.');
+  } else if(cloudCode){
+    lines.push(['✅ 코드 연결됨 — 이 코드만 있으면 어느 기기·주소에서도 이어집니다.','dim']);
+    lines.push([`내 계정 코드: ${cloudCode}`,'hl']);
+    lines.push('','【저장】을 누르면 현재 진행이 클라우드에 즉시 저장됩니다.');
+    choices.push(['💾 저장 (클라우드에 지금 저장)', async ()=>{
+      if(cloudSaving) return; cloudSaving=true; cloudMsg='저장 중…'; render();
+      const ok = await saveToCloud(); cloudSaving=false;
+      cloudMsg = ok ? '✅ 클라우드에 저장 완료!' : '저장 실패 — 잠시 후 다시 시도하세요.'; render();
+    }]);
+    choices.push(['📋 내 코드 보기 (복사용)', ()=>showCloudCodeDlg()]);
+    choices.push(['🔑 다른 코드로 불러오기', ()=>openCloudLoadDlg()]);
+    choices.push(['로그아웃 (이 기기에서 코드 분리)', ()=>{
+      setCloudCode(null); cloudMsg='로그아웃했습니다. 로컬 진행은 그대로 남아 있어요.'; render();
+    }]);
+  } else {
+    lines.push('계정 코드를 발급하면 진행상황이 클라우드에 저장되어');
+    lines.push('주소나 기기가 달라도 코드만 입력하면 이어할 수 있습니다.','');
+    lines.push(['※ 코드는 비밀번호와 같습니다. 잃어버리면 복구할 수 없으니 꼭 보관하세요.','dim']);
+    choices.push(['🆕 새 계정 코드 발급 (현재 진행 업로드)', async ()=>{
+      if(cloudSaving) return; cloudSaving=true;
+      const code = makeUUID(); setCloudCode(code); cloudMsg='발급 중…'; render();
+      const ok = await saveToCloud(); cloudSaving=false;
+      if(ok){ cloudMsg='✅ 코드 발급 + 저장 완료!\n반드시 [내 코드 보기]로 코드를 복사해 보관하세요.'; }
+      else { setCloudCode(null); cloudMsg='발급 실패 — 네트워크를 확인하고 다시 시도하세요.'; }
+      render();
+    }]);
+    choices.push(['🔑 코드로 불러오기', ()=>openCloudLoadDlg()]);
+  }
+  choices.push(['돌아간다', ()=>{ G.screen = G.party.length?'hub':'title'; render(); }]);
+  paint(lines, choices, '=CLOUD(계정코드)');
+}
+function showCloudCodeDlg(){
+  document.getElementById('dlgtitle').textContent = '클라우드 계정 코드';
+  document.getElementById('dlgdesc').textContent = '이 코드를 안전한 곳에 보관하세요. 다른 기기에서 [코드로 불러오기]에 입력하면 이어집니다.';
+  dlgText.value = cloudCode || ''; dlgText.onfocus = ()=>dlgText.select();
+  dlgOk.textContent = '닫기'; dlgOk.onclick = closeDlg;
+  dlg.classList.add('show'); dlgText.focus();
+}
+function openCloudLoadDlg(){
+  document.getElementById('dlgtitle').textContent = '코드로 불러오기';
+  document.getElementById('dlgdesc').textContent = '발급받은 계정 코드를 붙여넣고 [불러오기]를 누르세요. (현재 진행은 덮어써집니다)';
+  dlgText.value = ''; dlgText.onfocus = null;
+  dlgOk.textContent = '불러오기';
+  dlgOk.onclick = async ()=>{
+    const code = (dlgText.value||'').trim();
+    if(!code) return;
+    document.getElementById('dlgdesc').textContent = '불러오는 중…';
+    const d = await loadFromCloud(code);
+    if(d){
+      setCloudCode(code); closeDlg();
+      G = d; playSessionStart = Date.now();
+      if(!G.name) G.name = '사원'+Math.floor(Math.random()*900+100);
+      if(!RESUME_SAFE_SCREENS.includes(G.screen)) G.screen='hub';
+      G.battle = null;
+      pendingMsg.push('☁ 클라우드 코드에서 진행을 불러왔다!');
+      render();
+    } else {
+      document.getElementById('dlgdesc').textContent = '코드를 찾을 수 없습니다. 정확히 붙여넣었는지 확인하세요.';
+    }
+  };
+  dlg.classList.add('show'); dlgText.focus();
 }
 
 /* ── 합성 실험실: 동종 = 등급 도전(저확률) / 이종 = 레시피 신종 ── */
