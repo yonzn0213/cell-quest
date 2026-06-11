@@ -1723,10 +1723,11 @@ function paintRankDetail(p, idx){
   setCell(ROWS-1,1,'1. 목록으로','choice',()=>{ rankSel=-1; paintRank(); });
   setFx(`=VLOOKUP("${p.name}", 사내랭킹, 파티)`);
 }
-function scrRank(){
+async function scrRank(){
   rankCache = null;
   rankSel = -1;
-  paintRank();
+  paintRank();                 /* '불러오는 중…' 즉시 표시 */
+  await updateBoard(true);      /* 내 최신 기록을 먼저 강제 푸시(throttle 우회) — race 방지로 await */
   loadRank();
 }
 function openRenameDlg(){
@@ -2433,6 +2434,11 @@ function scrGacha(){
 /* ── 인게임 패치노트: 배포 사이트에서도 최근 업데이트를 볼 수 있게.
    전체 이력은 저장소의 CHANGELOG.md, 여기엔 핵심만 요약해 최신순으로 둔다. ── */
 const PATCH_NOTES = [
+  { ver:'v6.3', title:'보스 격노 · 랭킹 보드 실시간 반영', items:[
+    '🔥 보스·아레나에서 회복 아이템을 4회 이상 쓰면 회복할수록 상대 공격이 누적 증가(격노)',
+    '⚖ 엘릭서 등 무한 회복으로 버티던 졸전 해소 — 단, 공격만 하는 긴 전투(다수 파티 보스)는 영향 없음',
+    '🔧 랭킹 보드를 열 때 내 최신 기록을 강제 동기화 — 방금 한 플레이가 보드에 바로 반영',
+  ]},
   { ver:'v6.2', title:'난이도 리밸런스 · 보관함 등급 표시', items:[
     '⚖ 무한루프(6부) 난이도 대폭 상향 — 보스 강화 배율 1.5 → 1.7~2.0 (옴니루프 2.0)',
     '⚖ 리부트(5부) 난이도 상향 — 보스 배율 1.45~1.5 → 1.55~1.7 (4부<5부≤6부 곡선)',
@@ -3205,6 +3211,16 @@ function levelDmgFactor(attLv, defLv){
   if(gap <= 0) return 1;
   return Math.max(0.5, 1 - gap*0.04);
 }
+/* 보스 격노(enrage): 회복 아이템을 많이 쓸수록(=무한 회복 스톨) 보스 데미지가 누적 증가해
+   회복으로 버티는 전략이 결국 지는 길이 되게 한다. 야생전 제외(보스·아레나만).
+   ※ '턴 수'가 아니라 '회복 횟수' 기준 — 공격만 하는 긴 전투(다수 파티 보스)는 아무리 길어도 격노하지 않는다. */
+const ENRAGE_FREE_HEALS = 3;   /* 이만큼은 자유, 그 이후 회복할수록 격노 누적 */
+const ENRAGE_PER_HEAL = 0.15;  /* 초과 회복 1회당 보스 데미지 +15% */
+function enrageMult(b){
+  if(!b || b.wild) return 1;
+  const over = (b.heals||0) - ENRAGE_FREE_HEALS;
+  return over>0 ? 1 + ENRAGE_PER_HEAL*over : 1;
+}
 function dmgCalc(attacker, power, moveType, defender){
   const mult = moveType ? typeMult(moveType, monType(defender)) : 1;
   const critRate = attacker.trait==='집중' ? 0.20 : 0.08;
@@ -3251,9 +3267,11 @@ function enemyTurn(){
   const e=b.enemy, me=activeMon();
   if(e.hp<=0) return;
   const mv = pickEnemyMove(e, me, !b.wild || Math.random() < (G.floor>=6 ? 0.8 : 0.5));
-  const {val,mult,crit} = dmgCalc(e, mv[2], mv[3], me);
+  const r = dmgCalc(e, mv[2], mv[3], me);
+  const en = enrageMult(b);
+  const val = en>1 ? Math.max(1, Math.round(r.val*en)) : r.val;
   me.hp = Math.max(0, me.hp - val);
-  pushLog(`${monName(e)}의 ${mv[1]}! ${val} 데미지${fxTag(mult,crit)}`);
+  pushLog(`${monName(e)}의 ${mv[1]}! ${val} 데미지${fxTag(r.mult,r.crit)}${en>1?` 🔥격노×${en.toFixed(2)}`:''}`);
   applyTraits(e, val);
   if(me.hp<=0){
     pushLog(`${monName(me)}이(가) 기절했다!`);
@@ -3449,7 +3467,14 @@ function useHeal(kind){
     me.hp=Math.min(me.maxhp, me.hp+heal); pushLog(`${monName(me)} HP ${heal} 회복!`);
   }
   else { me.hp=me.maxhp; pushLog(`${monName(me)} HP 완전 회복!`); }
+  countHeal(b);
   b.menu='main'; enemyTurn(); render();
+}
+/* 회복 횟수 누적 — 한도 초과 시 보스 격노 시작 안내(보스·아레나만) */
+function countHeal(b){
+  b.heals = (b.heals||0) + 1;
+  if(!b.wild && b.heals === ENRAGE_FREE_HEALS+1)
+    pushLog('🔥 회복이 잦아지자 상대가 격노했다! 이제 회복할수록 상대 공격이 거세진다 — 빨리 끝내자!');
 }
 
 /* 전투 중 기절·부상 동료 회복 — 모닝커피(기절 50% 부활) / 엘릭서(1마리 완전 회복).
@@ -3470,6 +3495,7 @@ function useBattleHeal(kind){
     G.items.elixir--; target.hp = target.maxhp;
     pushLog(`✨ ${monName(target)}이(가) 엘릭서의 빛에 완전히 회복되었다!`);
   }
+  countHeal(b);
   b.menu='main'; enemyTurn(); render();
 }
 
