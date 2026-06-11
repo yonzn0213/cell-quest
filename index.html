@@ -1244,7 +1244,7 @@ function newGame(){
     v:SAVE_VERSION, screen:'title', name:'', pid:makePid(),
     party:[], box:[], active:0, revN:{}, mutFail:{},
     items:{ clip:5, goldclip:0, prismclip:0, dimclip:0, godclip:0, bacchus:3, hotsix:0, coffee:0, elixir:0, ample:0, detox:0, hair:0 },
-    money:200, wins:0, story:0, streak:0, isekai:false, gifts:{},
+    money:200, wins:0, arenaWins:0, story:0, streak:0, isekai:false, gifts:{},
     dex:{}, rarDex:{}, dexRewards:[],
     battle:null, log:[], floor:0, coolerCd:0, playMs:0,
   };
@@ -1571,6 +1571,7 @@ async function loadRank(){
     rankCache = rows.slice(0,RANK_MAX_ROWS);
   }catch(e){ rankCache = []; }
   if(G.screen==='rank' && !bossMode) paintRank();
+  if(G.screen==='arena' && !bossMode) scrArena();
 }
 const PROG_LABEL = ['1장','2장','3장','4장','최종장','엔딩','진엔딩 ★','이세계 1장','이세계 2장','이세계 3장','이세계 4장','이세계 최종장','이세계 5장 ★★','이세계 6장','이세계 7장','이세계 진최종장','전차원 클리어 ★★★','신계 로비 돌파','신계 운명부 돌파','신계 윤회실 돌파','신계 정비창 돌파','신계 연구소 돌파','전우주 클리어 ★★★★★','공허 수속장 돌파','공허 평원 돌파','공허 도서관 돌파','공허 공장 돌파','공허 본청 돌파','무(無)차원 클리어 ★★★★★★','리부트 캐시폐기장 돌파','리부트 롤백협곡 돌파','리부트 스냅샷고 돌파','리부트 권한관제실 돌파','리부트 메모리부서 돌파','리부트 디스크부서 돌파','리부트 차원 클리어 ★★★★★★★','무한루프 교착층 돌파','무한루프 붕괴층 돌파','무한루프 경합층 돌파','무한루프 특이점층 돌파','무한루프 타임아웃 돌파','무한루프 교착심연 돌파','무한루프 커널노심 돌파','무한루프 클리어 ★★★★★★★★'];
 let rankSel = -1;
@@ -1713,7 +1714,7 @@ function render(){
     moveFloor:scrMoveFloor, storyBeat:scrStoryBeat, gameover:scrGameover, ending:scrEnding,
     rank:scrRank, dope:scrDope, fusion:scrFusion, isekai:scrIsekai, ldex:scrLegendDex,
     academy:scrAcademy, wiki:scrWiki, gacha:scrGacha, recipe:scrRecipe, cloud:scrCloud,
-    patchnotes:scrPatchNotes };
+    patchnotes:scrPatchNotes, arena:scrArena };
   (map[G.screen]||scrHub)();
 }
 
@@ -1919,6 +1920,7 @@ function scrHub(){
     ['몬스터 도감', ()=>{ G.screen='dex'; render(); }],
   );
   if(hasBoard) choices.push(['사내 랭킹 보드', ()=>{ G.screen='rank'; render(); }]);
+  choices.push(['🥊 사내 대전 (아레나 · PvP)', ()=>{ arenaMsg=''; G.screen='arena'; render(); }]);
   choices.push(['사내 위키 (도움말)', ()=>{ G.screen='wiki'; render(); }]);
   choices.push(['📋 패치노트 (업데이트 내역)', ()=>{ patchPage=0; G.screen='patchnotes'; render(); }]);
   if(hasCloudSave){
@@ -2921,6 +2923,79 @@ function startBossBattle(idx, revenge){
   G.screen='battle'; render();
 }
 
+/* ════════════════ 비동기 PvP — 사내 대전 아레나 ════════════════
+   랭킹 보드의 다른 사원 파티 스냅샷(s/l/r/t/d + lead)을 실제 몬스터로 복원해 1:1 팀전.
+   보드가 비었거나 오프라인이면 내 파티 기반 '그림자 사원'을 합성한다(항상 플레이 가능).
+   패배 페널티 없음 — 부담 없이 자주 즐기게. 서버 변경 0 (기존 loadRank/normalizeEntry 재사용). */
+const ARENA_DOPE_CAP = 4;   /* 공개 보드 조작 대비: 복원 도핑 배율 상한 */
+function reconstructMon(snap){
+  if(!snap || !SPECIES[snap.s]) return null;
+  const lv = Math.max(1, Math.min(Math.round(snap.l||1), 200));
+  const rar = RARITY[snap.r] ? snap.r : 'normal';
+  const m = makeMon(snap.s, lv, rar);
+  if(snap.t && TRAITS[snap.t]) m.trait = snap.t;          /* 스냅샷 특성 그대로 */
+  const dope = (typeof snap.d==='number' && snap.d>0) ? Math.min(snap.d, ARENA_DOPE_CAP) : 1;
+  m.dope = dope; recalcMonStats(m); m.hp = m.maxhp;        /* 도핑 배율 재현 */
+  return m;
+}
+function arenaMyProgress(){ return G.isekai ? G.story+1 : G.story; }
+/* 진행도가 비슷한 상대 우선. 본인·파티 없는 항목 제외 */
+function arenaCandidates(){
+  const mine = arenaMyProgress();
+  const pool = (rankCache||[]).filter(e => e && Array.isArray(e.party) && e.party.length && e.name !== G.name);
+  pool.sort((a,b) => (Math.abs((a.story||0)-mine) - Math.abs((b.story||0)-mine)) || rankCompare(a,b));
+  return pool;
+}
+/* 그림자 파티(폴백): 내 파티를 거울처럼 복제 — 보드가 비어도 항상 대전 가능 */
+function arenaShadowFoe(){
+  const src = G.party.length ? G.party : [makeMon('espresso', Math.max(5, arenaMyProgress()*5))];
+  return { name:'그림자 사원', lead:0, shadow:true,
+    party: src.slice(0,4).map(m=>({ s:m.sid, l:m.lv, r:m.rar||'normal', t:m.trait||null, d:m.dope||1 })) };
+}
+function arenaReward(party){
+  const lv = party.reduce((s,m)=>s+m.lv,0);
+  return Math.round(lv*40 + party.length*250);
+}
+let arenaMsg = '';
+function scrArena(){
+  setStatus('대전');
+  if(rankCache===null && hasBoard) loadRank();   /* 보드 미로드 시 비동기 로드 후 재페인트 */
+  const lines = [['― 사내 대전 (아레나) ―','bold'],'',
+    ['다른 사원의 파티와 1:1 팀전. 패배 페널티 없음 — 회복템은 쓸 수 있지만 도망은 불가.','dim'],
+    [`통산 대전 ${G.arenaWins||0}승 · 내 진행도 ${PROG_LABEL[Math.min(arenaMyProgress(),PROG_LABEL.length-1)]}`,'dim'],''];
+  if(arenaMsg){ lines.push([arenaMsg,'hl'],''); arenaMsg=''; }
+  const cands = arenaCandidates();
+  const choices = [];
+  if(cands.length){
+    lines.push('진행도가 비슷한 도전 상대:');
+    cands.slice(0,3).forEach(e=>{
+      const top = Math.max(...e.party.map(p=>p.l||1));
+      choices.push([`${e.name} (${PROG_LABEL[Math.min(e.story||0,PROG_LABEL.length-1)]} · ${e.party.length}마리 · LV~${top})`, ()=>startArenaBattle(e)]);
+    });
+    choices.push(['🎲 랜덤 도전 (보드에서 무작위)', ()=>startArenaBattle(cands[Math.floor(Math.random()*cands.length)])]);
+  } else {
+    lines.push(hasBoard ? '보드에 도전할 상대가 아직 없다. 그림자 사원과 연습 대전을 한다.' : '오프라인 — 그림자 사원과 연습 대전을 한다.');
+  }
+  choices.push(['🥊 그림자 사원과 대전 (내 파티 거울)', ()=>startArenaBattle(arenaShadowFoe())]);
+  choices.push(['← 거점으로', ()=>{ G.screen='hub'; render(); }]);
+  paint(lines, choices, '=ARENA()');
+}
+function startArenaBattle(foe){
+  if(!foe){ arenaMsg='상대를 찾지 못했다.'; G.screen='arena'; render(); return; }
+  ensureAliveLead();
+  if(aliveMons().length===0){ arenaMsg='싸울 수 있는 몬스터가 없다. 먼저 회복하자.'; G.screen='arena'; render(); return; }
+  const party = (foe.party||[]).map(reconstructMon).filter(Boolean);
+  if(!party.length){ arenaMsg='상대 파티를 불러오지 못했다.'; G.screen='arena'; render(); return; }
+  const lead = G.active;
+  battleSnapshot = JSON.stringify(G, saveReplacer);
+  party.forEach(m=>dexSee(m.sid));
+  const reward = arenaReward(party);
+  G.battle = { enemyParty:party, eIdx:0, enemy:party[0], wild:false, arena:true,
+    foeName:foe.name, foeReward:reward, over:false, menu:'main', lead };
+  G.log = [`사내 대전 — ${foe.name}의 파티와 맞붙는다!`, `상대가 ${monName(party[0])}을(를) 내보냈다!`];
+  G.screen='battle'; render();
+}
+
 /* 레벨차 데미지 보정: 상대가 나보다 높을수록 내 공격이 약해진다 (1레벨당 -4%, 최저 50%).
    적 AI도 같은 dmgCalc를 쓰므로, 내가 더 높은 적을 칠 때도 동일하게 적용돼 양방향으로 작동한다.
    "도핑·상성으로 고레벨 한 마리 잡고 폭주 성장"하는 루트를 억제한다 (v5.9). */
@@ -3082,13 +3157,18 @@ function winWild(){
 }
 
 function onTrainerMonDown(){
-  const b=G.battle, B=BOSSES[b.bossIdx];
+  const b=G.battle, B=b.arena ? null : BOSSES[b.bossIdx];
   pushLog(`${monName(b.enemy)}을(를) 쓰러뜨렸다!`);
-  grantExpAndMoney(b.enemy, 1.3);
+  if(!b.arena) grantExpAndMoney(b.enemy, 1.3);   /* 아레나는 킬당 경험치/돈 없음 — 파밍 악용 방지, 승리 보상만 */
   b.eIdx++;
   if(b.eIdx < b.enemyParty.length){
     b.enemy = b.enemyParty[b.eIdx];
-    pushLog(`${B.name}이(가) ${monName(b.enemy)}을(를) 내보냈다!`);
+    pushLog(`${b.arena ? b.foeName : B.name}이(가) ${monName(b.enemy)}을(를) 내보냈다!`);
+  } else if(b.arena){
+    b.over=true;
+    G.arenaWins = (G.arenaWins||0) + 1;
+    G.money += b.foeReward;
+    pushLog(`★ 사내 대전 승리! ${b.foeName}을(를) 꺾었다! 보상 ${b.foeReward.toLocaleString()}P · 통산 ${G.arenaWins}승`);
   } else {
     b.over=true; G.wins++; countCoolerWin(); countStreakWin();
     const reward = Math.round(B.reward * (b.revenge ? revengeRate(b.bossIdx) : 1));
@@ -3211,7 +3291,7 @@ function scrBattle(){
   const b=G.battle, e=b.enemy, me=activeMon();
   /* 선두가 기절 상태로 메인 메뉴에 머무는 일이 없도록 (구버전 저장 데이터 복구 겸) */
   if(!b.over && me.hp<=0 && aliveMons().length>0) b.menu='forceSwitch';
-  const bossLabel = b.wild ? '' : ` 〔${BOSSES[b.bossIdx].name} ${b.eIdx+1}/${b.enemyParty.length}〕`;
+  const bossLabel = b.wild ? '' : ` 〔${b.arena ? b.foeName : BOSSES[b.bossIdx].name} ${b.eIdx+1}/${b.enemyParty.length}〕`;
   const lines = [
     [`⚔ ${monName(e)}  LV${e.lv}  [${monType(e)}]${bossLabel}`, monCls(e)||'bold'],
     [`   HP ${e.hp}/${e.maxhp}  ${'█'.repeat(Math.ceil(e.hp/e.maxhp*10)).padEnd(10,'░')}`, e.hp<e.maxhp*0.3?'hl':''],
@@ -3223,7 +3303,9 @@ function scrBattle(){
   ];
   let choices = [];
   if(b.over){
-    const next = b.afterStory
+    const next = b.arena
+      ? ()=>{ restoreLead(); arenaMsg=`${b.foeName}과(와)의 대전에서 승리했다!`; G.screen='arena'; render(); }
+      : b.afterStory
       ? ()=>{ restoreLead(); pendingMsg.push(BOSSES[b.bossIdx].win); G.screen='storyBeat'; storyBeatNext='hub'; render(); }
       : ()=>{ restoreLead(); G.screen='hub'; render(); };
     if(aliveMons().length>0) choices=[['전투 종료 — 돌아간다', next]];
@@ -3401,6 +3483,7 @@ function migrateSave(obj){
   if(obj.items && obj.items.detox===undefined) obj.items.detox = 0;
   if(obj.items && obj.items.hair===undefined) obj.items.hair = 0;
   if(typeof obj.streak!=='number') obj.streak = 0;
+  if(typeof obj.arenaWins!=='number') obj.arenaWins = 0;
   if(obj.isekai===undefined) obj.isekai = false;
   if(!obj.gifts) obj.gifts = {};
   if(!obj.pid) obj.pid = makePid();

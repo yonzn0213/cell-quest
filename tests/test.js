@@ -231,6 +231,41 @@ T('5·6부 합성 레시피 8종 추가 (결과 fusion:true · 재료 존재)', 
   });
 });
 
+/* ── v6.0 비동기 PvP 아레나 ── */
+T('아레나: reconstructMon — 스냅샷 복원(종족·레벨·등급·특성·도핑)', () => {
+  const m = reconstructMon({ s: 'espresso', l: 50, r: 'gold', t: '흡혈', d: 1.5 });
+  const base = statsFor('espresso', 50, 'gold');
+  return m && m.sid === 'espresso' && m.lv === 50 && m.rar === 'gold' && m.trait === '흡혈'
+    && m.dope === 1.5 && m.atk === Math.max(1, Math.round(base.atk * 1.5)) && m.hp === m.maxhp;
+});
+T('아레나: 잘못된 스냅샷 null · 도핑 상한 적용', () =>
+  reconstructMon({ s: '없는종' }) === null && reconstructMon(null) === null
+  && reconstructMon({ s: 'espresso', l: 50, d: 99 }).dope === ARENA_DOPE_CAP);
+T('아레나: 그림자 사원 폴백 — 항상 내 파티 거울 생성', () => {
+  newGame(); G.party = [makeMon('espresso', 30), makeMon('gyeoljae', 28)];
+  const foe = arenaShadowFoe();
+  return foe.party.length === 2 && foe.party[0].s === 'espresso' && foe.shadow === true;
+});
+T('아레나: 전투 시작 — arena 플래그·적 파티·전투 화면·보상>0', () => {
+  newGame(); G.party = [makeMon('espresso', 50)];
+  startArenaBattle({ name: '테스트사원', party: [{ s: 'wifi', l: 40, r: 'normal', t: null, d: 1 }, { s: 'gyeoljae', l: 42, r: 'normal', t: null, d: 1 }] });
+  return G.battle && G.battle.arena === true && G.battle.enemyParty.length === 2 && G.screen === 'battle' && G.battle.foeReward > 0;
+});
+T('아레나: 승리 보상 — arenaWins↑·복지P↑·스토리 진행도 불변', () => {
+  newGame(); G.party = [makeMon('espresso', 99)]; G.story = 3;
+  const money0 = G.money, story0 = G.story;
+  startArenaBattle({ name: '테스트사원', party: [{ s: 'wifi', l: 10, r: 'normal', t: null, d: 1 }] });
+  G.battle.eIdx = G.battle.enemyParty.length - 1;
+  onTrainerMonDown();
+  return G.arenaWins === 1 && G.money > money0 && G.story === story0 && G.battle.over === true;
+});
+T('아레나 화면 렌더 (보드 비었을 때 그림자 폴백)', () => {
+  newGame(); G.party = [makeMon('espresso', 40)]; rankCache = []; G.screen = 'arena'; render(); return true;
+});
+T('migrateSave: arenaWins 기본값 보충', () => {
+  const o = {}; migrateSave(o); return o.arenaWins === 0;
+});
+
 /* ── 패치 이벤트 2: 디톡스 + 의문의 머리카락 ── */
 T('디톡스 앰플: 도핑 배율·횟수 초기화', () => {
   newGame(); const mm = makeMon('espresso', 20);
