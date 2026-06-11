@@ -267,8 +267,8 @@ T('아레나 화면 렌더 (보드 비었을 때 그림자 폴백)', () => {
 T('migrateSave: arenaWins 기본값 보충', () => {
   const o = {}; migrateSave(o); return o.arenaWins === 0;
 });
-T('v6.0 버전 — 패치노트 최신·위장 제목 자동 반영', () =>
-  PATCH_NOTES[0].ver === 'v6.0' && GAME_VERSION === 'v6.0');
+T('v6.1 버전 — 패치노트 최신·위장 제목 자동 반영', () =>
+  PATCH_NOTES[0].ver === 'v6.1' && GAME_VERSION === 'v6.1');
 
 /* ── v6.1 일일 도전 + 출석 스트릭 ── */
 function ymd(offsetDays) { const d = new Date(); d.setDate(d.getDate() + offsetDays); const p = n => String(n).padStart(2, '0'); return d.getFullYear() + '-' + p(d.getMonth() + 1) + '-' + p(d.getDate()); }
@@ -801,7 +801,7 @@ T('패치노트 데이터: 비어있지 않고 각 항목 형식 유효', () =>
   Array.isArray(PATCH_NOTES) && PATCH_NOTES.length >= 1
   && PATCH_NOTES.every(p => typeof p.ver === 'string' && typeof p.title === 'string'
     && Array.isArray(p.items) && p.items.length >= 1));
-T('패치노트 최신 항목은 v6.0', () => /6\.0/.test(PATCH_NOTES[0].ver));
+T('패치노트 최신 항목은 v6.1', () => /6\.1/.test(PATCH_NOTES[0].ver));
 T('패치노트 화면 렌더 (스모크)', () => { newGame(); patchPage = 0; G.screen = 'patchnotes'; render(); return true; });
 T('GAME_VERSION은 최신 패치 버전과 일치', () => GAME_VERSION === PATCH_NOTES[0].ver);
 T('위장 엑셀 제목에 최신 버전 주입', () => {
