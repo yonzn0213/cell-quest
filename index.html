@@ -2772,12 +2772,20 @@ function scrFusion(){
 const DEX_PER_COL = 26;
 const DEX_PER_PAGE = DEX_PER_COL * 3;
 let dexPage = 0;
+/* 돌연변이종 = 다른 종의 evo.mut.to인 종 / 분류 심볼(도감 표시용) */
+function isMutationSpecies(sid){ return ALL_SIDS.some(b=>{ const e=SPECIES[b].evo; return e && e.mut && e.mut.to===sid; }); }
+function dexCategory(sid){
+  const s = SPECIES[sid];
+  if(s.fusion) return '🧬';            /* 합성 전용종 */
+  if(isMutationSpecies(sid)) return '🧪'; /* 돌연변이종 */
+  return '';
+}
 function scrDex(){
   clearGrid();
   const totalPages = Math.max(1, Math.ceil(ALL_SIDS.length/DEX_PER_PAGE));
   if(dexPage >= totalPages) dexPage = 0;
   setCell(2,1,`― 오피스 몬스터 도감 ―  등록 ${dexCaughtCount()} / ${ALL_SIDS.length}  (${dexPage+1}/${totalPages}페이지)`,'bold');
-  setCell(3,1,'─ 미확인 / 👁 목격 / ✔ 포획 / ★ 황금 / ◆ 프리즘 / 👑 레전드 / ✨ 신화','dim');
+  setCell(3,1,'─ 미확인 / 👁 목격 / ✔ 포획 / ★ 황금 / ◆ 프리즘 / 👑 레전드 / ✨ 신화  ·  🧬 합성종 / 🧪 돌연변이종','dim');
   const pageSids = ALL_SIDS.slice(dexPage*DEX_PER_PAGE, (dexPage+1)*DEX_PER_PAGE);
   pageSids.forEach((sid,j)=>{
     const i = dexPage*DEX_PER_PAGE + j;
@@ -2795,7 +2803,7 @@ function scrDex(){
     }
     setCell(r,col,`${no}.`,'num dim');
     setCell(r,col+1,`${mark} ${name}`,cls);
-    if(st>0) setCell(r,col+2,`[${SPECIES[sid].type}]`,'dim');
+    if(st>0) setCell(r,col+2,`[${SPECIES[sid].type}]${dexCategory(sid)}`,'dim');
   });
   setCell(ROWS-1,1,'1. 돌아간다','choice',()=>{ G.screen='hub'; render(); });
   if(totalPages>1) setCell(ROWS-1,4,'2. 다음 페이지 →','choice',()=>{ dexPage=(dexPage+1)%totalPages; render(); });

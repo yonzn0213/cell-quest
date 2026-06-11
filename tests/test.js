@@ -354,6 +354,15 @@ T('이벤트 화면 렌더 — 5종 + 결과 화면 크래시 없음', () => {
   return true;
 });
 
+/* ── v6.1 도감 종족 분류 표시 ── */
+T('도감: isMutationSpecies — 돌연변이종 판정', () =>
+  isMutationSpecies('rbaSnapwraith') === true && isMutationSpecies('chaosslime') === true
+  && isMutationSpecies('espresso') === false && isMutationSpecies('rbaResetcerberus') === false);
+T('도감: dexCategory — 합성/돌연변이/일반 구분', () =>
+  dexCategory('rbaResetcerberus') !== '' && dexCategory('rbaSnapwraith') !== ''
+  && dexCategory('rbaResetcerberus') !== dexCategory('rbaSnapwraith') && dexCategory('espresso') === '');
+T('도감 화면 렌더 (분류 심볼 포함)', () => { newGame(); G.dex.rbaResetcerberus = 2; G.dex.rbaSnapwraith = 2; G.screen = 'dex'; render(); return true; });
+
 /* ── 패치 이벤트 2: 디톡스 + 의문의 머리카락 ── */
 T('디톡스 앰플: 도핑 배율·횟수 초기화', () => {
   newGame(); const mm = makeMon('espresso', 20);
