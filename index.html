@@ -105,7 +105,7 @@
 
 <div class="statusbar">
   <div id="statustext">준비</div>
-  <div class="hint">ESC: 빠른 시트 전환 · 숫자키: 선택</div>
+  <div class="hint">ESC: 빠른 시트 전환 · 1~9, Q~H: 선택</div>
   <div class="right"><span>평균: -</span><span>개수: -</span><span>합계: -</span><span>100%</span></div>
 </div>
 
@@ -1283,11 +1283,11 @@ function openRenameDlg(){
 
 /* ════════════════ 렌더링 공통 ════════════════ */
 function paintPartyPanel(){
-  setCell(2,7,'■ 파티 현황','hdr'); setCell(2,8,'LV','hdr'); setCell(2,9,'HP','hdr'); setCell(2,10,'상태','hdr');
+  setCell(2,7,'■ 파티 현황','hdr'); setCell(2,8,'LV·EXP','hdr'); setCell(2,9,'HP','hdr'); setCell(2,10,'상태','hdr');
   G.party.forEach((m,i)=>{
     const r = 3+i;
     setCell(r,7,(i===G.active?'▶ ':'')+monName(m), monCls(m)||(i===G.active?'bold':''));
-    setCell(r,8,`${m.lv} ·${expPct(m)}%`,'num');
+    setCell(r,8,`${m.lv} · ${expPct(m)}%`,'num');
     setCell(r,9,`${m.hp}/${m.maxhp}`,'num');
     setCell(r,10, m.hp<=0?'기절': m.hp<m.maxhp*0.3?'위험':'정상', m.hp<=0?'dim':'');
   });
@@ -1306,6 +1306,9 @@ function paintPartyPanel(){
   setCell(r,7,'연승'); setCell(r,8,`${G.streak||0} (+${Math.min(G.streak||0,10)*3}%)`, (G.streak||0)>0?'num hl':'num');
 }
 
+/* 선택지 단축키: 1~9 다음은 Q~H 순서 (10개 이상 메뉴 대응) */
+const CHOICE_KEYS = '123456789qwertyuiopasdfgh';
+const choiceKey = i => (CHOICE_KEYS[i]||'').toUpperCase();
 function paint(lines, choices, fx){
   clearGrid();
   let r = 2;
@@ -1318,7 +1321,7 @@ function paint(lines, choices, fx){
   r++;
   choices.forEach((ch,i)=>{
     if(r>ROWS) return;
-    setCell(r,1,`${i+1}. ${ch[0]}`,'choice',ch[1]);
+    setCell(r,1,`${choiceKey(i)||'·'}. ${ch[0]}`,'choice',ch[1]);
     r++;
   });
   if(G.screen!=='title') paintPartyPanel();
@@ -1349,7 +1352,7 @@ function scrTitle(){
     '',
     [`목표: 보스들을 꺾고, ${ALL_SIDS.length}종의 몬스터 도감을 완성하라.`,'hl'],
     '',
-    ['※ 셀 클릭 또는 숫자키로 진행 · ESC = 위장 시트 전환','dim'],
+    ['※ 셀 클릭 또는 단축키(1~9, Q~H)로 진행 · ESC = 위장 시트 전환','dim'],
   ];
   if(hasCloud){
     lines.push(['※ 진행 상황은 자동 저장됩니다. 랭킹 보드의 이름·기록은 함께 플레이하는 모두에게 공개됩니다.','dim']);
@@ -1636,9 +1639,9 @@ function scrParty(){
   G.party.forEach((m,i)=>{
     const evo = SPECIES[m.sid].evo;
     const evoTag = evo ? `  · 진화 LV${evo.lv}${evo.mut?' (돌연변이 가능)':''}` : '';
-    lines.push([`${i===G.active?'▶':' '} ${monName(m)}  LV${m.lv} [${monType(m)}]  HP ${m.hp}/${m.maxhp}  공격 ${m.atk}  EXP ${expBar(m)} ${expPct(m)}%${evoTag}`, monCls(m)]);
-    lines.push(['    기술: '+knownMoves(m).map(mv=>mv[1]).join(', '),'dim']);
-    if(m.trait) lines.push([`    특성: ${m.trait} — ${TRAITS[m.trait]}`,'dim']);
+    lines.push([`${i===G.active?'▶':' '} ${monName(m)}  LV${m.lv} [${monType(m)}]  HP ${m.hp}/${m.maxhp}  공격 ${m.atk}${evoTag}`, monCls(m)]);
+    lines.push([`    EXP ${expBar(m,16)} ${expPct(m)}%  (다음 레벨까지 ${(expNeed(m.lv)-m.exp).toLocaleString()})`,'dim']);
+    lines.push(['    기술: '+knownMoves(m).map(mv=>mv[1]).join(', ')+(m.trait?`  ·  특성: ${m.trait}(${TRAITS[m.trait]})`:''),'dim']);
   });
   const choices = [];
   G.party.forEach((m,i)=>{
@@ -1772,18 +1775,31 @@ function scrDope(){
   paint(lines, choices);
 }
 
-/* ── 사내 연수원: 복지포인트 → 즉시 1레벨 (후반 잉여 화폐의 사용처) ── */
-const ACADEMY_COST_PER_LV = 400; /* 수강비 = 현재 레벨 × 이 값 — 야생 사냥보다 약간 비싸게 */
+/* ── 사내 연수원: 복지포인트 → 즉시 1레벨 (후반 잉여 화폐의 사용처) ──
+   비용은 필요 경험치에 비례(레벨 제곱 곡선) — 야생 사냥보다 살짝 비싸다.
+   해금한 차원의 야생 최대 레벨 +2 까지만 수강 가능 — 돈으로 차원을 건너뛰는 것 방지 */
+const ACADEMY_COST_MULT = 2.2;
+function academyCost(m){ return Math.max(500, Math.round(expNeed(m.lv)*ACADEMY_COST_MULT/10)*10); }
+function academyLvCap(){
+  let cap = 10;
+  FLOORS.forEach((f,i)=>{ if(floorUnlocked(i)) f.areas.forEach(a=>{ cap = Math.max(cap, a.lv[1]); }); });
+  return cap + 2;
+}
 let academyMsg = '';
 function scrAcademy(){
+  const cap = academyLvCap();
   const lines = [['― 사내 연수원 ―','bold'],'',
     '복지포인트로 몬스터를 교육해 즉시 1레벨 올린다. (진화·기술 습득도 그대로 발동)',
-    [`수강비: 현재 레벨 × ${ACADEMY_COST_PER_LV}P`,'dim'],''];
+    [`수강비는 레벨이 오를수록 가파르게 비싸진다 · 수강 한도: LV${cap} (해금 차원 기준)`,'dim'],''];
   if(academyMsg){ lines.push([academyMsg,'hl'],''); academyMsg=''; }
   lines.push(`보유 복지포인트: ${G.money.toLocaleString()}P`);
   const choices = [];
   G.party.forEach(m=>{
-    const cost = m.lv*ACADEMY_COST_PER_LV;
+    if(m.lv>=cap){
+      lines.push([`  ${monName(m)} LV${m.lv} — 수강 한도 도달 (새 차원을 해금하면 한도가 오른다)`,'dim']);
+      return;
+    }
+    const cost = academyCost(m);
     choices.push([`${monName(m)} LV${m.lv} → LV${m.lv+1} 수강 (${cost.toLocaleString()}P)`, ()=>{
       if(G.money<cost){ academyMsg='복지포인트가 부족하다…'; render(); return; }
       G.money -= cost;
@@ -2515,7 +2531,8 @@ function scrBattle(){
   const lines = [
     [`⚔ ${monName(e)}  LV${e.lv}  [${monType(e)}]${bossLabel}`, monCls(e)||'bold'],
     [`   HP ${e.hp}/${e.maxhp}  ${'█'.repeat(Math.ceil(e.hp/e.maxhp*10)).padEnd(10,'░')}`, e.hp<e.maxhp*0.3?'hl':''],
-    [`▼ ${monName(me)}  LV${me.lv}  HP ${me.hp}/${me.maxhp}  EXP ${expBar(me)} ${expPct(me)}%`, 'dim'],
+    [`▼ ${monName(me)}  LV${me.lv}  [${monType(me)}]`, monCls(me)||'bold'],
+    [`   HP ${me.hp}/${me.maxhp}  ${'█'.repeat(Math.ceil(Math.max(0,me.hp)/me.maxhp*10)).padEnd(10,'░')}  ·  EXP ${expBar(me,10)} ${expPct(me)}%`, me.hp<me.maxhp*0.3?'hl':''],
     '',
     ...G.log,
     '',
@@ -2801,9 +2818,12 @@ document.addEventListener('keydown', e=>{
     bossMode=!bossMode; render(); return;
   }
   if(dlg.classList.contains('show')) return;
-  if(!bossMode && /^[1-9]$/.test(e.key)){
-    const tds=[...sheetEl.querySelectorAll('td.choice')];
-    if(tds[+e.key-1]) tds[+e.key-1].click();
+  if(!bossMode){
+    const ki = CHOICE_KEYS.indexOf(e.key.toLowerCase());
+    if(ki>=0){
+      const tds=[...sheetEl.querySelectorAll('td.choice')];
+      if(tds[ki]) tds[ki].click();
+    }
   }
 });
 
