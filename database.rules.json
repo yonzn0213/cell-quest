@@ -1,0 +1,37 @@
+{
+  "rules": {
+    ".read": false,
+    ".write": false,
+    "lb": {
+      ".read": true,
+      ".indexOn": ["score"],
+      "$entry": {
+        ".write": true,
+        ".validate": "newData.hasChildren(['name','ts']) && $entry.length <= 24",
+        "name":  { ".validate": "newData.isString() && newData.val().length >= 1 && newData.val().length <= 12" },
+        "wins":  { ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 9999999" },
+        "dex":   { ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 500" },
+        "gold":  { ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 500" },
+        "prism": { ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 500" },
+        "leg":   { ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 500" },
+        "pt":    { ".validate": "newData.isNumber() && newData.val() >= 0" },
+        "story": { ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 60" },
+        "ts":    { ".validate": "newData.isNumber()" },
+        "score": { ".validate": "newData.isNumber() && newData.val() >= 0" },
+        "lead":  { ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 5" },
+        "party": {
+          "$i": {
+            ".validate": "$i.matches(/^[0-5]$/)",
+            "s": { ".validate": "newData.isString() && newData.val().length <= 40" },
+            "l": { ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 999" },
+            "r": { ".validate": "newData.isString() && newData.val().length <= 10" },
+            "t": { ".validate": "newData.isString() && newData.val().length <= 10" },
+            "d": { ".validate": "newData.isNumber() && newData.val() > 0 && newData.val() < 10" },
+            "$other": { ".validate": false }
+          }
+        },
+        "$other": { ".validate": false }
+      }
+    }
+  }
+}
