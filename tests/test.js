@@ -212,7 +212,7 @@ T('머리카락 부족/대상 아님이면 진화 시도 불가', () => {
   if (tryHairEvolution(mm) !== null) return false;
   G.items.hair = 5; return tryHairEvolution(makeMon('espresso', 40)) === null;
 });
-T('의문의 머리카락은 매점에서 팔지 않는다', () => ITEM_DEF.hair.nosale === true && ITEM_DEF.detox.price === 8000);
+T('의문의 머리카락은 매점에서 팔지 않는다', () => ITEM_DEF.hair.nosale === true && ITEM_DEF.detox.price > 0);
 T('패치 보상 2탄: 허브 진입 시 디톡스 1개 지급', () => {
   newGame(); G.party = [makeMon('espresso', 5)]; G.screen = 'hub'; render();
   return G.gifts.patch2 === true && G.items.detox >= 1;
@@ -305,10 +305,10 @@ T('전투 수학: 동레벨 TTK 1.2~8턴 (원턴킬 메타 방지)', () => {
     return ttk >= 1.2 && ttk <= 8;
   });
 });
-T('경험치 공유: 선두 100% + 파티원 30%', () => {
-  newGame(); const a = makeMon('espresso', 30), b = makeMon('gyeoljae', 30);
+T('경험치 공유: 선두 100% + 파티원 30% (동레벨, 페널티 없음)', () => {
+  newGame(); const a = makeMon('espresso', 10), b = makeMon('gyeoljae', 10);
   G.party = [a, b]; G.active = 0; G.log = [];
-  grantExpAndMoney({ lv: 10, rar: 'normal' }, 1);
+  grantExpAndMoney({ lv: 10, rar: 'normal' }, 1);  /* 적 lv10 = 내 lv10, 페널티 없음 */
   return a.exp === 130 && b.exp === 39;
 });
 T('돌연변이 천장: 3회 실패 누적 후 확정 발동', () => {
@@ -433,6 +433,39 @@ T('진화 재배치: 2단 진화 라인은 1단보다 충분히 뒤 (간격 ≥5
     const e2 = SPECIES[e.to] && SPECIES[e.to].evo;
     return !e2 || (e2.lv - e.lv) >= 5;
   });
+});
+
+/* ── v5.7: 앰플 가격·야생 난이도·레벨 차 경험치·조합표 ── */
+T('앰플 가격 인상: 수상한 5000P / 디톡스 18000P', () =>
+  ITEM_DEF.ample.price === 5000 && ITEM_DEF.detox.price === 18000);
+T('레벨 차 경험치 페널티: 동레벨~+2는 100%, 큰 차이는 급감', () => {
+  return expLevelFactor(10, 10) === 1 && expLevelFactor(12, 10) === 1
+    && expLevelFactor(20, 10) < 0.5 && expLevelFactor(60, 10) === 0.12
+    && expLevelFactor(10, 30) === 1;  /* 적이 더 높으면 패널티 없음 */
+});
+T('야생 강화: 일반 야생 적 HP/공격 상향, 전설은 소폭', () => {
+  newGame(); G.party = [makeMon('espresso', 30)];
+  const base = makeMon('mixrat', 20), baseHp = base.maxhp, baseAtk = base.atk;
+  startWildBattle(makeMon('mixrat', 20));
+  const e = G.battle.enemy;
+  const ok = e.maxhp > baseHp && e.atk > baseAtk && e.maxhp === Math.round(baseHp * WILD_HP_MULT);
+  G.battle = null; return ok;
+});
+T('야생 강화분은 포획 시 정상 스탯으로 복원', () => {
+  newGame(); G.party = [makeMon('espresso', 50)]; G.items.clip = 99;
+  startWildBattle(makeMon('mixrat', 20));
+  const buffedHp = G.battle.enemy.maxhp;
+  const orig = Math.random; Math.random = () => 0;  /* 포획 확정 */
+  throwClip('clip');
+  Math.random = orig;
+  const caught = [...G.party, ...G.box].find(m => m.sid === 'mixrat');
+  const normalHp = statsFor('mixrat', 20).maxhp;
+  G.battle = null;
+  return caught && caught.maxhp === normalHp && caught.maxhp < buffedHp;
+});
+T('합성 조합표 화면 렌더 (스모크)', () => {
+  newGame(); G.party = [makeMon('espresso', 5)]; G.dex.latte = 1; G.dex.gian = 2;
+  G.screen = 'recipe'; render(); return true;
 });
 `;
 vm.runInContext(TESTS, ctx, { filename: 'tests' });
