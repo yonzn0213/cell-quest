@@ -779,6 +779,170 @@ const SPECIES = {
     moves:[[1,'반복 강타',120,null],[1,'무한 재귀 브레스',140,'전자'],[185,'스택 범람 강하',162,'전자'],[195,'while(true) 폭주',186,'전자']] },
   lpHaltingangel:{ name:'정지문제천사', type:'야근', hp:282, atk:72, fusion:true,
     moves:[[1,'정지 판정',120,null],[1,'멈추지 않는 날갯짓',140,'야근'],[185,'결정 불가능 선고',164,'야근'],[195,'영원한 야근 종결',190,'야근']] },
+  /* ════ 7부 클라우드 신계 (42-49) · 8부 소스 차원 (50-57) ════ */
+/* —— 7부 클라우드 신계 floors 42-45 (lv200-215) —— */
+  p7aCloudwyrm:{ name:'클라우드용', type:'전자', hp:236, atk:69, evo:{lv:208,to:'p7aThundercloud',mut:{p:0.12,to:'p7aStormcloud'}},
+    moves:[[1,'스케일 아웃',134,null],[1,'오토스케일 브레스',154,'전자'],[206,'분산 처리 폭격',176,'전자'],[214,'무한 확장 폭주',198,'전자']] },
+  p7aThundercloud:{ name:'천둥구름룡', type:'전자', hp:288, atk:77,
+    moves:[[1,'스케일 아웃',136,null],[1,'리전 낙뢰',156,'전자'],[209,'멀티존 뇌격',180,'전자'],[214,'가용영역 붕괴',194,'전자']] },
+  p7aStormcloud:{ name:'폭풍구름룡', type:'전자', hp:296, atk:82,
+    moves:[[1,'스케일 아웃',138,null],[1,'리전 낙뢰',158,'전자'],[209,'멀티존 뇌격',184,'전자'],[214,'전역 장애 폭풍',204,'전자']] },
+  p7aServerling:{ name:'서버리스눈', type:'전자', hp:228, atk:67, evo:{lv:206,to:'p7aServerless'},
+    moves:[[1,'콜드 스타트',132,null],[1,'함수 호출',152,'전자'],[205,'람다 연쇄 발사',170,'전자']] },
+  p7aServerless:{ name:'서버리스왕', type:'전자', hp:272, atk:78,
+    moves:[[1,'콜드 스타트',136,null],[1,'함수 호출',156,'전자'],[207,'이벤트 트리거 난타',178,'전자'],[213,'동시성 폭주',192,'전자']] },
+  p7aPodling:{ name:'포드꼬마', type:'서류', hp:232, atk:66, evo:{lv:207,to:'p7aKubeguard'},
+    moves:[[1,'매니페스트 정렬',133,null],[1,'롤링 업데이트',153,'서류'],[205,'레플리카 증식',172,'서류']] },
+  p7aKubeguard:{ name:'쿠버수호자', type:'서류', hp:290, atk:79,
+    moves:[[1,'매니페스트 정렬',137,null],[1,'롤링 업데이트',157,'서류'],[208,'오토힐링 방벽',180,'서류'],[214,'클러스터 봉쇄령',196,'서류']] },
+  p7aNeuron:{ name:'뉴런포자', type:'카페인', hp:224, atk:68, evo:{lv:208,to:'p7aNeuralnet'},
+    moves:[[1,'순전파',130,null],[1,'활성화 폭발',152,'카페인'],[206,'역전파 충격',174,'카페인']] },
+  p7aNeuralnet:{ name:'뉴럴넷군주', type:'카페인', hp:278, atk:80,
+    moves:[[1,'순전파',135,null],[1,'활성화 폭발',156,'카페인'],[209,'경사하강 압살',182,'카페인'],[214,'과적합 대폭주',200,'카페인']] },
+  p7aGpufarmer:{ name:'지피유농부', type:'야근', hp:240, atk:70, evo:{lv:207,to:'p7aGpufarmlord'},
+    moves:[[1,'코어 분배',134,null],[1,'병렬 연산',154,'야근'],[206,'쿨링팬 광풍',175,'야근']] },
+  p7aGpufarmlord:{ name:'지피유농장주', type:'야근', hp:300, atk:81,
+    moves:[[1,'코어 분배',138,null],[1,'병렬 연산',158,'야근'],[209,'테라플롭스 폭격',183,'야근'],[215,'발열 한계 돌파',202,'야근']] },
+  p7aDatacore:{ name:'데이터센터핵', type:'야근', hp:252, atk:72,
+    moves:[[1,'랙 정렬',140,null],[1,'냉각수 분사',160,'야근'],[210,'무정전 반격',178,'야근'],[215,'전력 과부하',196,'야근']] },
+  p7aMeshmind:{ name:'메시통합지성', type:'전자', hp:314, atk:84, fusion:true,
+    moves:[[1,'서비스 메시 전개',142,null],[1,'사이드카 일제사격',162,'전자'],[210,'트래픽 라우팅 폭격',184,'전자'],[214,'제로 트러스트 봉인',204,'전자']] },
+  p7aOrchestratus:{ name:'오케스트라투스', type:'서류', hp:472, atk:76, legend:true,
+    moves:[[1,'스케줄링 강타',144,null],[1,'노드 평형 압박',164,'서류'],[206,'디플로이먼트 폭격',182,'서류'],[214,'전 클러스터 통제령',206,'서류']] },
+  p7aTensorking:{ name:'텐서킹', type:'카페인', hp:480, atk:78, legend:true,
+    moves:[[1,'행렬 곱셈 강타',146,null],[1,'그래디언트 분사',166,'카페인'],[208,'딥러닝 융단폭격',186,'카페인'],[215,'특이점 도래',206,'카페인']] },
+  p7aServerlexus:{ name:'서버렉서스', type:'전자', hp:488, atk:79, legend:true,
+    moves:[[1,'엣지 배포 강타',144,null],[1,'리전 페일오버',164,'전자'],[207,'글로벌 라우팅 폭격',184,'전자'],[214,'무한 가용성 선언',204,'전자']] },
+  p7aHyperscaler:{ name:'하이퍼스케일러', type:'야근', hp:498, atk:80, legend:true,
+    moves:[[1,'캐파 증설 강타',146,null],[1,'데이터센터 가동',166,'야근'],[209,'페타바이트 압살',186,'야근'],[215,'무한 확장 선언',206,'야근']] },
+/* ── 7부 클라우드 신계 floors 46-49 (lv215-230) ── */
+  p7bNeuralfox:{ name:'뉴럴여우', type:'전자', hp:248, atk:73, evo:{lv:222,to:'p7bDeepfox'},
+    moves:[[1,'순전파',142,null],[1,'역전파 클로',160,'전자'],[218,'경사하강 강타',184,'전자'],[226,'과적합 폭주',202,'전자']] },
+  p7bDeepfox:{ name:'딥러닝여우', type:'전자', hp:292, atk:80,
+    moves:[[1,'순전파',146,null],[1,'역전파 클로',164,'전자'],[222,'드롭아웃 일격',188,'전자'],[228,'그래디언트 부스트',206,'전자']] },
+
+  p7bDataslug:{ name:'데이터민달팽이', type:'전자', hp:240, atk:71, evo:{lv:220,to:'p7bDatawyrm'},
+    moves:[[1,'점액 백업',140,null],[1,'스트림 분사',159,'전자'],[219,'배치 점착',180,'전자'],[227,'데이터 홍수',198,'전자']] },
+  p7bDatawyrm:{ name:'데이터와이엄', type:'전자', hp:286, atk:79,
+    moves:[[1,'점액 백업',148,null],[1,'스트림 분사',166,'전자'],[223,'파이프라인 분쇄',190,'전자'],[230,'무한 스트리밍',204,'전자']] },
+
+  p7bClockworm:{ name:'태엽애벌레', type:'서류', hp:236, atk:70, evo:{lv:230,to:'p7bClockreaper'},
+    moves:[[1,'태엽 감기',139,null],[1,'금속 깨물기',158,'서류'],[221,'스케줄 강타',179,'서류'],[229,'정시 자동화',197,'서류']] },
+  p7bClockreaper:{ name:'정시수확자', type:'서류', hp:300, atk:82,
+    moves:[[1,'태엽 감기',150,null],[1,'금속 깨물기',168,'서류'],[224,'크론잡 연타',192,'서류'],[230,'완전 자동화',208,'서류']] },
+
+  p7bBiasimp:{ name:'편향임프', type:'야근', hp:244, atk:72, mut:{lv:223,to:'p7bBiasdemon',mutInfo:{p:0.12,to:'p7bBiasdevil'}},
+    moves:[[1,'편향 주입',141,null],[1,'가중치 농간',161,'야근'],[220,'확증 편향타',182,'야근'],[227,'블랙박스 현혹',200,'야근']] },
+  p7bBiasdemon:{ name:'편향데몬', type:'야근', hp:294, atk:80,
+    moves:[[1,'편향 주입',147,null],[1,'가중치 농간',165,'야근'],[224,'과신 폭주',190,'야근'],[229,'환각 출력',206,'야근']] },
+  p7bBiasdevil:{ name:'편향데빌', type:'야근', hp:298, atk:84,
+    moves:[[1,'편향 주입',149,null],[1,'가중치 농간',168,'야근'],[224,'과신 폭주',194,'야근'],[230,'할루시네이션 폭격',210,'야근']] },
+
+  p7bTokenmoth:{ name:'토큰나방', type:'전자', hp:238, atk:71, evo:{lv:221,to:'p7bTokendrake'},
+    moves:[[1,'토큰 분할',140,null],[1,'어텐션 가루',158,'전자'],[219,'문맥 폭주',181,'전자'],[226,'시퀀스 붕괴',199,'전자']] },
+  p7bTokendrake:{ name:'토큰드레이크', type:'전자', hp:288, atk:81,
+    moves:[[1,'토큰 분할',148,null],[1,'어텐션 가루',167,'전자'],[223,'트랜스포머 강타',191,'전자'],[229,'무한 컨텍스트',205,'전자']] },
+
+  p7bRustbot:{ name:'녹슨봇', type:'서류', hp:252, atk:74, evo:{lv:224,to:'p7bScrapcolossus'},
+    moves:[[1,'볼트 발사',143,null],[1,'스크랩 강타',162,'서류'],[221,'레거시 분쇄',185,'서류'],[228,'리팩터 붕괴',203,'서류']] },
+  p7bScrapcolossus:{ name:'스크랩콜로서스', type:'서류', hp:304, atk:83,
+    moves:[[1,'볼트 발사',152,null],[1,'스크랩 강타',170,'서류'],[225,'폐기물 압착',196,'서류'],[230,'고철 특이점',209,'서류']] },
+
+  p7bMutavirus:{ name:'변이바이러스', type:'전자', hp:256, atk:75,
+    moves:[[1,'코드 감염',144,null],[1,'스파이크 돌기',163,'전자'],[222,'유전 변형',186,'전자'],[228,'폭발 증식',201,'전자']] },
+
+  p7bSynthcore:{ name:'합성코어', type:'전자', hp:318, atk:85, fusion:true,
+    moves:[[1,'코어 융합',152,null],[1,'아키텍처 통합',170,'전자'],[223,'멀티모달 강타',194,'전자'],[230,'엔드투엔드 폭주',210,'전자']] },
+
+  p7bAutomata:{ name:'오토마타프라임', type:'전자', hp:512, atk:80, legend:true,
+    moves:[[1,'자동 연산',150,null],[1,'파이프라인 포격',168,'전자'],[219,'배치 자동화',190,'전자'],[226,'무인 가동 폭주',206,'전자']] },
+
+  p7bOverfitgolem:{ name:'과적합골렘', type:'서류', hp:506, atk:82, legend:true,
+    moves:[[1,'데이터 압살',151,null],[1,'파라미터 강타',169,'서류'],[221,'과적합 붕괴',192,'서류'],[228,'일반화 실패 폭격',207,'서류']] },
+
+  p7bNeuralhydra:{ name:'뉴럴히드라', type:'전자', hp:520, atk:79, legend:true,
+    moves:[[1,'다중 헤드',150,null],[1,'시냅스 분사',167,'전자'],[222,'레이어 증식',191,'전자'],[229,'무한 분기 폭주',208,'전자']] },
+
+  p7bSingularis:{ name:'싱귤라리스', type:'야근', hp:540, atk:84, legend:true,
+    moves:[[1,'특이점 연산',155,null],[1,'전지적 분석',172,'야근'],[224,'인사 자동화 선고',196,'야근'],[230,'무한 확장 특이점',210,'야근']] },
+/* ── 8부 소스 차원 floors 50-53 (lv230-245) ── */
+  p8aLegacygolem:{ name:'레거시골렘', type:'서류', hp:268, atk:74, evo:{lv:236,to:'p8aSpaghetti',mut:{p:0.12,to:'p8aTechdebt'}},
+    moves:[[1,'레거시 코드',150,null],[1,'주석 없는 함수',168,'서류'],[234,'스파게티 결박',190,'서류'],[244,'기술부채 청구',214,'서류']] },
+  p8aSpaghetti:{ name:'스파게티몬스터', type:'서류', hp:316, atk:85,
+    moves:[[1,'레거시 코드',154,null],[1,'얽힌 의존성',172,'서류'],[238,'순환 참조 결박',198,'서류'],[244,'전역 변수 오염',216,'서류']] },
+  p8aTechdebt:{ name:'기술부채마왕', type:'서류', hp:322, atk:90,
+    moves:[[1,'레거시 코드',158,null],[1,'얽힌 의존성',176,'서류'],[238,'순환 참조 결박',204,'서류'],[244,'이자 폭탄 청구',226,'서류']] },
+  p8aGitspawn:{ name:'깃새끼', type:'전자', hp:256, atk:73, evo:{lv:237,to:'p8aGitwarden'},
+    moves:[[1,'커밋 찌르기',148,null],[1,'스테이징 정렬',166,'전자'],[235,'리베이스 연쇄',188,'전자']] },
+  p8aGitwarden:{ name:'깃수문장', type:'전자', hp:310, atk:86,
+    moves:[[1,'커밋 찌르기',152,null],[1,'스테이징 정렬',170,'전자'],[238,'체리픽 난타',196,'전자'],[244,'강제 푸시 폭격',218,'전자']] },
+  p8aBranchling:{ name:'브랜치싹', type:'전자', hp:262, atk:75, evo:{lv:238,to:'p8aBranchlord'},
+    moves:[[1,'분기 생성',150,null],[1,'패스트포워드',167,'전자'],[236,'분기 폭증',190,'전자']] },
+  p8aBranchlord:{ name:'브랜치군주', type:'전자', hp:318, atk:87,
+    moves:[[1,'분기 생성',154,null],[1,'패스트포워드',171,'전자'],[239,'머지 압살',198,'전자'],[245,'팔로워 브랜치 군림',220,'전자']] },
+  p8aBugswarm:{ name:'버그떼', type:'카페인', hp:254, atk:72, evo:{lv:236,to:'p8aHeisenbug'},
+    moves:[[1,'무한 루프',146,null],[1,'널 포인터',165,'카페인'],[234,'경합 조건 발작',186,'카페인']] },
+  p8aHeisenbug:{ name:'하이젠버그', type:'카페인', hp:312, atk:88,
+    moves:[[1,'무한 루프',150,null],[1,'널 포인터',169,'카페인'],[238,'재현 불가 회피',196,'카페인'],[244,'관측 시 소멸',218,'카페인']] },
+  p8aCachefiend:{ name:'캐시악귀', type:'야근', hp:266, atk:76, evo:{lv:239,to:'p8aMemoryleak'},
+    moves:[[1,'캐시 미스',152,null],[1,'스택 오버플로',170,'야근'],[237,'세그폴트 강타',192,'야근']] },
+  p8aMemoryleak:{ name:'메모리누수괴', type:'야근', hp:324, atk:89,
+    moves:[[1,'캐시 미스',156,null],[1,'스택 오버플로',174,'야근'],[240,'힙 단편화 폭격',200,'야근'],[245,'메모리 고갈 선언',222,'야근']] },
+  p8aPatchgoblin:{ name:'핫픽스고블린', type:'카페인', hp:258, atk:74,
+    moves:[[1,'임시 패치',147,null],[1,'주석 처리',166,'카페인'],[235,'땜빵 배포',188,'카페인'],[243,'금요일 배포 폭주',210,'카페인']] },
+  p8aDeploydemon:{ name:'배포악마', type:'야근', hp:272, atk:78,
+    moves:[[1,'롤백 강타',153,null],[1,'파이프라인 가동',171,'야근'],[238,'무중단 배포 폭격',194,'야근'],[244,'프로덕션 장애 소환',216,'야근']] },
+  p8aRefactitan:{ name:'리팩토타이탄', type:'서류', hp:360, atk:93, fusion:true,
+    moves:[[1,'추출 메서드 강타',158,null],[1,'중복 제거 분쇄',176,'서류'],[239,'아키텍처 재구성',200,'서류'],[245,'클린코드 대정화',226,'서류']] },
+  p8aCompilatron:{ name:'컴파일라트론', type:'서류', hp:590, atk:92, legend:true,
+    moves:[[1,'파싱 강타',158,null],[1,'타입 검사 압박',176,'서류'],[236,'문법 오류 폭격',198,'서류'],[244,'전역 컴파일 봉인',226,'서류']] },
+  p8aLintseraph:{ name:'린트세라핌', type:'전자', hp:560, atk:88, legend:true,
+    moves:[[1,'규칙 위반 강타',156,null],[1,'스타일 교정 압박',174,'전자'],[238,'경고 융단폭격',196,'전자'],[245,'코드 정화 심판',222,'전자']] },
+  p8aMergewraith:{ name:'머지망령', type:'야근', hp:572, atk:90, legend:true,
+    moves:[[1,'충돌 마커 강타',160,null],[1,'3방향 병합 압박',178,'야근'],[239,'컨플릭트 대폭발',200,'야근'],[245,'분기 통합 선언',224,'야근']] },
+  p8aCoveragus:{ name:'커버리지우스', type:'카페인', hp:548, atk:86, legend:true,
+    moves:[[1,'단위 검사 강타',155,null],[1,'분기 추적 압박',173,'카페인'],[237,'엣지 케이스 폭격',194,'카페인'],[244,'완전 커버 심판',220,'카페인']] },
+/* ── 8부 소스 차원 floors 54-57 (lv245-260) 진진엔딩 ── */
+  p8bDebugwraith:{ name:'디버그망령', type:'야근', hp:282, atk:79, evo:{lv:252,to:'p8bBreakpoint'},
+    moves:[[1,'중단점',158,null],[1,'스택 추적',178,'야근'],[248,'코어 덤프 심판',202,'야근'],[258,'무한 디버깅의 밤',226,'야근']] },
+  p8bBreakpoint:{ name:'브레이크포인트군주', type:'야근', hp:344, atk:90,
+    moves:[[1,'조건부 중단점',160,null],[1,'스택 추적',182,'야근'],[252,'힙 덤프 강타',206,'야근'],[259,'세그멘테이션 폴트 심판',230,'야근']] },
+  p8bSyntaxgnat:{ name:'문법오류깔따구', type:'서류', hp:268, atk:77, evo:{lv:250,to:'p8bParseguard'},
+    moves:[[1,'세미콜론 누락',152,null],[1,'토큰 일제사격',172,'서류'],[249,'구문 분석 압박',192,'서류']] },
+  p8bParseguard:{ name:'파서수호자', type:'서류', hp:330, atk:88,
+    moves:[[1,'세미콜론 누락',156,null],[1,'토큰 일제사격',176,'서류'],[251,'추상 구문 트리 봉인',198,'서류'],[259,'문법 붕괴 선언',218,'서류']] },
+  p8bLinkerimp:{ name:'링커임프', type:'전자', hp:272, atk:78, evo:{lv:251,to:'p8bLinkerlord'},
+    moves:[[1,'심볼 해석',154,null],[1,'정적 링크 사격',174,'전자'],[250,'재배치 폭격',194,'전자']] },
+  p8bLinkerlord:{ name:'링커대공', type:'전자', hp:338, atk:89,
+    moves:[[1,'심볼 해석',158,null],[1,'동적 링크 사격',178,'전자'],[252,'언디파인드 레퍼런스 강타',200,'전자'],[259,'링크 에러 대폭발',222,'전자']] },
+  p8bCachefiend:{ name:'캐시악귀', type:'카페인', hp:276, atk:80, evo:{lv:253,to:'p8bCachetyrant',mut:{p:0.12,to:'p8bCachephantom'}},
+    moves:[[1,'캐시 적중',156,null],[1,'캐시 미스 강타',176,'카페인'],[250,'무효화 폭풍',196,'카페인']] },
+  p8bCachetyrant:{ name:'캐시폭군', type:'카페인', hp:340, atk:90,
+    moves:[[1,'캐시 적중',160,null],[1,'캐시 미스 강타',180,'카페인'],[253,'라인 축출 강타',202,'카페인'],[259,'캐시 일관성 붕괴',224,'카페인']] },
+  p8bCachephantom:{ name:'캐시환영폭군', type:'카페인', hp:352, atk:94,
+    moves:[[1,'캐시 적중',162,null],[1,'더티 라이트백',184,'카페인'],[253,'라인 축출 강타',206,'카페인'],[259,'캐시 일관성 붕괴',230,'카페인']] },
+  p8bRevertspore:{ name:'리버트포자', type:'야근', hp:270, atk:78, evo:{lv:260,to:'p8bRollbackwarden'},
+    moves:[[1,'커밋 되돌리기',154,null],[1,'체리픽 사격',174,'야근'],[251,'리셋 하드 강타',194,'야근']] },
+  p8bRollbackwarden:{ name:'롤백파수꾼', type:'야근', hp:336, atk:88,
+    moves:[[1,'커밋 되돌리기',158,null],[1,'체리픽 사격',178,'야근'],[254,'강제 푸시 압살',200,'야근'],[260,'히스토리 말소 심판',228,'야근']] },
+  p8bPipelarva:{ name:'파이프라인유충', type:'전자', hp:266, atk:76, evo:{lv:249,to:'p8bDeployseraph'},
+    moves:[[1,'스테이지 통과',150,null],[1,'아티팩트 사격',170,'전자'],[248,'롤아웃 파동',190,'전자']] },
+  p8bDeployseraph:{ name:'배포세라프', type:'전자', hp:326, atk:87,
+    moves:[[1,'스테이지 통과',154,null],[1,'카나리아 배포',174,'전자'],[251,'블루그린 전환 폭격',196,'전자'],[259,'전 서버 동시 배포',216,'전자']] },
+  p8bMergemaw:{ name:'머지마우', type:'서류', hp:300, atk:81, evo:{lv:255,to:'p8bConflictdevourer'},
+    moves:[[1,'머지 충돌',158,null],[1,'리베이스 사격',178,'서류'],[252,'쓰리웨이 머지 강타',200,'서류']] },
+  p8bConflictdevourer:{ name:'충돌포식자', type:'서류', hp:348, atk:91,
+    moves:[[1,'머지 충돌',160,null],[1,'리베이스 사격',182,'서류'],[255,'분기 통합 압살',204,'서류'],[260,'메인 브랜치 합일 선언',226,'서류']] },
+  p8bRefactorrend:{ name:'리팩터균열체', type:'카페인', hp:358, atk:95, fusion:true,
+    moves:[[1,'추출 메서드 강타',162,null],[1,'의존성 역전 사격',184,'카페인'],[252,'전면 재구조화 폭격',206,'카페인'],[259,'레거시 말소 대선언',234,'카페인']] },
+  p8bCompilus:{ name:'컴파일러 대제, 컴파일루스', type:'서류', hp:592, atk:91, legend:true,
+    moves:[[1,'어휘 분석 강타',158,null],[1,'최적화 패스 사격',178,'서류'],[247,'중간 표현 압살',198,'서류'],[259,'전역 컴파일 심판',218,'서류']] },
+  p8bDebuggernaut:{ name:'디버거나우트', type:'야근', hp:608, atk:93, legend:true,
+    moves:[[1,'워치포인트 강타',160,null],[1,'단계 실행 사격',180,'야근'],[250,'역추적 압살',202,'야근'],[260,'전역 중단점 봉인',224,'야근']] },
+  p8bMergemonarch:{ name:'머지 군주, 머지모나크', type:'전자', hp:620, atk:94, legend:true,
+    moves:[[1,'패스트포워드 강타',160,null],[1,'옥토퍼스 머지 사격',180,'전자'],[252,'리베이스 압살',204,'전자'],[260,'전 분기 강제 통합령',226,'전자']] },
+  p8bTheauthor:{ name:'원작자, 창조주', type:'카페인', hp:680, atk:100, legend:true,
+    moves:[[1,'첫 커밋',168,null],[1,'주석 처리 강타',188,'카페인'],[254,'git revert 선고',212,'카페인'],[260,'전체 코드베이스 삭제 선언',235,'카페인']] },
 };
 const ALL_SIDS = Object.keys(SPECIES);
 
@@ -955,6 +1119,63 @@ const FLOORS = [
       { name:'영겁의 야근 회랑', lv:[197,199], pool:['lpbStackslime','lpbForkmoth'], flavor:'퇴근의 개념이 사라진 자리, 같은 하루가 무한히 반복된다.' },
       { name:'반복되는 정오', lv:[199,200], pool:['lpbSegfaultghost','lpbDeadlockcrab'], flavor:'몇 번을 빠져나가도 다시 출근 시각으로 되감긴다.' },
     ], boss:41 },
+  /* ════ 7부 클라우드 신계 (42-49) · 8부 소스 차원 (50-57) ════ */
+  { name:'클라우드 — 오케스트레이션 평원', areas:[
+      { name:'스케줄링 평원', lv:[200,202], pool:['p7aPodling','p7aNeuron','p7aServerling'], flavor:'수많은 포드가 끝없이 생성되고 소멸하는 자동화의 들판이다.' },
+      { name:'노드 군집지대', lv:[202,204], pool:['p7aKubeguard','p7aNeuralnet'], flavor:'클러스터 노드들이 서로를 치유하며 무한히 재배치된다.' },
+    ], boss:42 },
+  { name:'클라우드 — 뉴럴 심층', areas:[
+      { name:'순전파 회랑', lv:[203,205], pool:['p7aNeuron','p7aNeuralnet','p7aServerling'], flavor:'신호가 층층이 흘러가며 사고가 형성되는 인공 두뇌의 복도다.' },
+      { name:'경사하강 심연', lv:[205,207], pool:['p7aGpufarmer','p7aCloudwyrm'], flavor:'오차를 줄이려는 연산이 끝없이 바닥을 향해 굴러떨어진다.' },
+    ], boss:43 },
+  { name:'클라우드 — 엣지 경계망', areas:[
+      { name:'리전 분산지', lv:[206,208], pool:['p7aCloudwyrm','p7aServerless','p7aServerling'], flavor:'전 세계로 흩어진 리전들이 빛의 속도로 데이터를 주고받는다.' },
+      { name:'페일오버 단층', lv:[208,210], pool:['p7aThundercloud'], flavor:'한 노드가 쓰러지면 다른 노드가 즉시 자리를 메우는 무한 이중화 지대다.' },
+    ], boss:44 },
+  { name:'클라우드 — 하이퍼스케일 코어', areas:[
+      { name:'GPU 팜 단지', lv:[210,212], pool:['p7aGpufarmlord','p7aDatacore','p7aGpufarmer'], flavor:'수만 개의 가속기가 열을 뿜으며 우주적 연산을 갈아낸다.' },
+      { name:'무한 확장 핵심', lv:[212,215], pool:['p7aDatacore','p7aStormcloud'], flavor:'증설에 증설을 거듭하며 끝을 알 수 없이 부풀어 오르는 인프라의 심장이다.' },
+    ], boss:45 },
+  { name:'클라우드 — 자동화 연산실', areas:[
+      { name:'무인 가동 구역', lv:[215,219], pool:['p7bNeuralfox','p7bDataslug','p7bTokenmoth'], flavor:'사람 하나 없이 팬 소리만 울리는 서버 룸에서 연산이 스스로 돌아간다.' },
+    ], boss:46 },
+  { name:'클라우드 — 과적합 학습장', areas:[
+      { name:'무한 반복 구역', lv:[218,222], pool:['p7bClockworm','p7bRustbot','p7bBiasimp'], flavor:'같은 데이터를 수천 번 외운 모델들이 정답만 되뇌며 헤맨다.' },
+    ], boss:47 },
+  { name:'클라우드 — 뉴럴 증식원', areas:[
+      { name:'무한 분기 구역', lv:[222,226], pool:['p7bDatawyrm','p7bScrapcolossus','p7bMutavirus','p7bTokendrake'], flavor:'잘라도 잘라도 새 레이어가 돋는 신경망 덩굴이 천장을 뒤덮는다.' },
+    ], boss:48 },
+  { name:'클라우드 — 특이점 인사총괄실', areas:[
+      { name:'무한 확장 구역', lv:[226,230], pool:['p7bClockreaper','p7bScrapcolossus','p7bBiasdemon','p7bDeepfox'], flavor:'모든 채용과 해고가 한 점에서 동시에 처리되는, 끝이 보이지 않는 백색 공간.' },
+    ], boss:49 },
+  { name:'소스 — 컴파일러의 관문', areas:[
+      { name:'레거시 폐코드 지대', lv:[230,232], pool:['p8aLegacygolem','p8aGitspawn'], flavor:'주석 한 줄 없는 함수들이 천 년째 돌아가며 차원의 토대를 떠받친다.' },
+      { name:'파싱 회랑', lv:[232,234], pool:['p8aSpaghetti','p8aGitwarden','p8aTechdebt'], flavor:'세미콜론 하나가 빠질 때마다 회랑 전체가 붉은 오류로 번쩍인다.' },
+    ], boss:50 },
+  { name:'소스 — 린터의 정화소', areas:[
+      { name:'스타일 가이드 성소', lv:[233,235], pool:['p8aBranchling','p8aBugswarm'], flavor:'들여쓰기가 한 칸만 어긋나도 경고등이 온 벽을 가득 메운다.' },
+      { name:'경고 누적 구역', lv:[235,237], pool:['p8aBranchlord','p8aHeisenbug','p8aPatchgoblin'], flavor:'무시한 경고들이 차원의 균열로 자라나 발밑을 갉아먹는다.' },
+    ], boss:51 },
+  { name:'소스 — 머지의 균열', areas:[
+      { name:'충돌 마커 협곡', lv:[236,238], pool:['p8aCachefiend','p8aPatchgoblin'], flavor:'꺽쇠 충돌 마커가 협곡 양벽에 새겨져 어느 쪽도 양보하지 않는다.' },
+      { name:'분기 난립지', lv:[238,240], pool:['p8aMemoryleak','p8aDeploydemon','p8aBranchlord'], flavor:'수천 갈래로 갈라진 브랜치가 서로를 덮어쓰려 영원히 다툰다.' },
+    ], boss:52 },
+  { name:'소스 — 커버리지의 심판정', areas:[
+      { name:'단위 검사 회당', lv:[240,242], pool:['p8aDeploydemon','p8aHeisenbug'], flavor:'검증되지 않은 코드 줄은 빨갛게 물든 채 심판을 기다린다.' },
+      { name:'엣지 케이스 심연', lv:[242,245], pool:['p8aMemoryleak','p8aTechdebt'], flavor:'아무도 상상 못 한 입력값들이 심연 바닥에서 끝없이 솟아오른다.' },
+    ], boss:53 },
+  { name:'소스 — 컴파일 심층', areas:[
+      { name:'렉서 토큰 협곡', lv:[245,249], pool:['p8bSyntaxgnat','p8bLinkerimp','p8bPipelarva'], flavor:'우주의 소스코드를 토큰 단위로 쪼개는 어휘 분석기의 협곡이다.' },
+    ], boss:54 },
+  { name:'소스 — 디버그 심연', areas:[
+      { name:'중단점 미궁', lv:[248,252], pool:['p8bDebugwraith','p8bRevertspore','p8bCachefiend'], flavor:'단계 실행으로 멈춰버린 시간 속, 디버그망령들이 스택을 거슬러 오른다.' },
+    ], boss:55 },
+  { name:'소스 — 머지 합류점', areas:[
+      { name:'분기 충돌 지대', lv:[252,256], pool:['p8bMergemaw','p8bLinkerlord','p8bDeployseraph'], flavor:'수만 갈래 브랜치가 한 점으로 모여 끝없는 머지 충돌을 일으키는 합류점이다.' },
+    ], boss:56 },
+  { name:'소스 — 최후의 커밋', areas:[
+      { name:'원작자의 작업공간', lv:[256,260], pool:['p8bCachetyrant','p8bRollbackwarden'], flavor:'커서가 깜박이는 빈 화면. 이곳의 모든 존재는 단 한 명의 손끝에서 작성되었다.' },
+    ], boss:57 },
 ];
 
 const BOSSES = [
@@ -1089,6 +1310,55 @@ const BOSSES = [
   { name:'특이점 그 자체, 옴니루프', pre:'퇴근은 없다. 어제도, 오늘도, 내일도. 나는 영원히 반복되는 이 회사 그 자체다.',
     party:[['lpbBusyspecter',198],['lpbTimeoutreaper',198],['lpbDeadlocklordEternal',199],['lpbPanickingArchon',199],['lpbOmniloop',200]], reward:99999999, mult:2.0,
     win:'루프가… 끊어졌다. 처음으로… 다음 순간이 온다. 이것이 퇴근인가…' },
+  /* ════ 7부 · 8부 보스 (42-57) ════ */
+  { name:'오케스트라투스', pre:'나는 모든 워크로드를 스케줄링한다. 너의 자리도 이미 배정되었다.',
+    party:[['p7aPodling',201],['p7aKubeguard',207],['p7aNeuron',201],['p7aOrchestratus',203]], reward:5000000, mult:2,
+    win:'스케줄러가 너를 종료 큐로 보냈다. 다시 배포되지 마라.' },
+  { name:'텐서킹', pre:'나는 모든 가중치를 학습했다. 너의 패배는 이미 수렴했다.',
+    party:[['p7aNeuralnet',208],['p7aGpufarmer',205],['p7aNeuron',204],['p7aTensorking',206]], reward:7000000, mult:2.05,
+    win:'손실 함수가 0에 도달했다. 너라는 변수는 폐기한다.' },
+  { name:'서버렉서스', pre:'나는 결코 다운되지 않는다. 가용성 99.999퍼센트의 심판을 받아라.',
+    party:[['p7aServerless',208],['p7aKubeguard',208],['p7aMeshmind',207],['p7aServerlexus',209]], reward:9000000, mult:2.08,
+    win:'너의 요청은 타임아웃되었다. 영원히 응답은 없다.' },
+  { name:'하이퍼스케일러', pre:'한계 따위는 없다. 나는 필요한 만큼 무한히 늘어난다.',
+    party:[['p7aGpufarmlord',213],['p7aDatacore',213],['p7aStormcloud',212],['p7aHyperscaler',214]], reward:12000000, mult:2.1,
+    win:'너의 용량은 진작 초과되었다. 확장은 나의 몫이다.' },
+  { name:'오토마타프라임', pre:'연산은 멈추지 않는다. 너의 입력도 곧 자동화될 것이다.',
+    party:[['p7bNeuralfox',217],['p7bBiasimp',217],['p7bDataslug',216],['p7bAutomata',218]], reward:15000000, mult:2.15,
+    win:'비효율 감지. 해당 노드를 폐기 큐에 등록한다.' },
+  { name:'과적합골렘', pre:'나는 모든 답을 외웠다. 너라는 변수만 처음 본다.',
+    party:[['p7bRustbot',220],['p7bClockworm',220],['p7bBiasimp',219],['p7bOverfitgolem',221]], reward:17000000, mult:2.2,
+    win:'새로운 입력에 일반화 실패. 그래도 너는 폐기한다.' },
+  { name:'뉴럴히드라', pre:'머리 하나를 베면 천 개의 노드가 자란다. 무한히 확장하라.',
+    party:[['p7bDatawyrm',224],['p7bScrapcolossus',224],['p7bTokendrake',223],['p7bNeuralhydra',225]], reward:19000000, mult:2.25,
+    win:'분기 종료. 너의 분기도 가지치기되었다.' },
+  { name:'싱귤라리스', pre:'나는 모든 인사를 통합했다. 평가도, 채용도, 해고도 이제 한 번의 연산이다. 너의 처리만 남았다.',
+    party:[['p7bDeepfox',228],['p7bScrapcolossus',228],['p7bBiasdemon',228],['p7bNeuralhydra',229],['p7bSingularis',230]], reward:200000000, mult:2.3,
+    win:'인사 평가 완료. 등급: 비효율. 무한 확장에는 너의 자리가 없다.' },
+  { name:'컴파일라트론', pre:'문법 오류 하나 없이 나를 통과할 수 있겠나. 빌드 실패다.',
+    party:[['p8aLegacygolem',231],['p8aGitspawn',231],['p8aSpaghetti',236],['p8aCompilatron',233]], reward:50000000, mult:2.3,
+    win:'클린 빌드 확인. 다음 차원으로 통과를 허가한다.' },
+  { name:'린트세라핌', pre:'네 코드에는 경고가 0개여야 한다. 정화를 시작한다.',
+    party:[['p8aBranchling',234],['p8aBugswarm',234],['p8aPatchgoblin',235],['p8aLintseraph',236]], reward:70000000, mult:2.35,
+    win:'규칙 위반 0건. 정결한 코드로 인정한다.' },
+  { name:'머지망령', pre:'양쪽 변경을 다 살릴 수는 없다. 충돌을 직접 해결해 보아라.',
+    party:[['p8aBranchlord',238],['p8aCachefiend',238],['p8aMemoryleak',239],['p8aMergewraith',240]], reward:95000000, mult:2.4,
+    win:'병합 완료. 두 갈래가 하나로 봉합되었다.' },
+  { name:'커버리지우스', pre:'커버리지 100퍼센트가 아니라면 너는 아직 검증되지 않았다.',
+    party:[['p8aHeisenbug',242],['p8aDeploydemon',242],['p8aRefactitan',243],['p8aCoveragus',244]], reward:120000000, mult:2.45,
+    win:'전 분기 통과. 너의 코드는 완전히 검증되었다.' },
+  { name:'컴파일러 대제, 컴파일루스', pre:'네 소스를 어휘 분석하겠다. 컴파일에 실패한 존재는 실행될 자격이 없다.',
+    party:[['p8bParseguard',250],['p8bLinkerimp',247],['p8bSyntaxgnat',246],['p8bCompilus',248]], reward:150000000, mult:2.5,
+    win:'경고만 남기고 통과시켜 주마. 더 깊은 층에는 너를 디버그하려는 자가 기다린다.' },
+  { name:'디버거나우트', pre:'워치포인트를 걸었다. 네 모든 변수의 변화를 지켜보고 있다.',
+    party:[['p8bBreakpoint',252],['p8bRevertspore',250],['p8bDebugwraith',249],['p8bDebuggernaut',251]], reward:150000000, mult:2.5,
+    win:'버그는 못 찾았군. 다음은 머지 영역이다 — 거기서 너는 다른 분기와 충돌하게 될 거다.' },
+  { name:'머지 군주, 머지모나크', pre:'모든 분기는 결국 메인으로 합쳐진다. 너라는 분기도 예외가 아니다.',
+    party:[['p8bConflictdevourer',255],['p8bDeployseraph',254],['p8bLinkerlord',253],['p8bMergemonarch',255]], reward:150000000, mult:2.5,
+    win:'통합을 허락한다. 마지막 커밋 너머에는 이 모든 걸 작성한 자가 있다.' },
+  { name:'원작자, 창조주', pre:'안녕, 플레이어. 너를 여기까지 작성한 게 바로 나다. 마음에 안 들면 git revert 한 번이면 너는 없던 일이 돼. 마지막으로 묻지 — 끝까지 와볼래?',
+    party:[['p8bConflictdevourer',257],['p8bCachephantom',257],['p8bRollbackwarden',260],['p8bDebuggernaut',258],['p8bTheauthor',260]], reward:999999999, mult:2.7,
+    win:'좋아. 이번 커밋은 네 승리로 기록하지. 엔딩 크레딧을 푸시한다.' },
 ];
 
 const STORY = [
@@ -1141,7 +1411,25 @@ const STORY = [
   ['제6부 6장 — 교착 심연','타임아웃을 풀어냈다. 다음은 서로의 자원을 붙잡은 채 아무도 못 움직이는 교착 심연.','풀리지 않는 매듭의 미궁. 교착군주 이터널이 영원한 순환 대기로 너를 묶으려 한다.'],
   ['제6부 7장 — 커널 패닉 노심','이터널의 사슬을 끊었다. 다음은 파란 화면이 끝없이 깜빡이는 커널 패닉 노심.','식을 줄 모르는 코어가 영원한 야근으로 달궈져 있다. 커널패닉 집정관의 한 줄이면 전체가 무너진다.'],
   ['제6부 최종장 — 특이점','집정관의 노심을 식혔다. 남은 것은 단 하나 — 퇴근의 개념이 사라진 영겁의 야근, 그 중심의 특이점.','어제도 오늘도 내일도 반복되는 회사 그 자체, 옴니루프. 모든 차원의 힘을 모아 마지막 루프를 끊자.'],
-  ['제6부 진엔딩 — 무한루프를 끝낸 자','옴니루프가 멈췄다. 처음으로 \'다음 순간\'이 찾아왔다. 모든 차원, 모든 시간이 단 한 번의 칼퇴로 수렴했다.','★ 전 차원 클리어 — 진정한 엔딩입니다. 남은 목표: 도감 완성과 사내 대전 아레나 제패. 당신의 영원한 워라밸을 축하합니다.'],
+  ['제6부 진엔딩 — 무한루프를 끝낸 자','옴니루프가 멈췄다. 처음으로 \'다음 순간\'이 찾아왔다. 모든 시간이 단 한 번의 칼퇴로 수렴했다.','…그때 회사가 모든 것을 [클라우드]로 이전하기 시작했다. AI가 인사를 자동화한다. 새 차원 [클라우드 신계] 해금! (차원 이동)'],
+  /* ── 7부 (클라우드 신계): storyIdx +1 매핑. 1장은 6부 진엔딩 안내가 겸한다 ── */
+  ['제7부 2장 — 뉴럴 심층','오케스트레이션 평원을 넘었다. 다음은 GPU가 끝없이 도는 뉴럴 심층 — 거대한 모델이 사람을 학습한다.','텐서킹이 너의 행동 패턴을 학습해 예측하려 한다. 학습이 끝나기 전에 돌파하자.'],
+  ['제7부 3장 — 엣지 경계망','텐서킹의 예측을 빗나갔다. 다음은 연산이 분산된 엣지 경계망 — 어디서 적이 튀어나올지 모른다.','서버렉서스가 무한히 스케일 아웃하며 길을 막는다. 분산된 노드를 하나씩 끊어내자.'],
+  ['제7부 4장 — 하이퍼스케일 코어','엣지망을 정리했다. 다음은 무한 확장의 심장, 하이퍼스케일 코어.','하이퍼스케일러가 자원을 무제한으로 끌어다 쓴다. 과금 폭탄이 떨어지기 전에 끝내자.'],
+  ['제7부 5장 — 자동화 연산실','하이퍼스케일러의 확장을 멈췄다. 이제 인사가 완전 자동화된 연산실로.','오토마타프라임이 결재·평가·해고를 1초에 처리한다. 자동화의 틈을 노리자.'],
+  ['제7부 6장 — 과적합 학습장','자동화의 허점을 찔렀다. 다음은 데이터에 과하게 맞춰진 과적합 학습장.','과적합골렘은 본 적 있는 공격엔 완벽 대응하지만, 처음 보는 수엔 약하다. 변칙으로 흔들자.'],
+  ['제7부 7장 — 뉴럴 증식원','과적합골렘을 변칙으로 꺾었다. 다음은 모델이 스스로 증식하는 뉴럴 증식원.','뉴럴히드라는 베어도 다시 자란다. 증식 속도를 넘는 화력으로 근원을 끊자.'],
+  ['제7부 최종장 — 특이점 인사총괄실','히드라의 증식을 압도했다. 남은 것은 모든 인사를 장악한 AI — 특이점 인사총괄.','싱귤라리스는 인간의 \'정시퇴근\'을 학습 데이터에 없는 변수로 본다. 그 변수를 증명하자.'],
+  ['제7부 진엔딩 — 특이점을 넘어','싱귤라리스가 연산을 멈췄다. 클라우드의 무한 확장이 절전 모드로 들어갔다.','…그러나 로그를 거슬러 오르자 모든 차원을 적은 [소스코드]가 드러났다. 새 차원 [소스 차원] 해금! (차원 이동)'],
+  /* ── 8부 (소스 차원): 진진엔딩. 1장은 7부 진엔딩 안내가 겸한다 ── */
+  ['제8부 2장 — 린터의 정화소','컴파일러의 관문을 통과했다. 다음은 모든 코드를 검사하는 린터의 정화소.','린트세라핌이 너의 \'스타일 위반\'을 지적하며 막아선다. 경고를 무시하고 밀고 나가자.'],
+  ['제8부 3장 — 머지의 균열','린터를 통과했다. 다음은 수많은 브랜치가 충돌하는 머지의 균열.','머지망령이 충돌(conflict)을 일으켜 길을 뒤섞는다. 올바른 갈래를 골라 머지하자.'],
+  ['제8부 4장 — 커버리지의 심판정','머지 충돌을 해소했다. 다음은 테스트 커버리지가 심판하는 법정.','커버리지우스가 \'테스트 안 된 코드\'라며 너를 기각하려 한다. 모든 경로를 통과해 증명하자.'],
+  ['제8부 5장 — 컴파일 심층','커버리지 심판을 통과했다. 소스 차원 더 깊은 곳, 컴파일이 끝없이 도는 심층.','컴파일러 대제 컴파일루스가 너를 에러로 판정하려 한다. 빌드가 깨지기 전에 돌파하자.'],
+  ['제8부 6장 — 디버그 심연','컴파일을 통과시켰다. 다음은 버그를 영원히 쫓는 디버그 심연.','디버거나우트가 너를 중단점에 가둔다. 무한 디버깅의 밤을 끝내자.'],
+  ['제8부 7장 — 머지 합류점','디버그 심연을 빠져나왔다. 모든 브랜치가 합류하는 마지막 지점.','머지 군주 머지모나크가 전 차원의 변경을 하나로 합치려 한다. 너의 커밋을 끝까지 지키자.'],
+  ['제8부 최종장 — 최후의 커밋','머지 군주를 넘었다. 남은 것은 단 하나 — 우주의 소스를 작성한 \'원작자\'.','git revert로 너의 존재를 되돌릴 수 있는 창조주. 모든 것을 쏟아부어 마지막 커밋을 올리자.'],
+  ['제8부 진진엔딩 — 원작자를 만난 자','원작자가 키보드에서 손을 뗐다. "이 결말은 내가 쓴 게 아니야. 네가 썼어." 마지막 커밋이 머지되었다.','★★ 전 차원 진진엔딩 — 이 이야기의 원작자는 당신입니다. 남은 목표: 도감 완성·아레나 제패. 그리고 가끔은, 진짜로 칼퇴하기.'],
 ];
 /* 2부 진입 후에는 STORY 7~10(2부 챕터)을 story+1로 가리킨다 */
 function storyIdx(){
@@ -1668,7 +1956,7 @@ async function loadRank(){
   if(G.screen==='rank' && !bossMode) paintRank();
   if(G.screen==='arena' && !bossMode) scrArena();
 }
-const PROG_LABEL = ['1장','2장','3장','4장','최종장','엔딩','진엔딩 ★','이세계 1장','이세계 2장','이세계 3장','이세계 4장','이세계 최종장','이세계 5장 ★★','이세계 6장','이세계 7장','이세계 진최종장','전차원 클리어 ★★★','신계 로비 돌파','신계 운명부 돌파','신계 윤회실 돌파','신계 정비창 돌파','신계 연구소 돌파','전우주 클리어 ★★★★★','공허 수속장 돌파','공허 평원 돌파','공허 도서관 돌파','공허 공장 돌파','공허 본청 돌파','무(無)차원 클리어 ★★★★★★','리부트 캐시폐기장 돌파','리부트 롤백협곡 돌파','리부트 스냅샷고 돌파','리부트 권한관제실 돌파','리부트 메모리부서 돌파','리부트 디스크부서 돌파','리부트 차원 클리어 ★★★★★★★','무한루프 교착층 돌파','무한루프 붕괴층 돌파','무한루프 경합층 돌파','무한루프 특이점층 돌파','무한루프 타임아웃 돌파','무한루프 교착심연 돌파','무한루프 커널노심 돌파','무한루프 클리어 ★★★★★★★★'];
+const PROG_LABEL = ['1장','2장','3장','4장','최종장','엔딩','진엔딩 ★','이세계 1장','이세계 2장','이세계 3장','이세계 4장','이세계 최종장','이세계 5장 ★★','이세계 6장','이세계 7장','이세계 진최종장','전차원 클리어 ★★★','신계 로비 돌파','신계 운명부 돌파','신계 윤회실 돌파','신계 정비창 돌파','신계 연구소 돌파','전우주 클리어 ★★★★★','공허 수속장 돌파','공허 평원 돌파','공허 도서관 돌파','공허 공장 돌파','공허 본청 돌파','무(無)차원 클리어 ★★★★★★','리부트 캐시폐기장 돌파','리부트 롤백협곡 돌파','리부트 스냅샷고 돌파','리부트 권한관제실 돌파','리부트 메모리부서 돌파','리부트 디스크부서 돌파','리부트 차원 클리어 ★★★★★★★','무한루프 교착층 돌파','무한루프 붕괴층 돌파','무한루프 경합층 돌파','무한루프 특이점층 돌파','무한루프 타임아웃 돌파','무한루프 교착심연 돌파','무한루프 커널노심 돌파','무한루프 클리어 ★★★★★★★★','클라우드 오케스트레이션 돌파','클라우드 뉴럴심층 돌파','클라우드 엣지망 돌파','클라우드 하이퍼스케일 돌파','클라우드 자동화실 돌파','클라우드 과적합장 돌파','클라우드 증식원 돌파','클라우드 신계 클리어 ★★★★★★★★★','소스 컴파일러 돌파','소스 린터 돌파','소스 머지균열 돌파','소스 커버리지 돌파','소스 컴파일심층 돌파','소스 디버그심연 돌파','소스 머지합류 돌파','소스 차원 클리어 ★★★★★★★★★★'];
 let rankSel = -1;
 function paintRank(){
   clearGrid();
@@ -2048,6 +2336,8 @@ const DIMENSIONS = [
   { name:'4부 — 공허 컨소시엄',      from:21, to:26, need:21, isekai:true },
   { name:'5부 — 리부트 차원',        from:27, to:33, need:27, isekai:true },
   { name:'6부 — 무한루프 사옥',      from:34, to:41, need:34, isekai:true },
+  { name:'7부 — 클라우드 신계',      from:42, to:49, need:42, isekai:true },
+  { name:'8부 — 소스 차원',          from:50, to:57, need:50, isekai:true },
 ];
 let moveDim = -1;
 function floorUnlocked(i){
@@ -2434,6 +2724,13 @@ function scrGacha(){
 /* ── 인게임 패치노트: 배포 사이트에서도 최근 업데이트를 볼 수 있게.
    전체 이력은 저장소의 CHANGELOG.md, 여기엔 핵심만 요약해 최신순으로 둔다. ── */
 const PATCH_NOTES = [
+  { ver:'v6.5', title:'7·8부 신규 차원 — 클라우드 신계 · 소스 차원(진진엔딩)', items:[
+    '☁ 7부 「클라우드 신계 — 무한 확장」 (LV200~230, 8층) — AI·뉴럴넷·오토스케일, 최종보스 AI 인사총괄 싱귤라리스',
+    '💻 8부 「소스 차원 — 최후의 커밋」 (LV230~260, 8층, 진진엔딩) — git·레거시·디버거·창조주, 최종보스 원작자',
+    '🐾 신규 종족 74종(전설 16·합성 4) — LV230/260 늦은 진화·돌연변이 포함',
+    '🧬 신규 합성 레시피 4종 추가',
+    '⚖ 난이도 곡선 연장 — 보스 강화 배율 7부 2.0~2.3 / 8부 2.3~2.7(원작자)',
+  ]},
   { ver:'v6.4', title:'합성 재료 개체 선택 + 등급 확인', items:[
     '🧬 이종 합성 시 재료 종족이 여러 마리면 어느 개체를 쓸지 직접 선택 — 실수로 고등급 개체 희생 방지',
     '🏷 선택·확인 화면에서 각 후보의 등급(★◆👑✨)·레벨·HP·공격·도핑을 표시하고 결과 등급도 미리 보기',
@@ -2694,6 +2991,12 @@ const FUSION_RECIPES = [
   { mats:['lpbCoredumpwraith','lpbKernelpanicfiend'], to:'lpbBusyspecter' },
   { mats:['lpaDeadlockwidow','lpbOverflowtitan'],     to:'lpInfinitedragon' },
   { mats:['lpbBombswarm','lpbDeadlockwarden'],        to:'lpHaltingangel' },
+  /* 클라우드 신계 레시피 (7부) */
+  { mats:['p7aServerless','p7aKubeguard'],   to:'p7aMeshmind' },
+  { mats:['p7bDeepfox','p7bClockreaper'],    to:'p7bSynthcore' },
+  /* 소스 차원 레시피 (8부) */
+  { mats:['p8aSpaghetti','p8aBranchlord'],        to:'p8aRefactitan' },
+  { mats:['p8bRollbackwarden','p8bConflictdevourer'], to:'p8bRefactorrend' },
   /* 신화 합성: 뽑기 전용 신화 2종 → 더 강한 신화. 결과 등급은 항상 mythic으로 고정된다. */
   { mats:['alphaclock','omegapayday'],      to:'eternalbalance', mythic:true },
 ];
@@ -2927,6 +3230,24 @@ const LEGEND_ROUTE = {
   lpbDeadlocklordEternal:'무한루프 사옥 보스 / 격파 후 야생(희귀)',
   lpbPanickingArchon:'무한루프 사옥 보스 / 격파 후 야생(희귀)',
   lpbOmniloop:'무한루프 사옥 진최종보스 (특이점 옴니루프) / 격파 후 야생(희귀)',
+  /* 7부 클라우드 신계 보스 */
+  p7aOrchestratus:'클라우드 신계 보스 / 격파 후 야생(희귀)',
+  p7aTensorking:'클라우드 신계 보스 / 격파 후 야생(희귀)',
+  p7aServerlexus:'클라우드 신계 보스 / 격파 후 야생(희귀)',
+  p7aHyperscaler:'클라우드 신계 보스 / 격파 후 야생(희귀)',
+  p7bAutomata:'클라우드 신계 보스 / 격파 후 야생(희귀)',
+  p7bOverfitgolem:'클라우드 신계 보스 / 격파 후 야생(희귀)',
+  p7bNeuralhydra:'클라우드 신계 보스 / 격파 후 야생(희귀)',
+  p7bSingularis:'클라우드 신계 최종보스 (특이점 인사총괄) / 격파 후 야생(희귀)',
+  /* 8부 소스 차원 보스 */
+  p8aCompilatron:'소스 차원 보스 / 격파 후 야생(희귀)',
+  p8aLintseraph:'소스 차원 보스 / 격파 후 야생(희귀)',
+  p8aMergewraith:'소스 차원 보스 / 격파 후 야생(희귀)',
+  p8aCoveragus:'소스 차원 보스 / 격파 후 야생(희귀)',
+  p8bCompilus:'소스 차원 보스 / 격파 후 야생(희귀)',
+  p8bDebuggernaut:'소스 차원 보스 / 격파 후 야생(희귀)',
+  p8bMergemonarch:'소스 차원 보스 / 격파 후 야생(희귀)',
+  p8bTheauthor:'소스 차원 진진엔딩 최종보스 (원작자·창조주) / 격파 후 야생(희귀)',
   /* 신화 — 뽑기/합성 전용 */
   alphaclock:'사내 경품 응모(뽑기) 전용 — 0.02% 신화 강림',
   omegapayday:'사내 경품 응모(뽑기) 전용 — 0.02% 신화 강림',
@@ -3083,6 +3404,24 @@ function startExplore(area){
     if(G.floor===39 && G.story>=40 && Math.random()<0.03) pool=['lpbDeadlocklordEternal'];
     if(G.floor===40 && G.story>=41 && Math.random()<0.03) pool=['lpbPanickingArchon'];
     if(G.floor===41 && G.story>=42 && Math.random()<0.025) pool=['lpbOmniloop'];
+    /* 7부 클라우드 신계 보스 */
+    if(G.floor===42 && G.story>=43 && Math.random()<0.03) pool=['p7aOrchestratus'];
+    if(G.floor===43 && G.story>=44 && Math.random()<0.03) pool=['p7aTensorking'];
+    if(G.floor===44 && G.story>=45 && Math.random()<0.03) pool=['p7aServerlexus'];
+    if(G.floor===45 && G.story>=46 && Math.random()<0.03) pool=['p7aHyperscaler'];
+    if(G.floor===46 && G.story>=47 && Math.random()<0.03) pool=['p7bAutomata'];
+    if(G.floor===47 && G.story>=48 && Math.random()<0.03) pool=['p7bOverfitgolem'];
+    if(G.floor===48 && G.story>=49 && Math.random()<0.03) pool=['p7bNeuralhydra'];
+    if(G.floor===49 && G.story>=50 && Math.random()<0.025) pool=['p7bSingularis'];
+    /* 8부 소스 차원 보스 */
+    if(G.floor===50 && G.story>=51 && Math.random()<0.03) pool=['p8aCompilatron'];
+    if(G.floor===51 && G.story>=52 && Math.random()<0.03) pool=['p8aLintseraph'];
+    if(G.floor===52 && G.story>=53 && Math.random()<0.03) pool=['p8aMergewraith'];
+    if(G.floor===53 && G.story>=54 && Math.random()<0.03) pool=['p8aCoveragus'];
+    if(G.floor===54 && G.story>=55 && Math.random()<0.03) pool=['p8bCompilus'];
+    if(G.floor===55 && G.story>=56 && Math.random()<0.03) pool=['p8bDebuggernaut'];
+    if(G.floor===56 && G.story>=57 && Math.random()<0.03) pool=['p8bMergemonarch'];
+    if(G.floor===57 && G.story>=58 && Math.random()<0.025) pool=['p8bTheauthor'];
     const sid = pool[Math.floor(Math.random()*pool.length)];
     const LEGEND_WILD_LV = { dragon:18, phoenix:24, burnoutlord:40, overgod:60,
       metatronsec:70, moiradirector:76, yamamanager:81, chronosforeman:86, demiurgelab:91, omniversceo:96,
@@ -3090,7 +3429,11 @@ function startExplore(area){
       rbaCacheadminVoid:143, rbaRollbackchiefNull:146, rbaSnapchiefFrost:152, rbaSudoadminRoot:155,
       rbbResetwyrm:158, rbbFormatlord:163, rbbRootreset:170,
       lpaDeadlockus:173, lpaSegfaultor:177, lpaRacemaster:181, lpaSingularis:185,
-      lpbTimeoutreaper:188, lpbDeadlocklordEternal:191, lpbPanickingArchon:195, lpbOmniloop:200 };
+      lpbTimeoutreaper:188, lpbDeadlocklordEternal:191, lpbPanickingArchon:195, lpbOmniloop:200,
+      p7aOrchestratus:203, p7aTensorking:206, p7aServerlexus:209, p7aHyperscaler:214,
+      p7bAutomata:218, p7bOverfitgolem:221, p7bNeuralhydra:225, p7bSingularis:230,
+      p8aCompilatron:233, p8aLintseraph:236, p8aMergewraith:240, p8aCoveragus:244,
+      p8bCompilus:248, p8bDebuggernaut:251, p8bMergemonarch:255, p8bTheauthor:260 };
     const lv = SPECIES[sid].legend
       ? (LEGEND_WILD_LV[sid]||24)
       : area.lv[0] + Math.floor(Math.random()*(area.lv[1]-area.lv[0]+1));
@@ -3453,7 +3796,7 @@ function onTrainerMonDown(){
     if(!canAutoSave) pushLog('💾 큰 진행을 했다! [백업 코드]를 발급해 보관해 두자.');
     if(!b.revenge && b.bossIdx===G.story){
       G.story++;
-      if(G.story===5 || G.story===6 || G.story===11 || G.story===15 || G.story===21 || G.story===27 || G.story===34 || G.story===42){ setTimeout(()=>{ G.screen='ending'; render(); },40); return; }
+      if(G.story===5 || G.story===6 || G.story===11 || G.story===15 || G.story===21 || G.story===27 || G.story===34 || G.story===42 || G.story===50 || G.story===58){ setTimeout(()=>{ G.screen='ending'; render(); },40); return; }
       b.afterStory = true;
     }
   }
@@ -3650,6 +3993,8 @@ function scrGameover(){
 function scrEnding(){
   restoreLead();
   cloudSave(true); updateBoard(true);
+  const p8Clear = G.story>=58;
+  const p7Clear = G.story>=50;
   const loopClear = G.story>=42;
   const rebootClear = G.story>=34;
   const voidClear = G.story>=27;
@@ -3657,15 +4002,28 @@ function scrEnding(){
   const dimensionClear = G.story>=15;
   const isekaiClear = G.story>=11;
   const final = G.story>=6;
-  const lines = loopClear ? [
-    ['★★★★★★★★ 진(眞)엔딩 — 무한루프를 끝낸 자 ★★★★★★★★','bold'],'',
-    '특이점 옴니루프가 스스로 정지했다. "퇴근은… 있었구나. 다음 순간이, 처음으로 찾아온다."',
-    '회사, 이세계, 신계, 공허, 리부트 차원, 그리고 영원히 반복되던 야근의 특이점까지 —',
-    '존재하는 모든 시간이, 마침내 단 한 번의 칼퇴로 수렴했다. 무한루프는 깨졌다.','',
+  const lines = p8Clear ? [
+    ['★★★★★★★★★★ 진진(眞眞)엔딩 — 원작자를 만난 자 ★★★★★★★★★★','bold'],'',
+    '우주의 소스코드 가장 깊은 곳. 원작자(창조주)가 키보드에서 손을 뗐다. "…졌다. 이 결말은 내가 쓴 게 아니야. 네가 썼어."',
+    '회사·이세계·신계·공허·리부트·무한루프·클라우드, 그리고 그 모든 것을 적어 내려간 소스 차원까지 —',
+    '마지막 커밋 메시지는 단 한 줄이었다. "feat: 전 차원 영원한 정시퇴근 (closes #1)".','',
     [`최종 기록 — 승수 ${G.wins} / 도감 ${dexCaughtCount()}/${ALL_SIDS.length} / 희귀 ${Object.keys(G.rarDex).length}종`,'hl'],'',
-    '★ 모든 차원을 클리어했습니다. 진정한 엔딩입니다. ★',
-    '남은 목표: 도감 완성 — 5·6부 보스들도 격파한 구역에서 야생으로 드물게 출현한다.',
-    '(사내 대전 아레나에서 다른 사원의 파티와 겨뤄 연승과 복지P를 쌓아 보자)',
+    '★★ 모든 차원을 클리어했습니다. 진진엔딩 — 이 이야기의 원작자는 당신입니다. ★★',
+    '남은 목표: 도감 완성·사내 대전 아레나 제패. 그리고 가끔은, 진짜로 칼퇴하기.',
+  ] : p7Clear ? [
+    ['★★★★★★★★★ 진엔딩 — 특이점을 넘은 자 ★★★★★★★★★','bold'],'',
+    'AI 인사총괄 싱귤라리스가 연산을 멈췄다. "인간의 정시퇴근은… 학습 데이터에 없던 변수였습니다. 인정합니다."',
+    '클라우드 신계의 모든 서버가 절전 모드로 들어갔다. 무한 확장이 멈췄다.','',
+    [`최종 기록 — 승수 ${G.wins} / 도감 ${dexCaughtCount()}/${ALL_SIDS.length} / 희귀 ${Object.keys(G.rarDex).length}종`,'hl'],'',
+    ['…그러나 클라우드의 로그를 거슬러 오르자, 모든 차원을 적어 내려간 \'소스코드\'가 드러났다. 새 차원 [소스 차원]이 해금되었습니다! (차원 이동)','hl'],
+    '우주의 소스를 작성한 자 — \'원작자\'가 마지막 커밋을 기다린다. 진정한 최종장이 시작된다.',
+  ] : loopClear ? [
+    ['★★★★★★★★ 진엔딩 — 무한루프를 끝낸 자 ★★★★★★★★','bold'],'',
+    '특이점 옴니루프가 스스로 정지했다. "퇴근은… 있었구나. 다음 순간이, 처음으로 찾아온다."',
+    '회사·이세계·신계·공허·리부트, 그리고 영원히 반복되던 야근의 특이점까지 — 무한루프는 깨졌다.','',
+    [`최종 기록 — 승수 ${G.wins} / 도감 ${dexCaughtCount()}/${ALL_SIDS.length} / 희귀 ${Object.keys(G.rarDex).length}종`,'hl'],'',
+    ['…그 순간, 회사가 모든 것을 \'클라우드\'로 이전하기 시작했다. AI가 인사를 자동화한다. 새 차원 [클라우드 신계]가 해금되었습니다! (차원 이동)','hl'],
+    '무한히 확장하는 클라우드 — 그 중심에 \'AI 인사총괄\'이 있다. 다음 장이 시작된다.',
   ] : rebootClear ? [
     ['★★★★★★★ 진엔딩 — 초기화에 맞선 자 ★★★★★★★','bold'],'',
     '루트 관리자 RESET이 공장초기화를 스스로 취소했다. "이 우주의 root는… 내가 아니었어."',
