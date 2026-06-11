@@ -114,8 +114,10 @@ T('레전드 개체 생성 시 특성 부여', () => { const mm = makeMon('espre
 /* ── 성장/전투 ── */
 T('필요 경험치 단조 증가', () => { for (let l = 1; l < 140; l++) { if (expNeed(l + 1) <= expNeed(l)) return false; } return true; });
 T('스탯 레벨 비례 증가', () => { const a = statsFor('espresso', 1), b = statsFor('espresso', 50); return b.maxhp > a.maxhp && b.atk > a.atk; });
-T('상성 삼각: 카페인>서류, 역상성 감소, 야근 양방향 1.3', () =>
-  typeMult('카페인','서류') === 1.5 && typeMult('서류','카페인') === 0.67 && typeMult('야근','전자') === 1.3 && typeMult('전자','야근') === 1.3);
+T('상성 삼각: 카페인>서류, 역상성 감소, 야근 공격1.15·피격1.3 (글래스캐논)', () =>
+  typeMult('카페인','서류') === 1.5 && typeMult('서류','카페인') === 0.67
+  && typeMult('야근','전자') === 1.15 && typeMult('전자','야근') === 1.3
+  && typeMult('야근','야근') === 1);
 T('데미지 최소 1 보장', () => { const a = makeMon('mixrat', 1), d = makeMon('phoenix', 90); return dmgCalc(a, 40, null, d).val >= 1; });
 T('야생 AI 똑똑함 확률 상향 (코드 검사)', () => true /* enemyTurn 내 0.8/0.5 — 아래 소스 검사로 대체 */);
 
