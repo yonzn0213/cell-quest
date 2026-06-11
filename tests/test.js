@@ -314,6 +314,46 @@ T('일일: claimDaily — 완료 미션 보상 1회만 지급', () => {
 T('migrateSave: daily 기본값 보충', () => { const o = {}; migrateSave(o); return o.daily && o.daily.date === '' && Array.isArray(o.daily.missions); });
 T('일일 도전 화면 렌더', () => { newGame(); G.party = [makeMon('espresso', 10)]; G.screen = 'daily'; render(); return true; });
 
+/* ── v6.1 탐색 랜덤 이벤트 ── */
+T('이벤트: 버려진 몬스터 무료 포획 — 합류·도감·일일진행', () => {
+  newGame(); G.party = []; G.daily = { date: todayStr(), streak: 1, missions: [{ id: 0, type: 'catch', sub: null, target: 1, prog: 0, done: false, claimed: false, label: 'x', money: 1, item: null, qty: 0 }] };
+  const toParty = eventTakeAbandon({ type: 'abandon', sid: 'wifi', lv: 10 });
+  return toParty === true && G.party.length === 1 && G.party[0].sid === 'wifi' && G.dex.wifi === 2 && G.daily.missions[0].prog === 1;
+});
+T('이벤트: 수수께끼 상인 — 구매 차감·지급, 특가<정상', () => {
+  newGame(); G.money = 100000;
+  const normal = merchantPrice({ good: ['goldclip', 2], bargain: false });
+  const bargain = merchantPrice({ good: ['goldclip', 2], bargain: true });
+  const g0 = G.items.goldclip || 0, m0 = G.money;
+  const ok = eventBuy({ good: ['goldclip', 2], bargain: true });
+  return bargain < normal && ok === true && (G.items.goldclip || 0) === g0 + 2 && G.money === m0 - bargain;
+});
+T('이벤트: 상인 — 포인트 부족 시 구매 불가', () => {
+  newGame(); G.money = 0; return eventBuy({ good: ['dimclip', 1], bargain: false }) === false;
+});
+T('이벤트: 도박꾼 — 승리 2배·패배 차감(음수 없음)', () => {
+  newGame(); G.money = 5000; eventGamble(3000, true); const win = G.money;
+  G.money = 1000; eventGamble(3000, false); const lose = G.money;
+  return win === 8000 && lose === 0;
+});
+T('이벤트: 행운의 상자 — 보상(P 또는 아이템) 지급', () => {
+  newGame(); const m0 = G.money, items0 = Object.values(G.items).reduce((a, b) => a + b, 0);
+  eventLuckyOpen();
+  return G.money > m0 || Object.values(G.items).reduce((a, b) => a + b, 0) > items0;
+});
+T('이벤트: eventLead — 살아있는 선두 반환', () => {
+  newGame(); G.party = [makeMon('espresso', 10)]; G.active = 0;
+  return eventLead() === G.party[0];
+});
+T('이벤트 화면 렌더 — 5종 + 결과 화면 크래시 없음', () => {
+  newGame(); G.party = [makeMon('espresso', 30)];
+  for (const ev of [{ type: 'lucky' }, { type: 'abandon', sid: 'wifi', lv: 10 }, { type: 'merchant', good: ['goldclip', 2], bargain: true }, { type: 'gamble', bet: 3000 }, { type: 'peddler' }]) {
+    curEvent = ev; G.screen = 'event'; render();
+  }
+  curEvent.done = true; curEvent.msg = 'x'; render();
+  return true;
+});
+
 /* ── 패치 이벤트 2: 디톡스 + 의문의 머리카락 ── */
 T('디톡스 앰플: 도핑 배율·횟수 초기화', () => {
   newGame(); const mm = makeMon('espresso', 20);

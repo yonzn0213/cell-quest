@@ -1805,7 +1805,7 @@ function render(){
     moveFloor:scrMoveFloor, storyBeat:scrStoryBeat, gameover:scrGameover, ending:scrEnding,
     rank:scrRank, dope:scrDope, fusion:scrFusion, isekai:scrIsekai, ldex:scrLegendDex,
     academy:scrAcademy, wiki:scrWiki, gacha:scrGacha, recipe:scrRecipe, cloud:scrCloud,
-    patchnotes:scrPatchNotes, arena:scrArena, daily:scrDaily };
+    patchnotes:scrPatchNotes, arena:scrArena, daily:scrDaily, event:scrEvent };
   (map[G.screen]||scrHub)();
 }
 
@@ -2881,8 +2881,84 @@ function scrLegendDex(){
 
 /* ── 탐색 ── */
 let curArea = null, exploreText = [];
+/* ════════════════ 탐색 랜덤 이벤트 ════════════════
+   탐색 시 ~10% 확률 발생. 모두 선택형 — 리스크(P 도박·도핑 룰렛)는 자발 참여만, 강제 손실 없음.
+   결과 효과는 테스트 가능한 순수 함수로 분리하고 scrEvent는 UI만 담당. */
+let curEvent = null;
+function eventScale(){ return Math.round(dailyScale()); }
+const EVENT_MERCHANT_GOODS = [['goldclip',2],['prismclip',1],['dimclip',1],['bacchus',5],['hotsix',2]];
+function merchantPrice(e){ const [it,q]=e.good; return Math.max(1, Math.round(ITEM_DEF[it].price*q*(e.bargain?0.4:1.2))); }
+function pickExploreEvent(area){
+  const r = Math.random();
+  if(r < 0.24) return { type:'lucky' };
+  if(r < 0.44) return { type:'abandon', sid: area.pool[Math.floor(Math.random()*area.pool.length)], lv: area.lv[0] };
+  if(r < 0.66){ return { type:'merchant', good: EVENT_MERCHANT_GOODS[Math.floor(Math.random()*EVENT_MERCHANT_GOODS.length)], bargain: Math.random()<0.35 }; }
+  if(r < 0.85) return { type:'gamble', bet: 3000*eventScale() };
+  return { type:'peddler' };
+}
+/* ── 결과 효과(순수) ── */
+function eventLuckyOpen(){
+  const s = eventScale();
+  if(Math.random()<0.5){ const p=(1000+Math.floor(Math.random()*4000))*s; G.money+=p; return `상자에서 복지포인트가 쏟아졌다! +${p.toLocaleString()}P`; }
+  const pool=['clip','goldclip','bacchus','prismclip']; const it=pool[Math.floor(Math.random()*pool.length)]; const q=it==='clip'?5:it==='bacchus'?3:1;
+  G.items[it]=(G.items[it]||0)+q; return `상자에서 ${ITEM_DEF[it].name} ×${q}이(가) 나왔다!`;
+}
+function eventTakeAbandon(e){
+  const m = makeMon(e.sid, e.lv, 'normal');
+  const toParty = G.party.length<4;
+  if(toParty) G.party.push(m); else G.box.push(m);
+  dexCatch(e.sid,'normal'); dailyProgress('catch',1); dailyProgress('typecatch',1,{type:SPECIES[e.sid].type});
+  return toParty;
+}
+function eventBuy(e){
+  const price=merchantPrice(e); if(G.money<price) return false;
+  const [it,q]=e.good; G.money-=price; G.items[it]=(G.items[it]||0)+q; return true;
+}
+function eventGamble(bet, win){ if(win) G.money+=bet; else G.money=Math.max(0,G.money-bet); return win; }
+function eventLead(){ return (G.party[G.active]&&G.party[G.active].hp>0) ? G.party[G.active] : G.party.find(m=>m&&m.hp>0) || null; }
+function tryExploreEvent(area){ curEvent = pickExploreEvent(area); G.screen='event'; render(); return true; }
+function eventResult(msg){ curEvent.done=true; curEvent.msg=msg; render(); }
+function eventLeave(){ curEvent=null; G.screen='hub'; render(); }
+function scrEvent(){
+  setStatus('이벤트');
+  const e = curEvent;
+  if(!e){ G.screen='hub'; render(); return; }
+  if(e.done){ paint([['― 사건 발생 ―','bold'],'',[e.msg,'hl']], [['탐색을 계속한다', eventLeave]], '=EVENT()'); return; }
+  let lines, choices;
+  if(e.type==='lucky'){
+    lines = [['🎁 행운의 상자','bold'],'','복도 구석에 송장이 지워진 택배 상자가 놓여 있다. 열어 볼까?'];
+    choices = [['상자를 연다', ()=>eventResult(eventLuckyOpen())], ['그냥 둔다', eventLeave]];
+  } else if(e.type==='abandon'){
+    const nm = SPECIES[e.sid] ? SPECIES[e.sid].name : '몬스터';
+    lines = [['🐾 버려진 몬스터','bold'],'',`상자 안에서 ${nm}이(가) 떨고 있다. "삐… 삐…" 데려갈까?`];
+    choices = [['데려간다 (무료 포획)', ()=>{ const p=eventTakeAbandon(e); eventResult(`${nm}이(가) ${p?'파티에':'보관함에'} 합류했다!`); }], ['두고 간다', eventLeave]];
+  } else if(e.type==='merchant'){
+    const [it,q]=e.good; const price=merchantPrice(e);
+    lines = [['🛒 수수께끼 상인','bold'],'',`후드를 쓴 상인이 속삭인다. "${ITEM_DEF[it].name} ×${q}… ${e.bargain?'오늘만 특가':'특별히'} ${price.toLocaleString()}P에 주지."`,'',`보유: ${G.money.toLocaleString()}P`];
+    choices = [];
+    if(G.money>=price) choices.push([`산다 (${price.toLocaleString()}P)`, ()=>{ eventBuy(e); eventResult(`${ITEM_DEF[it].name} ×${q}을(를) 샀다! (-${price.toLocaleString()}P)`); }]);
+    else lines.push(['…포인트가 부족하다.','dim']);
+    choices.push(['무시하고 지나간다', eventLeave]);
+  } else if(e.type==='gamble'){
+    lines = [['🎲 도박꾼','bold'],'',`수상한 직원이 동전을 튕긴다. "${e.bet.toLocaleString()}P 걸어. 앞면이면 두 배, 뒷면이면 꽝."`,'',`보유: ${G.money.toLocaleString()}P`];
+    choices = [];
+    if(G.money>=e.bet) choices.push([`${e.bet.toLocaleString()}P 건다 (50% 두 배)`, ()=>{ const win=Math.random()<0.5; eventGamble(e.bet,win); eventResult(win?`앞면!! ${e.bet.toLocaleString()}P를 따냈다! (+${e.bet.toLocaleString()}P)`:`뒷면… ${e.bet.toLocaleString()}P를 잃었다.`); }]);
+    else lines.push(['…걸 포인트가 부족하다.','dim']);
+    choices.push(['도박은 사양한다', eventLeave]);
+  } else { /* peddler */
+    const lead = eventLead();
+    lines = [['💊 수상한 약장수','bold'],'','"공짜 도핑이야. 한 방이면 강해져… 아마도." 약장수가 주사기를 내민다.'];
+    choices = [];
+    if(lead && (lead.dopeN||0)<DOPE_MAX) choices.push([`${monName(lead)}에게 무료 도핑 (성공/부작용 도박)`, ()=>{ const o=rollDope(); applyDope(lead,o); eventResult(`${monName(lead)} — ${o.msg}`); }]);
+    else lines.push(['…선두 몬스터가 없거나 도핑 한계라 권유를 거절했다.','dim']);
+    choices.push(['거절한다', eventLeave]);
+  }
+  paint(lines, choices, '=EVENT()');
+}
+
 function startExplore(area){
   curArea = area;
+  if(Math.random() < 0.10){ tryExploreEvent(area); return; }   /* ~10% 랜덤 이벤트 */
   const roll = Math.random();
   if(roll < 0.74){
     let pool = area.pool.slice();
