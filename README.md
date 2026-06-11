@@ -5,7 +5,7 @@
 ## 플레이
 아래 주소로 접속하면 바로 플레이할 수 있습니다.
 - **Firebase Hosting**: https://cell-quest-5c949.web.app
-- GitHub Pages: https://2hapu.github.io/cell-quest/
+- GitHub Pages: https://yonzn0213.github.io/cell-quest/
 - 셀 클릭 또는 숫자키(1~9)로 진행
 - **ESC** : 가짜 연차 계획 시트로 즉시 위장 전환 (셀을 클릭해 직접 편집도 가능)
 - 💾 **자동 저장**: 진행 상황이 브라우저 로컬 캐시(localStorage)에 자동 저장됩니다.
