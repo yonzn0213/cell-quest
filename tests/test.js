@@ -370,6 +370,11 @@ T('공용: rarMark 등급 심볼 (일반은 빈 문자열)', () =>
 T('보관함 렌더 — 황금·프리즘 개체 포함', () => {
   newGame(); G.box = [makeMon('latte', 27, 'gold'), makeMon('wifi', 20, 'prism')]; boxSel = -1; boxMode = 'view'; G.screen = 'box'; render(); return true;
 });
+T('밸런스: 6부 무한루프 보스 mult ≥ 1.7, 옴니루프 최고(≥2.0)', () => {
+  const six = BOSSES.slice(34);
+  return six.length === 8 && six.every(B => B.mult >= 1.7) && BOSSES[41].mult >= 2.0
+    && BOSSES[41].mult === Math.max.apply(null, six.map(B => B.mult));
+});
 
 /* ── 패치 이벤트 2: 디톡스 + 의문의 머리카락 ── */
 T('디톡스 앰플: 도핑 배율·횟수 초기화', () => {
