@@ -1245,6 +1245,7 @@ function newGame(){
     party:[], box:[], active:0, revN:{}, mutFail:{},
     items:{ clip:5, goldclip:0, prismclip:0, dimclip:0, godclip:0, bacchus:3, hotsix:0, coffee:0, elixir:0, ample:0, detox:0, hair:0 },
     money:200, wins:0, arenaWins:0, story:0, streak:0, isekai:false, gifts:{},
+    daily:{ date:'', streak:0, missions:[] },
     dex:{}, rarDex:{}, dexRewards:[],
     battle:null, log:[], floor:0, coolerCd:0, playMs:0,
   };
@@ -1313,11 +1314,101 @@ function applyDope(m, outcome){
   m.dope = +(((m.dope||1) * outcome.mult).toFixed(3));
   m.dopeN = (m.dopeN||0) + 1;
   recalcMonStats(m);
+  dailyProgress('dope', 1);
 }
 /* 디톡스 앰플: 도핑 배율·횟수 완전 초기화 (실패한 도핑을 비싸게 되돌리는 보험) */
 function applyDetox(m){
   m.dope = 1; m.dopeN = 0;
   recalcMonStats(m);
+}
+
+/* ════════════════ 일일 도전 + 출석 스트릭 ════════════════
+   로컬 날짜 기준(정적 호스팅). G.daily에 저장돼 클라우드/백업으로 함께 동기화된다.
+   같은 날 새로고침해도 미션이 고정되도록 날짜 문자열을 시드로 결정론적 선택. */
+function todayStr(){ const d=new Date(); return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`; }
+function dayDiff(a,b){ return Math.round((Date.parse(b+'T00:00:00') - Date.parse(a+'T00:00:00'))/86400000); }
+/* 보상 스케일: 해금 진행도가 깊을수록 ↑ (후반에도 의미 있게) */
+function dailyScale(){ return 1 + Math.min(arenaMyProgress(), 42)*0.5; }
+const DAILY_POOL = [
+  { type:'catch',     target:3, money:2500, item:'clip',      qty:3, label:n=>`몬스터 ${n}마리 포획` },
+  { type:'win',       target:8, money:3000, item:'bacchus',   qty:2, label:n=>`전투 ${n}회 승리` },
+  { type:'boss',      target:1, money:6000, item:'goldclip',  qty:1, label:n=>`보스 ${n}회 격파(재대결 포함)` },
+  { type:'fuse',      target:1, money:4000, item:'clip',      qty:2, label:n=>`이종 합성 ${n}회` },
+  { type:'dope',      target:2, money:3000, item:'ample',     qty:1, label:n=>`도핑 주사 ${n}회` },
+  { type:'arena',     target:1, money:5000, item:'goldclip',  qty:1, label:n=>`사내 대전 ${n}승` },
+  { type:'rare',      target:1, money:8000, item:'prismclip', qty:1, label:n=>`희귀(골드↑) 개체 ${n}마리 포획` },
+  { type:'typecatch', sub:'카페인', target:2, money:3000, item:'clip', qty:2, label:n=>`카페인 타입 ${n}마리 포획` },
+  { type:'typecatch', sub:'서류',   target:2, money:3000, item:'clip', qty:2, label:n=>`서류 타입 ${n}마리 포획` },
+  { type:'typecatch', sub:'전자',   target:2, money:3000, item:'clip', qty:2, label:n=>`전자 타입 ${n}마리 포획` },
+  { type:'typecatch', sub:'야근',   target:2, money:3000, item:'clip', qty:2, label:n=>`야근 타입 ${n}마리 포획` },
+];
+const STREAK_BONUS = [ /* 연속 출근 1~7일차, 7일 후 순환 */
+  {money:2000}, {money:3000}, {money:4000,item:'goldclip',qty:1}, {money:5000},
+  {money:7000,item:'prismclip',qty:1}, {money:10000}, {money:20000,item:'dimclip',qty:2} ];
+function dailySeed(str){ let h=2166136261; for(let i=0;i<str.length;i++){ h^=str.charCodeAt(i); h=Math.imul(h,16777619); } return h>>>0; }
+function rollDailyMissions(dateStr){
+  let seed = dailySeed(dateStr);
+  const rng = ()=>{ seed=(Math.imul(seed,1103515245)+12345)>>>0; return seed/4294967296; };
+  const pool = DAILY_POOL.slice(), picked = [];
+  while(picked.length<3 && pool.length) picked.push(pool.splice(Math.floor(rng()*pool.length),1)[0]);
+  return picked.map((m,i)=>({ id:i, type:m.type, sub:m.sub||null, target:m.target, prog:0, done:false, claimed:false,
+    label:m.label(m.target), money:m.money, item:m.item, qty:m.qty }));
+}
+function dailyCheck(){
+  if(!G.daily) G.daily = { date:'', streak:0, missions:[] };
+  const today = todayStr();
+  if(G.daily.date === today) return;
+  const prev = G.daily.date;
+  G.daily.streak = (prev && dayDiff(prev, today)===1) ? (G.daily.streak||0)+1 : 1;
+  G.daily.missions = rollDailyMissions(today);
+  G.daily.date = today;
+  const b = STREAK_BONUS[Math.min(G.daily.streak-1, STREAK_BONUS.length-1)];
+  const s = Math.round(dailyScale());
+  G.money += b.money*s;
+  let msg = `📅 ${G.daily.streak}일 연속 출근! 스트릭 보상 ${(b.money*s).toLocaleString()}P`;
+  if(b.item){ G.items[b.item]=(G.items[b.item]||0)+b.qty; msg += ` + ${ITEM_DEF[b.item].name}×${b.qty}`; }
+  pendingMsg.push(msg, '📋 오늘의 일일 도전 3개가 갱신되었다!');
+}
+/* 기존 행동 함수들이 호출하는 진행 후크 */
+function dailyProgress(type, n, meta){
+  if(!G.daily || !Array.isArray(G.daily.missions)) return;
+  meta = meta||{};
+  for(const m of G.daily.missions){
+    if(m.done || m.type!==type) continue;
+    if(type==='typecatch' && meta.type!==m.sub) continue;
+    m.prog += n;
+    if(m.prog>=m.target){ m.prog=m.target; m.done=true; }
+  }
+}
+let dailyMsg = '';
+function claimDaily(i){
+  const m = G.daily && G.daily.missions[i];
+  if(!m || !m.done || m.claimed) return;
+  const s = Math.round(dailyScale());
+  m.claimed = true;
+  G.money += m.money*s;
+  if(m.item){ G.items[m.item] = (G.items[m.item]||0) + m.qty; }
+  dailyMsg = `🎁 보상 수령: ${(m.money*s).toLocaleString()}P${m.item?` + ${ITEM_DEF[m.item].name}×${m.qty}`:''}`;
+  render();
+}
+function scrDaily(){
+  setStatus('일일 도전');
+  dailyCheck();
+  const s = Math.round(dailyScale());
+  const lines = [['― 📅 일일 도전 ―','bold'],'',
+    [`${G.daily.streak}일 연속 출근 중 · 완료 보상은 진행도 비례 ×${s}`,'dim'],''];
+  if(dailyMsg){ lines.push([dailyMsg,'hl'],''); dailyMsg=''; }
+  const choices = [];
+  G.daily.missions.forEach((m,i)=>{
+    const rwd = `${(m.money*s).toLocaleString()}P${m.item?` + ${ITEM_DEF[m.item].name}×${m.qty}`:''}`;
+    if(m.claimed) lines.push([`✅ ${m.label} — 수령 완료`,'dim']);
+    else if(m.done) choices.push([`🎁 보상 수령: ${m.label} (${rwd})`, ()=>claimDaily(i)]);
+    else lines.push(`▢ ${m.label}  [${m.prog}/${m.target}]  → ${rwd}`);
+  });
+  const nb = STREAK_BONUS[Math.min(G.daily.streak, STREAK_BONUS.length-1)];
+  lines.push('', [`다음 출근(연속 ${G.daily.streak+1}일) 보상: ${(nb.money*s).toLocaleString()}P${nb.item?` + ${ITEM_DEF[nb.item].name}×${nb.qty}`:''}`,'dim']);
+  choices.push(['← 거점으로', ()=>{ G.screen='hub'; render(); }]);
+  paint(lines, choices, '=DAILY()');
 }
 
 /* ── 패치 이벤트 2: 의문의 머리카락 — 모발이식 원태보 최종 진화 ── */
@@ -1714,7 +1805,7 @@ function render(){
     moveFloor:scrMoveFloor, storyBeat:scrStoryBeat, gameover:scrGameover, ending:scrEnding,
     rank:scrRank, dope:scrDope, fusion:scrFusion, isekai:scrIsekai, ldex:scrLegendDex,
     academy:scrAcademy, wiki:scrWiki, gacha:scrGacha, recipe:scrRecipe, cloud:scrCloud,
-    patchnotes:scrPatchNotes, arena:scrArena };
+    patchnotes:scrPatchNotes, arena:scrArena, daily:scrDaily };
   (map[G.screen]||scrHub)();
 }
 
@@ -1837,7 +1928,7 @@ function scrIsekai(){
 /* ── 허브 ── */
 function scrHub(){
   setStatus('준비');
-  cloudSave(); updateBoard();
+  cloudSave(); updateBoard(); dailyCheck();
   if(!G.gifts) G.gifts = {};
   if(!G.gifts.patch1){
     G.gifts.patch1 = true;
@@ -1921,6 +2012,7 @@ function scrHub(){
   );
   if(hasBoard) choices.push(['사내 랭킹 보드', ()=>{ G.screen='rank'; render(); }]);
   choices.push(['🥊 사내 대전 (아레나 · PvP)', ()=>{ arenaMsg=''; G.screen='arena'; render(); }]);
+  choices.push([`📅 일일 도전${G.daily&&G.daily.missions?` (${G.daily.missions.filter(m=>m.done&&!m.claimed).length>0?'수령 가능!':G.daily.missions.filter(m=>m.done).length+'/3'})`:''}`, ()=>{ dailyMsg=''; G.screen='daily'; render(); }]);
   choices.push(['사내 위키 (도움말)', ()=>{ G.screen='wiki'; render(); }]);
   choices.push(['📋 패치노트 (업데이트 내역)', ()=>{ patchPage=0; G.screen='patchnotes'; render(); }]);
   if(hasCloudSave){
@@ -2659,6 +2751,7 @@ function scrFusion(){
         const nm = makeMon(rc.to, lv, rar);
         addMon(nm);
         dexCatch(rc.to, rar);
+        dailyProgress('fuse', 1);
         if(rc.mythic) fuseMsg = `👑✨ 신화 합성 성공!!! 두 신화가 하나로 — [${monName(nm)}]이(가) 강림했다!!!`;
         else {
           fuseMsg = `🧬 이종 합성!! 새로운 종 [${monName(nm)}]이(가) 탄생했다!!`;
@@ -3151,6 +3244,7 @@ function countStreakWin(){
 }
 function winWild(){
   const b=G.battle; b.over=true; G.wins++; countCoolerWin(); countStreakWin();
+  dailyProgress('win', 1);
   pushLog(`${monName(b.enemy)}을(를) 쓰러뜨렸다!`);
   grantExpAndMoney(b.enemy, 1);
   if(Math.random()<0.4){
@@ -3175,10 +3269,12 @@ function onTrainerMonDown(){
   } else if(b.arena){
     b.over=true;
     G.arenaWins = (G.arenaWins||0) + 1;
+    dailyProgress('win', 1); dailyProgress('arena', 1);
     G.money += b.foeReward;
     pushLog(`★ 사내 대전 승리! ${b.foeName}을(를) 꺾었다! 보상 ${b.foeReward.toLocaleString()}P · 통산 ${G.arenaWins}승`);
   } else {
     b.over=true; G.wins++; countCoolerWin(); countStreakWin();
+    dailyProgress('win', 1); dailyProgress('boss', 1);
     const reward = Math.round(B.reward * (b.revenge ? revengeRate(b.bossIdx) : 1));
     if(b.revenge){ G.revN = G.revN||{}; G.revN[b.bossIdx] = (G.revN[b.bossIdx]||0)+1; }
     G.money += reward;
@@ -3228,6 +3324,8 @@ function throwClip(key){
     if(G.party.length<4){ G.party.push(e); pushLog('파티에 합류했다.'); }
     else { G.box.push(e); pushLog('파티가 가득 차서 보관함으로 이동했다.'); }
     dexCatch(e.sid, e.rar);
+    dailyProgress('catch', 1); dailyProgress('typecatch', 1, {type:monType(e)});
+    if(RARITY[e.rar||'normal'].rank>=1) dailyProgress('rare', 1);
     if(e.trait) pushLog(`특성 [${e.trait}] — ${TRAITS[e.trait]}`);
     if(!canAutoSave && RARITY[e.rar||'normal'].rank>=2) pushLog('💾 희귀 개체 획득! 잃기 전에 [백업 코드]를 발급해 두자.');
     b.over=true;
@@ -3492,6 +3590,7 @@ function migrateSave(obj){
   if(obj.items && obj.items.hair===undefined) obj.items.hair = 0;
   if(typeof obj.streak!=='number') obj.streak = 0;
   if(typeof obj.arenaWins!=='number') obj.arenaWins = 0;
+  if(!obj.daily || typeof obj.daily!=='object') obj.daily = { date:'', streak:0, missions:[] };
   if(obj.isekai===undefined) obj.isekai = false;
   if(!obj.gifts) obj.gifts = {};
   if(!obj.pid) obj.pid = makePid();

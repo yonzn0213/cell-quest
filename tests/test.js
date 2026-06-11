@@ -268,6 +268,52 @@ T('migrateSave: arenaWins 기본값 보충', () => {
 T('v6.0 버전 — 패치노트 최신·위장 제목 자동 반영', () =>
   PATCH_NOTES[0].ver === 'v6.0' && GAME_VERSION === 'v6.0');
 
+/* ── v6.1 일일 도전 + 출석 스트릭 ── */
+function ymd(offsetDays) { const d = new Date(); d.setDate(d.getDate() + offsetDays); const p = n => String(n).padStart(2, '0'); return d.getFullYear() + '-' + p(d.getMonth() + 1) + '-' + p(d.getDate()); }
+T('일일: rollDailyMissions 결정론적·3개·중복 없음', () => {
+  const a = rollDailyMissions('2026-06-11'), b = rollDailyMissions('2026-06-11');
+  return a.length === 3 && JSON.stringify(a.map(m => m.type + (m.sub || ''))) === JSON.stringify(b.map(m => m.type + (m.sub || '')))
+    && new Set(a.map(m => m.type + (m.sub || ''))).size === 3;
+});
+T('일일: dailyCheck — 날짜 바뀌면 미션 갱신·스트릭+1(연속)', () => {
+  newGame(); G.daily = { date: ymd(-1), streak: 5, missions: [] };
+  dailyCheck();
+  return G.daily.date === todayStr() && G.daily.missions.length === 3 && G.daily.streak === 6;
+});
+T('일일: 스트릭 끊김(2일+ 공백)이면 1로 리셋', () => {
+  newGame(); G.daily = { date: '2000-01-01', streak: 9, missions: [] };
+  dailyCheck();
+  return G.daily.streak === 1;
+});
+T('일일: 같은 날 재호출은 무변경(중복 보상 없음)', () => {
+  newGame(); dailyCheck(); const m0 = G.money, ms = G.daily.missions;
+  dailyCheck();
+  return G.money === m0 && G.daily.missions === ms;
+});
+T('일일: dailyProgress — 목표 도달 시 done, 타입 불일치는 무시', () => {
+  newGame(); G.daily = { date: todayStr(), streak: 1, missions: [{ id: 0, type: 'win', sub: null, target: 2, prog: 0, done: false, claimed: false, label: 'x', money: 1000, item: null, qty: 0 }] };
+  dailyProgress('catch', 5);
+  const mid = G.daily.missions[0].prog;
+  dailyProgress('win', 1); dailyProgress('win', 1);
+  return mid === 0 && G.daily.missions[0].prog === 2 && G.daily.missions[0].done === true;
+});
+T('일일: typecatch는 타입 일치할 때만 진행', () => {
+  newGame(); G.daily = { date: todayStr(), streak: 1, missions: [{ id: 0, type: 'typecatch', sub: '카페인', target: 1, prog: 0, done: false, claimed: false, label: 'x', money: 1, item: null, qty: 0 }] };
+  dailyProgress('typecatch', 1, { type: '서류' });
+  const a = G.daily.missions[0].prog;
+  dailyProgress('typecatch', 1, { type: '카페인' });
+  return a === 0 && G.daily.missions[0].done === true;
+});
+T('일일: claimDaily — 완료 미션 보상 1회만 지급', () => {
+  newGame(); G.money = 0; G.daily = { date: todayStr(), streak: 1, missions: [{ id: 0, type: 'win', sub: null, target: 1, prog: 1, done: true, claimed: false, label: 'x', money: 1000, item: 'clip', qty: 2 }] };
+  const clip0 = G.items.clip || 0;
+  claimDaily(0); const after = G.money;
+  claimDaily(0);
+  return G.daily.missions[0].claimed === true && after > 0 && G.money === after && (G.items.clip || 0) === clip0 + 2;
+});
+T('migrateSave: daily 기본값 보충', () => { const o = {}; migrateSave(o); return o.daily && o.daily.date === '' && Array.isArray(o.daily.missions); });
+T('일일 도전 화면 렌더', () => { newGame(); G.party = [makeMon('espresso', 10)]; G.screen = 'daily'; render(); return true; });
+
 /* ── 패치 이벤트 2: 디톡스 + 의문의 머리카락 ── */
 T('디톡스 앰플: 도핑 배율·횟수 초기화', () => {
   newGame(); const mm = makeMon('espresso', 20);
