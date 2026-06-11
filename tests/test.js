@@ -313,9 +313,10 @@ T('경험치 공유: 선두 100% + 파티원 30%', () => {
 });
 T('돌연변이 천장: 3회 실패 누적 후 확정 발동', () => {
   newGame(); G.mutFail = { kingslime: 3 };
-  const mon = makeMon('kingslime', 33); G.party = [mon]; G.log = [];
+  const evoLv = SPECIES.kingslime.evo.lv;  /* 재배치로 바뀐 진화 레벨을 직접 참조 */
+  const mon = makeMon('kingslime', evoLv - 1); G.party = [mon]; G.log = [];
   const orig = Math.random; Math.random = () => 0.99; /* 평소라면 12% 실패 */
-  gainExp(mon, expNeed(33) - mon.exp);
+  gainExp(mon, expNeed(mon.lv) - mon.exp);
   Math.random = orig;
   return mon.sid === 'chaosslime' && G.mutFail.kingslime === 0;
 });
@@ -403,6 +404,36 @@ T('연수원: 한도 도달 몬스터는 수강 불가 표시 (렌더)', () => {
 T('확장 단축키: 1~9 + Q~H, 25개 중복 없음', () =>
   CHOICE_KEYS.length === 25 && new Set(CHOICE_KEYS).size === 25
   && choiceKey(0) === '1' && choiceKey(9) === 'Q' && choiceKey(24) === 'H');
+
+/* ── v5.6: 진화 타이밍 전면 재배치 ── */
+T('진화 재배치: 야생종은 출현 최소레벨보다 낮은 진화 없음 (잡자마자 진화 0건)', () => {
+  const wild = {};
+  FLOORS.forEach(f => f.areas.forEach(a => a.pool.forEach(sid => {
+    if (!wild[sid]) wild[sid] = { min: a.lv[0], max: a.lv[1] };
+    wild[sid].min = Math.min(wild[sid].min, a.lv[0]);
+    wild[sid].max = Math.max(wild[sid].max, a.lv[1]);
+  })));
+  return ALL_SIDS.every(sid => {
+    const e = SPECIES[sid].evo, w = wild[sid];
+    return !e || !w || e.lv > w.min;  /* 출현 최소보다는 높아야 = 잡자마자 진화 방지 */
+  });
+});
+T('진화 재배치: 스타터 진화가 늦춰짐 (1차 15, 2차 27)', () =>
+  SPECIES.espresso.evo.lv === 15 && SPECIES.latte.evo.lv === 27
+  && SPECIES.gyeoljae.evo.lv === 15 && SPECIES.wifi.evo.lv === 15);
+T('진화 재배치: 오크십장 오류 수정 (출현 38~41 < 진화 44)', () =>
+  SPECIES.orcforeman.evo.lv === 44);
+T('진화 재배치: 후반 종 진화가 출현 상단 이상으로 이동 (예시 검증)', () =>
+  SPECIES.cherubintern.evo.lv === 77 && SPECIES.voidclerk.evo.lv === 111
+  && SPECIES.omegaslime.evo.lv === 135 && SPECIES.pegasusporter.evo.lv === 55);
+T('진화 재배치: 2단 진화 라인은 1단보다 충분히 뒤 (간격 ≥5)', () => {
+  return ALL_SIDS.every(sid => {
+    const e = SPECIES[sid].evo;
+    if (!e) return true;
+    const e2 = SPECIES[e.to] && SPECIES[e.to].evo;
+    return !e2 || (e2.lv - e.lv) >= 5;
+  });
+});
 `;
 vm.runInContext(TESTS, ctx, { filename: 'tests' });
 
