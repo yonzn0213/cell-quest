@@ -223,6 +223,13 @@ T('6부 진엔딩 허브 렌더 (옴니루프 직전, 41층)', () => {
 T('6부 진엔딩 화면 렌더 (옴니루프 격파)', () => {
   newGame(); G.party = [makeMon('espresso', 200)]; G.isekai = true; G.story = 42; G.screen = 'ending'; render(); return true;
 });
+T('5·6부 합성 레시피 8종 추가 (결과 fusion:true · 재료 존재)', () => {
+  const news = ['rbaResetcerberus', 'rbbPurgewight', 'rbRebirthphoenix', 'rbSudowyrm', 'lpaSingularitymoth', 'lpbBusyspecter', 'lpInfinitedragon', 'lpHaltingangel'];
+  return news.every(r => {
+    const rc = FUSION_RECIPES.find(x => x.to === r);
+    return rc && rc.mats.every(s => !!SPECIES[s]) && SPECIES[r] && SPECIES[r].fusion === true;
+  });
+});
 
 /* ── 패치 이벤트 2: 디톡스 + 의문의 머리카락 ── */
 T('디톡스 앰플: 도핑 배율·횟수 초기화', () => {

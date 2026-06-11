@@ -769,6 +769,15 @@ const SPECIES = {
 
   lpbOmniloop:{ name:'특이점 그 자체, 옴니루프', type:'야근', hp:440, atk:72, legend:true,
     moves:[[1,'시간 되감기',128,null],[1,'무한 분기 루프',148,'야근'],[194,'반복되는 영겁의 야근',180,'야근'],[200,'while(true){ 영원 }',192,'야근']] },
+  /* ── 5·6부 합성 전용종 (추가) ── */
+  rbRebirthphoenix:{ name:'새회계불사조', type:'서류', hp:218, atk:61, fusion:true,
+    moves:[[1,'결산 강타',108,null],[1,'분기 마감 화염',126,'서류'],[150,'새 회계연도 비상',146,'서류'],[160,'전기 이월 소각',166,'서류']] },
+  rbSudowyrm:{ name:'슈퍼유저드래곤', type:'야근', hp:224, atk:62, fusion:true,
+    moves:[[1,'권한 상승',108,null],[1,'sudo 브레스',126,'야근'],[150,'루트 권한 탈취',146,'야근'],[160,'시스템 장악 강하',168,'야근']] },
+  lpInfinitedragon:{ name:'무한루프드래곤', type:'전자', hp:270, atk:71, fusion:true,
+    moves:[[1,'반복 강타',120,null],[1,'무한 재귀 브레스',140,'전자'],[185,'스택 범람 강하',162,'전자'],[195,'while(true) 폭주',186,'전자']] },
+  lpHaltingangel:{ name:'정지문제천사', type:'야근', hp:282, atk:72, fusion:true,
+    moves:[[1,'정지 판정',120,null],[1,'멈추지 않는 날갯짓',140,'야근'],[185,'결정 불가능 선고',164,'야근'],[195,'영원한 야근 종결',190,'야근']] },
 };
 const ALL_SIDS = Object.keys(SPECIES);
 
@@ -2547,6 +2556,16 @@ const FUSION_RECIPES = [
   { mats:['archiveghoul','gravityleech'],  to:'oblivionwyrm' },
   { mats:['dismantlebot','silencebird'],   to:'paradoxengine' },
   { mats:['omegaslime','ideawisp'],        to:'genesisseed' },
+  /* 리부트 차원 레시피 (5부) */
+  { mats:['rbaCachelynx','rbaGcmantis'],       to:'rbaResetcerberus' },
+  { mats:['rbbScheduledoom','rbbLowformat'],   to:'rbbPurgewight' },
+  { mats:['rbaSnaphawk','rbbFactoryangel'],    to:'rbRebirthphoenix' },
+  { mats:['rbaRollbackdragon','rbbRootshell'], to:'rbSudowyrm' },
+  /* 무한루프 사옥 레시피 (6부) */
+  { mats:['lpaWhilefly','lpaRacecondition'],          to:'lpaSingularitymoth' },
+  { mats:['lpbCoredumpwraith','lpbKernelpanicfiend'], to:'lpbBusyspecter' },
+  { mats:['lpaDeadlockwidow','lpbOverflowtitan'],     to:'lpInfinitedragon' },
+  { mats:['lpbBombswarm','lpbDeadlockwarden'],        to:'lpHaltingangel' },
   /* 신화 합성: 뽑기 전용 신화 2종 → 더 강한 신화. 결과 등급은 항상 mythic으로 고정된다. */
   { mats:['alphaclock','omegapayday'],      to:'eternalbalance', mythic:true },
 ];
