@@ -276,9 +276,19 @@ T('마이그레이션: dexRewards·dex·items·log 보충 + 닉네임 정제', (
   return Array.isArray(mig.dexRewards) && !!mig.dex && !!mig.items && Array.isArray(mig.log)
     && mig.name.length <= 12 && !mig.name.includes('<') && typeof mig.money === 'number';
 });
-T('마이그레이션 v4: 저장 개체를 새 HP 곡선으로 재계산', () => {
+T('마이그레이션: 저장 개체를 현재 HP 곡선으로 재계산 + 최신 버전으로', () => {
   const mig = migrateSave({ v: 3, party: [{ sid: 'espresso', lv: 50, rar: 'normal', maxhp: 384, hp: 384, atk: 99, exp: 0 }], box: [] });
-  return mig.v === 4 && mig.party[0].maxhp === statsFor('espresso', 50).maxhp && mig.party[0].hp === mig.party[0].maxhp;
+  return mig.v === SAVE_VERSION && mig.party[0].maxhp === statsFor('espresso', 50).maxhp && mig.party[0].hp === mig.party[0].maxhp;
+});
+T('버전 호환: 과거(v2)·현재·미래(v6) 캐시 모두 유효 판정', () =>
+  isValidSave({ v: 2, party: [] }) && isValidSave({ v: 5, party: [] }) && isValidSave({ v: 6, party: [] })
+  && !isValidSave({ v: 1, party: [] }) && !isValidSave({ party: [] }) && !isValidSave(null));
+T('v5 같은 미래 캐시도 정규화되어 복원 (요아정 케이스)', () => {
+  const v5save = { v: 5, name: '요아정박사님', party: [{ sid: 'wontaebo4', lv: 53, rar: 'legend', maxhp: 2460, hp: 2226, atk: 408, dope: 1.757, trait: '흡혈' }], box: [], items: { clip: 1 }, story: 11, isekai: true };
+  if (!isValidSave(v5save)) return false;
+  const mig = migrateSave(v5save);
+  const st = statsFor('wontaebo4', 53, 'legend');
+  return mig.v === SAVE_VERSION && mig.party[0].maxhp === Math.round(st.maxhp * 1.757) && mig.party[0].sid === 'wontaebo4';
 });
 T('전투 중 저장은 전투 직전 스냅샷 (새로고침 무한 파밍 차단)', () => {
   newGame(); G.party = [makeMon('espresso', 30)]; G.name = 'T'; G.money = 1000; G.screen = 'hub';

@@ -915,9 +915,11 @@ function fmtPlayTime(ms){
   return min<60 ? `${min}분` : `${Math.floor(min/60)}시간 ${min%60}분`;
 }
 
+/* 저장 스키마 버전. 올라가도 isValidSave는 v>=2면 무조건 읽으므로 구·신 캐시 모두 호환된다. */
+const SAVE_VERSION = 5;
 function newGame(){
   G = {
-    v:4, screen:'title', name:'', pid:makePid(),
+    v:SAVE_VERSION, screen:'title', name:'', pid:makePid(),
     party:[], box:[], active:0, revN:{}, mutFail:{},
     items:{ clip:5, goldclip:0, prismclip:0, dimclip:0, godclip:0, bacchus:3, hotsix:0, coffee:0, elixir:0, ample:0, detox:0, hair:0 },
     money:200, wins:0, story:0, streak:0, isekai:false, gifts:{},
@@ -1096,7 +1098,7 @@ async function loadFromCloud(code){
     const r = await fetch(FIREBASE_DB_URL+'/saves/'+encodeURIComponent(code.trim())+'.json');
     if(!r.ok) return null;
     const obj = await r.json();
-    if(obj && (obj.v===2||obj.v===3||obj.v===4) && Array.isArray(obj.party)) return migrateSave(obj);
+    if(isValidSave(obj)) return migrateSave(obj);
   }catch(e){}
   return null;
 }
@@ -1127,7 +1129,7 @@ function localLoadCheck(){
     const raw = localStorage.getItem(LOCAL_KEY);
     if(!raw) return;
     const obj = JSON.parse(raw);
-    if(obj && (obj.v===2||obj.v===3||obj.v===4) && Array.isArray(obj.party)) cloudSaveData = migrateSave(obj);
+    if(isValidSave(obj)) cloudSaveData = migrateSave(obj);
   }catch(e){ /* 손상된 캐시는 무시 */ }
 }
 /* 복원 직후 안전하게 그릴 수 있는 화면 화이트리스트.
@@ -1158,7 +1160,7 @@ async function cloudLoadCheck(){
     const r = await window.storage.get('savegame');
     if(r && r.value){
       const obj = JSON.parse(r.value);
-      if(obj && (obj.v===2||obj.v===3||obj.v===4) && Array.isArray(obj.party)) cloudSaveData = migrateSave(obj);
+      if(isValidSave(obj)) cloudSaveData = migrateSave(obj);
     }
   }catch(e){ /* 저장 데이터 없음 */ }
   if(G.screen==='title' && !bossMode) render();
@@ -2884,24 +2886,26 @@ function migrateSave(obj){
   if(!obj.gifts) obj.gifts = {};
   if(!obj.pid) obj.pid = makePid();
   if(typeof obj.playMs!=='number') obj.playMs = 0;
-  /* v4: HP 성장 곡선 변경 — 저장된 모든 개체의 스탯을 새 공식으로 재계산 */
-  if(obj.v!==4){
-    for(const mon of [...(obj.party||[]), ...(obj.box||[])]){
-      if(!SPECIES[mon.sid]) continue;
-      const ratio = mon.maxhp>0 ? mon.hp/mon.maxhp : 1;
-      const st = statsFor(mon.sid, mon.lv, mon.rar);
-      const dope = mon.dope||1;
-      mon.maxhp = Math.max(1, Math.round(st.maxhp*dope));
-      mon.atk = Math.max(1, Math.round(st.atk*dope));
-      mon.hp = mon.hp<=0 ? 0 : Math.max(1, Math.round(mon.maxhp*ratio));
-    }
-    obj.v = 4;
+  /* 모든 개체 스탯을 현재 성장 곡선으로 정규화 (버전 무관 — 곡선이 바뀌어도 항상 일치).
+     HP 비율과 도핑 배율은 보존한다. */
+  for(const mon of [...(obj.party||[]), ...(obj.box||[])]){
+    if(!SPECIES[mon.sid]) continue;
+    const ratio = mon.maxhp>0 ? mon.hp/mon.maxhp : 1;
+    const st = statsFor(mon.sid, mon.lv, mon.rar);
+    const dope = mon.dope||1;
+    mon.maxhp = Math.max(1, Math.round(st.maxhp*dope));
+    mon.atk = Math.max(1, Math.round(st.atk*dope));
+    mon.hp = mon.hp<=0 ? 0 : Math.max(1, Math.round(mon.maxhp*ratio));
   }
+  obj.v = SAVE_VERSION;
   return obj;
 }
+/* 저장 데이터로 인정하는 조건 — 버전을 정확히 나열하지 않는다.
+   숫자 버전 2 이상이면 미래 버전(앞으로 올라갈 v)도 항상 읽어들인다. */
+function isValidSave(obj){ return obj && typeof obj.v==='number' && obj.v>=2 && Array.isArray(obj.party); }
 function decodeSave(code){
   const obj = JSON.parse(decodeURIComponent(escape(atob(code.trim()))));
-  if(!obj || (obj.v!==2 && obj.v!==3 && obj.v!==4) || !Array.isArray(obj.party)) throw new Error('bad');
+  if(!isValidSave(obj)) throw new Error('bad');
   if(!obj.name) obj.name = '사원'+Math.floor(Math.random()*900+100);
   return migrateSave(obj);
 }
