@@ -2434,6 +2434,10 @@ function scrGacha(){
 /* ── 인게임 패치노트: 배포 사이트에서도 최근 업데이트를 볼 수 있게.
    전체 이력은 저장소의 CHANGELOG.md, 여기엔 핵심만 요약해 최신순으로 둔다. ── */
 const PATCH_NOTES = [
+  { ver:'v6.4', title:'합성 재료 개체 선택 + 등급 확인', items:[
+    '🧬 이종 합성 시 재료 종족이 여러 마리면 어느 개체를 쓸지 직접 선택 — 실수로 고등급 개체 희생 방지',
+    '🏷 선택·확인 화면에서 각 후보의 등급(★◆👑✨)·레벨·HP·공격·도핑을 표시하고 결과 등급도 미리 보기',
+  ]},
   { ver:'v6.3', title:'보스 격노 · 랭킹 보드 실시간 반영', items:[
     '🔥 보스·아레나에서 회복 아이템을 4회 이상 쓰면 회복할수록 상대 공격이 누적 증가(격노)',
     '⚖ 엘릭서 등 무한 회복으로 버티던 졸전 해소 — 단, 공격만 하는 긴 전투(다수 파티 보스)는 영향 없음',
@@ -2711,7 +2715,9 @@ function addMon(m){
   if(G.active>=G.party.length) G.active=0;
 }
 let fuseMsg = '';
+let fuseSel = null;   /* 이종 합성 재료 선택 상태 {rc, a, b} */
 function scrFusion(){
+  if(fuseSel){ scrFuseSelect(); return; }
   const lines = [['― 합성 실험실 ―','bold'],'',
     ['동종 합성: 같은 종·같은 등급 2마리 → 낮은 확률로 등급 상승. 실패해도 부재료는 소멸!','dim'],
     ['이종 합성: 특정 조합 2마리 → 새로운 종 탄생 (재료 모두 소멸, 항상 성공)','dim'],''];
@@ -2754,33 +2760,18 @@ function scrFusion(){
       render();
     }]);
   }
-  /* 이종 후보 */
+  /* 이종 후보 — 클릭하면 재료 개체 선택 화면으로 (여러 개체 중 선택 + 등급 확인) */
   for(const rc of FUSION_RECIPES){
-    const a  = allMons().find(m=>m.sid===rc.mats[0]);
-    const b2 = allMons().find(m=>m.sid===rc.mats[1] && m!==a);
-    if(a && b2){
+    const aN = allMons().filter(m=>m.sid===rc.mats[0]).length;
+    const bN = allMons().filter(m=>m.sid===rc.mats[1]).length;
+    const sameMat = rc.mats[0]===rc.mats[1];
+    const have = sameMat ? aN>=2 : (aN>=1 && bN>=1);
+    if(have){
       const cost = rc.mythic ? MYTHIC_FUSE_COST : RECIPE_COST;
       const label = rc.mythic
         ? `[신화 합성] ${SPECIES[rc.mats[0]].name} + ${SPECIES[rc.mats[1]].name} → ✨신화✨ · ${cost.toLocaleString()}P`
-        : `[이종] ${SPECIES[rc.mats[0]].name} + ${SPECIES[rc.mats[1]].name} → ??? · ${cost}P`;
-      choices.push([label, ()=>{
-        if(G.money<cost){ fuseMsg='복지포인트가 부족하다…'; render(); return; }
-        G.money -= cost;
-        const lv = Math.max(3, Math.round((a.lv+b2.lv)/2));
-        const baseRar = RARITY[a.rar||'normal'].rank >= RARITY[b2.rar||'normal'].rank ? (a.rar||'normal') : (b2.rar||'normal');
-        const rar = rc.mythic ? 'mythic' : rollFuseRarity(baseRar);
-        removeMon(a); removeMon(b2);
-        const nm = makeMon(rc.to, lv, rar);
-        addMon(nm);
-        dexCatch(rc.to, rar);
-        dailyProgress('fuse', 1);
-        if(rc.mythic) fuseMsg = `👑✨ 신화 합성 성공!!! 두 신화가 하나로 — [${monName(nm)}]이(가) 강림했다!!!`;
-        else {
-          fuseMsg = `🧬 이종 합성!! 새로운 종 [${monName(nm)}]이(가) 탄생했다!!`;
-          if(rar !== baseRar) fuseMsg += ` ✨ 합성 중 ${RARITY[rar].prefix.trim()} 등급이 깃들었다!!`;
-        }
-        render();
-      }]);
+        : `[이종] ${SPECIES[rc.mats[0]].name}(${aN}) + ${SPECIES[rc.mats[1]].name}(${bN}) → ??? · ${cost}P`;
+      choices.push([label, ()=>{ fuseSel = { rc, a:null, b:null }; render(); }]);
     } else if(G.dex[rc.mats[0]] && G.dex[rc.mats[1]]){
       lines.push([`레시피 발견: ${SPECIES[rc.mats[0]].name} + ${SPECIES[rc.mats[1]].name} → ??? (재료 부족)`,'dim']);
     }
@@ -2788,6 +2779,68 @@ function scrFusion(){
   if(choices.length===0) lines.push('','지금 합성 가능한 조합이 없다. (같은 종·같은 등급 2마리, 또는 레시피 재료 2마리)');
   choices.push(['돌아간다', ()=>{ G.screen='hub'; render(); }]);
   paint(lines, choices);
+}
+/* 이종 합성 실행 — 선택된 두 개체(a,b2)를 소멸시키고 신종 생성 */
+function doCrossFuse(rc, a, b2){
+  const cost = rc.mythic ? MYTHIC_FUSE_COST : RECIPE_COST;
+  if(!a || !b2 || a===b2){ fuseMsg='재료 선택이 올바르지 않다.'; fuseSel=null; render(); return; }
+  if(G.money<cost){ fuseMsg='복지포인트가 부족하다…'; render(); return; }
+  G.money -= cost;
+  const lv = Math.max(3, Math.round((a.lv+b2.lv)/2));
+  const baseRar = RARITY[a.rar||'normal'].rank >= RARITY[b2.rar||'normal'].rank ? (a.rar||'normal') : (b2.rar||'normal');
+  const rar = rc.mythic ? 'mythic' : rollFuseRarity(baseRar);
+  removeMon(a); removeMon(b2);
+  const nm = makeMon(rc.to, lv, rar);
+  addMon(nm);
+  dexCatch(rc.to, rar);
+  dailyProgress('fuse', 1);
+  if(rc.mythic) fuseMsg = `👑✨ 신화 합성 성공!!! 두 신화가 하나로 — [${monName(nm)}]이(가) 강림했다!!!`;
+  else {
+    fuseMsg = `🧬 이종 합성!! 새로운 종 [${monName(nm)}]이(가) 탄생했다!!`;
+    if(rar !== baseRar) fuseMsg += ` ✨ 합성 중 ${RARITY[rar].prefix.trim()} 등급이 깃들었다!!`;
+  }
+  fuseSel = null;
+  render();
+}
+function fuseCandLabel(m){
+  return `${rarMark(m.rar)} ${monName(m)} LV${m.lv} · ${rarTag(m.rar)} (HP ${m.maxhp}·공 ${m.atk})${(m.dope&&m.dope!==1)?` ·도핑×${m.dope.toFixed(2)}`:''}`;
+}
+/* 이종 합성 재료 선택: 후보가 여럿이면 어느 개체를 쓸지 고르고, 항상 확인 화면에서 등급을 보여 준다 */
+function scrFuseSelect(){
+  setStatus('합성 재료 선택');
+  const sel = fuseSel, rc = sel.rc;
+  const lines = [['― 합성 재료 선택 ―','bold'],'',
+    [`레시피: ${SPECIES[rc.mats[0]].name} + ${SPECIES[rc.mats[1]].name} → ${rc.mythic?'✨신화✨':'신종 ???'}`,'dim'],''];
+  const choices = [];
+  if(!sel.a){
+    const cands = allMons().filter(m=>m.sid===rc.mats[0]);
+    if(cands.length===1){ sel.a = cands[0]; return scrFuseSelect(); }
+    lines.push(`재료 ① ${SPECIES[rc.mats[0]].name} — 사용할 개체 선택 (소멸):`);
+    cands.forEach(m=>choices.push([fuseCandLabel(m), ()=>{ sel.a=m; render(); }]));
+    choices.push(['취소', ()=>{ fuseSel=null; render(); }]);
+    paint(lines, choices, '=FUSE.SELECT()'); return;
+  }
+  if(!sel.b){
+    const cands = allMons().filter(m=>m.sid===rc.mats[1] && m!==sel.a);
+    if(cands.length===0){ fuseMsg='재료가 부족하다.'; fuseSel=null; render(); return; }
+    if(cands.length===1){ sel.b = cands[0]; return scrFuseSelect(); }
+    lines.push([`① ${fuseCandLabel(sel.a)}`,'dim'], '', `재료 ② ${SPECIES[rc.mats[1]].name} — 사용할 개체 선택 (소멸):`);
+    cands.forEach(m=>choices.push([fuseCandLabel(m), ()=>{ sel.b=m; render(); }]));
+    choices.push(['← 재료① 다시 고르기', ()=>{ sel.a=null; render(); }]);
+    choices.push(['취소', ()=>{ fuseSel=null; render(); }]);
+    paint(lines, choices, '=FUSE.SELECT()'); return;
+  }
+  const a=sel.a, b2=sel.b, cost = rc.mythic?MYTHIC_FUSE_COST:RECIPE_COST;
+  const baseRar = RARITY[a.rar||'normal'].rank>=RARITY[b2.rar||'normal'].rank ? (a.rar||'normal') : (b2.rar||'normal');
+  lines.push('선택한 재료 (둘 다 소멸):',
+    `  ① ${fuseCandLabel(a)}`,
+    `  ② ${fuseCandLabel(b2)}`, '',
+    [`결과 등급: 높은 쪽 [${rarTag(baseRar)}] 계승${rc.mythic?'':' (+낮은 확률 상승)'} · 비용 ${cost.toLocaleString()}P · 보유 ${G.money.toLocaleString()}P`,'hl']);
+  if(G.money>=cost) choices.push([`합성 실행 (${cost.toLocaleString()}P)`, ()=>doCrossFuse(rc,a,b2)]);
+  else lines.push(['…복지포인트가 부족하다.','dim']);
+  choices.push(['← 재료 다시 고르기', ()=>{ sel.a=null; sel.b=null; render(); }]);
+  choices.push(['취소', ()=>{ fuseSel=null; render(); }]);
+  paint(lines, choices, '=FUSE.SELECT()');
 }
 
 /* ── 도감 (종 수 증가로 페이지 분할: 3열 × 26행 = 페이지당 78종) ── */
