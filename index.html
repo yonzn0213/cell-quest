@@ -397,6 +397,8 @@ const SPECIES = {
     moves:[[1,'가발 휘두르기',44,null],[1,'스타일 변신',56,'야근'],[24,'가발 부메랑',74,'야근'],[28,'정체불명의 헤어',88,'야근']] },
   wontaebo3:{ name:'모발이식 원태보', type:'야근', hp:125, atk:26, legend:true,
     moves:[[1,'풍성함의 위엄',62,null],[1,'머릿결 채찍',76,'야근'],[34,'모근 각성',96,'야근'],[38,'풍성 폭발 헤어밤',114,'야근']] },
+  wontaebo4:{ name:'장발 원태보', type:'야근', hp:175, atk:36, legend:true,
+    moves:[[1,'머리카락 휘날리기',70,null],[1,'장발 채찍',86,'야근'],[36,'샴푸 광고 모드',104,'야근'],[42,'천만 모근의 위엄',124,'야근']] },
   /* ── 전설 ── */
   dragon:{ name:'부장드래곤', type:'야근', hp:110, atk:17, legend:true,
     moves:[[1,'호통',52,null],[1,'결재 반려 폭풍',64,'서류'],[15,'주말 출근 브레스',80,'야근'],[20,'정신력 운운',96,'야근']] },
@@ -907,7 +909,7 @@ function newGame(){
   G = {
     v:3, screen:'title', name:'', pid:makePid(),
     party:[], box:[], active:0,
-    items:{ clip:5, goldclip:0, prismclip:0, dimclip:0, godclip:0, bacchus:3, hotsix:0, coffee:0, elixir:0, ample:0 },
+    items:{ clip:5, goldclip:0, prismclip:0, dimclip:0, godclip:0, bacchus:3, hotsix:0, coffee:0, elixir:0, ample:0, detox:0, hair:0 },
     money:200, wins:0, story:0, streak:0, isekai:false, gifts:{},
     dex:{}, rarDex:{}, dexRewards:[],
     battle:null, log:[], floor:0, coolerCd:0, playMs:0,
@@ -945,6 +947,8 @@ const ITEM_DEF = {
   coffee:  { name:'모닝커피',  desc:'기절 회복 (HP 50%)', price:220 },
   elixir:  { name:'엘릭서',    desc:'1마리 완전 회복 (기절 포함)', price:800 },
   ample:   { name:'수상한 앰플', desc:'도핑 재료 — 성공 시 영구 강화, 실패 시 영구 약화', price:2000 },
+  detox:   { name:'디톡스 앰플', desc:'도핑 상태 완전 초기화 (배율·횟수 리셋)', price:8000 },
+  hair:    { name:'의문의 머리카락', desc:'…누구의 것일까? 5개 모으면 무언가 일어난다', price:0, nosale:true },
 };
 
 /* ── 도핑 (v2.0): 수상한 앰플로 영구 강화/약화. 효과는 배율로 누적 ── */
@@ -972,6 +976,26 @@ function applyDope(m, outcome){
   m.dope = +(((m.dope||1) * outcome.mult).toFixed(3));
   m.dopeN = (m.dopeN||0) + 1;
   recalcMonStats(m);
+}
+/* 디톡스 앰플: 도핑 배율·횟수 완전 초기화 (실패한 도핑을 비싸게 되돌리는 보험) */
+function applyDetox(m){
+  m.dope = 1; m.dopeN = 0;
+  recalcMonStats(m);
+}
+
+/* ── 패치 이벤트 2: 의문의 머리카락 — 모발이식 원태보 최종 진화 ── */
+const HAIR_REQUIRED = 5, HAIR_EVO_RATE = 0.4, HAIR_DROP_RATE = 0.06;
+function tryHairEvolution(m){
+  if(m.sid!=='wontaebo3' || G.items.hair<HAIR_REQUIRED) return null;
+  G.items.hair -= HAIR_REQUIRED;
+  if(Math.random()<HAIR_EVO_RATE){
+    const oldName = monName(m);
+    m.sid = 'wontaebo4';
+    recalcMonStats(m); m.hp = m.maxhp;
+    dexCatch('wontaebo4', m.rar);
+    return `!!! 최종 진화 !!! ${oldName}의 머리카락이 폭풍처럼 자라난다… [${monName(m)}] 탄생!!`;
+  }
+  return `…머리카락이 바람에 흩어졌다. 진화 실패. (의문의 머리카락 ×${HAIR_REQUIRED} 소멸)`;
 }
 
 function activeMon(){ return G.party[G.active]; }
@@ -1356,6 +1380,12 @@ function scrHub(){
     dexCatch('leejunseok','legend'); dexCatch('parksangkyu','legend');
     pendingMsg.push('🎁 패치 기념 보상! 특별 캐릭터 [무승복서 이준석] · [박치기 박상규] 합류! (합성 실험실에서 둘을 합치면…?)');
   }
+  if(!G.gifts.patch2){
+    G.gifts.patch2 = true;
+    G.items.detox = (G.items.detox||0) + 1;
+    pendingMsg.push('🎁 패치 보상! [디톡스 앰플] ×1 지급 — 도핑 실험에서 망가진 몬스터를 초기화할 수 있다. (매점 판매 8,000P)');
+    pendingMsg.push('💇 …그리고 요즘 사냥터 곳곳에서 [의문의 머리카락]이 발견된다는 소문이 돈다. 5개 모으면 무슨 일이?');
+  }
   if(G.floor > G.story && G.floor < 5) G.floor = Math.min(G.floor, G.story);
   if(G.floor >= 6 && (!G.isekai || G.floor > G.story)) G.floor = G.isekai ? Math.min(G.floor, G.story) : 0;
   const fl = FLOORS[G.floor];
@@ -1481,7 +1511,7 @@ function scrShop(){
     `보유 복지포인트: ${G.money.toLocaleString()}P`,
     '전투에서 이기면 포인트를 받는다. 보스전은 보상이 크다.','',
   ];
-  const choices = Object.keys(ITEM_DEF).map(k=>{
+  const choices = Object.keys(ITEM_DEF).filter(k=>!ITEM_DEF[k].nosale).map(k=>{
     const d = ITEM_DEF[k];
     return [`${d.name} 구매 — ${d.price}P (보유 ${G.items[k]}) · ${d.desc}`, ()=>{
       if(G.money>=d.price){ G.money-=d.price; G.items[k]++; setFx(`${d.name} 구매 완료`); }
@@ -1494,8 +1524,10 @@ function scrShop(){
 }
 
 /* ── 파티 / 보관함 ── */
+let partyMsg = '';
 function scrParty(){
   const lines = [['― 파티 관리 ―','bold'],''];
+  if(partyMsg){ lines.push([partyMsg,'hl'],''); partyMsg=''; }
   G.party.forEach((m,i)=>{
     lines.push([`${i===G.active?'▶':' '} ${monName(m)}  LV${m.lv} [${monType(m)}]  HP ${m.hp}/${m.maxhp}  공격 ${m.atk}  EXP ${m.exp}/${expNeed(m.lv)}`, monCls(m)]);
     lines.push(['    기술: '+knownMoves(m).map(mv=>mv[1]).join(', '),'dim']);
@@ -1505,6 +1537,16 @@ function scrParty(){
   G.party.forEach((m,i)=>{
     if(i!==G.active && m.hp>0) choices.push([`${monName(m)}을(를) 선두로`, ()=>{ G.active=i; render(); }]);
   });
+  if(G.items.hair>0){
+    lines.push('',[`💇 의문의 머리카락 ×${G.items.hair} ${G.items.hair>=HAIR_REQUIRED?'— 모발이식 원태보에게 무언가 일어날 것 같다!':`(${HAIR_REQUIRED}개 모으면…?)`}`,'dim']);
+  }
+  const hairMon = G.party.find(m=>m.sid==='wontaebo3');
+  if(hairMon && G.items.hair>=HAIR_REQUIRED){
+    choices.push([`💇 의문의 머리카락 ×${HAIR_REQUIRED} 사용 — ${monName(hairMon)} 최종 진화 시도 (성공 ${Math.round(HAIR_EVO_RATE*100)}%)`, ()=>{
+      partyMsg = tryHairEvolution(hairMon) || '';
+      render();
+    }]);
+  }
   choices.push([`도핑 실험 (수상한 앰플 ×${G.items.ample||0})`, ()=>{ G.screen='dope'; render(); }]);
   if(G.party.length>1){
     choices.push(['몬스터를 보관함으로 보낸다', ()=>{ boxMode='deposit'; boxSel=-1; G.screen='box'; render(); }]);
@@ -1590,9 +1632,9 @@ function scrBox(){
 let dopeMsg = '';
 function scrDope(){
   const lines = [['― 도핑 실험 ―','bold'],'',
-    [`수상한 앰플 ×${G.items.ample}`,'hl'],
+    [`수상한 앰플 ×${G.items.ample} · 디톡스 앰플 ×${G.items.detox||0}`,'hl'],
     '대성공 10% (+20%) · 성공 45% (+10%) · 부작용 30% (-8%) · 심각 15% (-20%)',
-    ['효과는 영구적이며 되돌릴 수 없다! (몬스터당 최대 5회, 이후 내성)','dim'],''];
+    ['효과는 영구적! [디톡스 앰플]로만 초기화 가능 (몬스터당 최대 5회, 이후 내성)','dim'],''];
   if(dopeMsg){ lines.push([dopeMsg,'hl'],''); dopeMsg=''; }
   const choices = [];
   if(G.items.ample>0){
@@ -1608,6 +1650,17 @@ function scrDope(){
       }]);
     });
   } else lines.push(`수상한 앰플이 없다. 매점에서 구할 수 있다. (${ITEM_DEF.ample.price}P)`);
+  /* 디톡스: 도핑 이력이 있는 몬스터의 배율·횟수를 초기화 (내성 해제 포함) */
+  if(G.items.detox>0){
+    G.party.forEach(m=>{
+      if((m.dopeN||0)>0) choices.push([`디톡스 — ${monName(m)} 초기화 (배율 ×${(m.dope||1).toFixed(2)} → ×1.00, 횟수 리셋)`, ()=>{
+        G.items.detox--;
+        applyDetox(m);
+        dopeMsg = `${monName(m)}의 도핑 성분이 완전히 씻겨 나갔다! 다시 처음부터 도핑할 수 있다.`;
+        render();
+      }]);
+    });
+  }
   choices.push(['돌아간다', ()=>{ G.screen='party'; render(); }]);
   paint(lines, choices);
 }
@@ -1780,6 +1833,7 @@ const LEGEND_ROUTE = {
   wontaebo:'합성: 이준석 + 박상규',
   wontaebo2:'대머리 원태보 LV20 진화',
   wontaebo3:'가발 원태보 LV32 진화',
+  wontaebo4:'모발이식 원태보 + 의문의 머리카락 ×5 (성공 40%)',
   metatronsec:'신계 로비 보스 / 격파 후 로비 야생(희귀)',
   moiradirector:'운명관리부 보스 / 격파 후 야생(희귀)',
   yamamanager:'윤회민원실 보스 / 격파 후 야생(희귀)',
@@ -2050,6 +2104,10 @@ function winWild(){
     G.items[drop]++;
     pushLog(`${ITEM_DEF[drop].name} 1개를 주웠다!`);
   }
+  if(Math.random()<HAIR_DROP_RATE){
+    G.items.hair++;
+    pushLog(`💇 [의문의 머리카락]을(를) 주웠다! (${G.items.hair}/${HAIR_REQUIRED}) …누구의 것일까?`);
+  }
 }
 
 function onTrainerMonDown(){
@@ -2306,6 +2364,8 @@ function migrateSave(obj){
   if(obj.items && obj.items.dimclip===undefined) obj.items.dimclip = 0;
   if(obj.items && obj.items.godclip===undefined) obj.items.godclip = 0;
   if(obj.items && obj.items.elixir===undefined) obj.items.elixir = 0;
+  if(obj.items && obj.items.detox===undefined) obj.items.detox = 0;
+  if(obj.items && obj.items.hair===undefined) obj.items.hair = 0;
   if(typeof obj.streak!=='number') obj.streak = 0;
   if(obj.isekai===undefined) obj.isekai = false;
   if(!obj.gifts) obj.gifts = {};

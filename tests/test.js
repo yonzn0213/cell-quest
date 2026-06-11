@@ -179,9 +179,43 @@ T('회복 시설 이름 차원별 변화', () => {
 T('도감 보상 단계가 전체 종 수 이내', () => ALL_SIDS.length > 160);
 
 /* ── 전설 도감/랭킹 ── */
-T('전설 종족 21종, 전부 입수처 등록', () => {
+T('전설 종족 22종, 전부 입수처 등록', () => {
   const legends = ALL_SIDS.filter(s => SPECIES[s].legend);
-  return legends.length === 21 && legends.every(s => !!LEGEND_ROUTE[s]);
+  return legends.length === 22 && legends.every(s => !!LEGEND_ROUTE[s]);
+});
+
+/* ── 패치 이벤트 2: 디톡스 + 의문의 머리카락 ── */
+T('디톡스 앰플: 도핑 배율·횟수 초기화', () => {
+  newGame(); const mm = makeMon('espresso', 20);
+  const baseAtk = mm.atk;
+  applyDope(mm, { mult: 1.2, msg: '' }); applyDope(mm, { mult: 1.2, msg: '' });
+  if (mm.dopeN !== 2 || mm.atk <= baseAtk) return false;
+  applyDetox(mm);
+  return mm.dope === 1 && mm.dopeN === 0 && mm.atk === baseAtk;
+});
+T('머리카락 진화 성공: 장발 원태보 탄생 + 머리카락 5개 소모', () => {
+  newGame(); const mm = makeMon('wontaebo3', 40, 'legend'); G.party = [mm]; G.items.hair = 7;
+  const orig = Math.random; Math.random = () => 0.1; /* 40% 미만 → 성공 */
+  const msg = tryHairEvolution(mm);
+  Math.random = orig;
+  return mm.sid === 'wontaebo4' && G.items.hair === 2 && /최종 진화/.test(msg) && G.dex.wontaebo4 === 2;
+});
+T('머리카락 진화 실패: 머리카락만 소모, 종족 유지', () => {
+  newGame(); const mm = makeMon('wontaebo3', 40); G.party = [mm]; G.items.hair = 5;
+  const orig = Math.random; Math.random = () => 0.9; /* 40% 이상 → 실패 */
+  const msg = tryHairEvolution(mm);
+  Math.random = orig;
+  return mm.sid === 'wontaebo3' && G.items.hair === 0 && /실패/.test(msg);
+});
+T('머리카락 부족/대상 아님이면 진화 시도 불가', () => {
+  newGame(); const mm = makeMon('wontaebo3', 40); G.items.hair = 4;
+  if (tryHairEvolution(mm) !== null) return false;
+  G.items.hair = 5; return tryHairEvolution(makeMon('espresso', 40)) === null;
+});
+T('의문의 머리카락은 매점에서 팔지 않는다', () => ITEM_DEF.hair.nosale === true && ITEM_DEF.detox.price === 8000);
+T('패치 보상 2탄: 허브 진입 시 디톡스 1개 지급', () => {
+  newGame(); G.party = [makeMon('espresso', 5)]; G.screen = 'hub'; render();
+  return G.gifts.patch2 === true && G.items.detox >= 1;
 });
 T('전설 도감 화면 렌더 (스모크)', () => { newGame(); G.party = [makeMon('espresso', 5)]; G.screen = 'ldex'; render(); return true; });
 T('랭킹 보드 렌더: 희귀도 3종·플레이타임 표시 (스모크)', () => {
