@@ -28,7 +28,7 @@ for (let r = 1; r <= ROWS; r++) for (let c = 0; c < COLS; c++) {
   tds.push(td);
 }
 const byId = {};
-['sheet','namebox','fxcontent','statustext','dlg','dlgtext','dlgok','dlgtitle','dlgdesc'].forEach(id => byId[id] = makeEl());
+['sheet','namebox','fxcontent','statustext','dlg','dlgtext','dlgok','dlgtitle','dlgdesc','tname'].forEach(id => byId[id] = makeEl());
 byId.sheet.querySelectorAll = sel => (sel === 'td' ? tds : []);
 const documentStub = {
   getElementById: id => byId[id] || makeEl(),
@@ -623,6 +623,19 @@ T('전설·신화 도감 렌더 — 신화 종족 포함 (스모크)', () => {
   G.party = [makeMon(sid, 1, 'mythic')]; G.dex[sid] = 2; G.rarDex[sid] = 'mythic';
   G.screen = 'ldex'; render(); return true;
 });
+
+/* ── v5.9: 인게임 패치노트 ── */
+T('패치노트 데이터: 비어있지 않고 각 항목 형식 유효', () =>
+  Array.isArray(PATCH_NOTES) && PATCH_NOTES.length >= 1
+  && PATCH_NOTES.every(p => typeof p.ver === 'string' && typeof p.title === 'string'
+    && Array.isArray(p.items) && p.items.length >= 1));
+T('패치노트 최신 항목은 v5.9', () => /5\.9/.test(PATCH_NOTES[0].ver));
+T('패치노트 화면 렌더 (스모크)', () => { newGame(); patchPage = 0; G.screen = 'patchnotes'; render(); return true; });
+T('GAME_VERSION은 최신 패치 버전과 일치', () => GAME_VERSION === PATCH_NOTES[0].ver);
+T('위장 엑셀 제목에 최신 버전 주입', () => {
+  applyVersionTitle();
+  return document.getElementById('tname').textContent.includes(GAME_VERSION) && /월별데이터_정리/.test(document.getElementById('tname').textContent);
+});
 `;
 vm.runInContext(TESTS, ctx, { filename: 'tests' });
 
@@ -639,6 +652,7 @@ srcTest('예상 데미지에 상성 반영', /typeMult\(mv\[3\], monType\(e\)\)/
 srcTest('랭킹 조회에 limitToLast 쿼리 사용', /orderBy=%22score%22&limitToLast/.test(html));
 srcTest('전투 가방에 모닝커피·엘릭서 추가', /useBattleHeal\('coffee'\)/.test(html) && /useBattleHeal\('elixir'\)/.test(html));
 srcTest('신화 합성: 결과 등급 mythic 고정', /rc\.mythic \? 'mythic'/.test(html));
+srcTest('패치노트 진입점(타이틀·허브)', /G\.screen='patchnotes'/.test(html));
 
 console.log(`\n테스트 결과: ${pass} PASS / ${fail} FAIL`);
 process.exit(fail ? 1 : 0);

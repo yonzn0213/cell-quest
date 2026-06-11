@@ -72,7 +72,7 @@
 <div class="titlebar">
   <div class="xicon">X</div>
   <div>자동 저장 <span style="opacity:.7">●</span> 끔</div>
-  <div class="tname">월별데이터_정리_v7_진짜최종.xlsx - Excel</div>
+  <div class="tname" id="tname">월별데이터_정리_v7_진짜최종.xlsx - Excel</div>
   <div class="winbtns"><span>—</span><span>□</span><span>✕</span></div>
 </div>
 
@@ -1415,7 +1415,8 @@ function render(){
     battle:scrBattle, bag:scrBag, party:scrParty, box:scrBox, dex:scrDex, shop:scrShop,
     moveFloor:scrMoveFloor, storyBeat:scrStoryBeat, gameover:scrGameover, ending:scrEnding,
     rank:scrRank, dope:scrDope, fusion:scrFusion, isekai:scrIsekai, ldex:scrLegendDex,
-    academy:scrAcademy, wiki:scrWiki, gacha:scrGacha, recipe:scrRecipe, cloud:scrCloud };
+    academy:scrAcademy, wiki:scrWiki, gacha:scrGacha, recipe:scrRecipe, cloud:scrCloud,
+    patchnotes:scrPatchNotes };
   (map[G.screen]||scrHub)();
 }
 
@@ -1454,6 +1455,7 @@ function scrTitle(){
   if(hasBoard) choices.push(['랭킹 보드 보기', ()=>{ G.screen='rank'; render(); }]);
   if(hasCloudSave) choices.push([cloudCode?'☁ 클라우드 계정 (코드)':'☁ 클라우드 코드로 불러오기', ()=>{ G.screen='cloud'; render(); }]);
   choices.push(['백업 코드 불러오기', openLoadDlg]);
+  choices.push(['📋 패치노트 (업데이트 내역)', ()=>{ patchPage=0; G.screen='patchnotes'; render(); }]);
   paint(lines, choices, '=GAME.START()');
 }
 
@@ -1621,6 +1623,7 @@ function scrHub(){
   );
   if(hasBoard) choices.push(['사내 랭킹 보드', ()=>{ G.screen='rank'; render(); }]);
   choices.push(['사내 위키 (도움말)', ()=>{ G.screen='wiki'; render(); }]);
+  choices.push(['📋 패치노트 (업데이트 내역)', ()=>{ patchPage=0; G.screen='patchnotes'; render(); }]);
   if(hasCloudSave){
     if(cloudCode){
       choices.push(['💾 클라우드 저장 (한 번에 저장)', async ()=>{
@@ -2029,6 +2032,54 @@ function scrGacha(){
   paint(lines, choices, '=RAND() · 사내복권');
 }
 
+/* ── 인게임 패치노트: 배포 사이트에서도 최근 업데이트를 볼 수 있게.
+   전체 이력은 저장소의 CHANGELOG.md, 여기엔 핵심만 요약해 최신순으로 둔다. ── */
+const PATCH_NOTES = [
+  { ver:'v5.9', title:'신화 등급 · 전투 회복 버그 · 밸런스', items:[
+    '✨ 신화(Mythic) 등급 신설 — 레전드 위 최상위 (능력치 ×1.75, 무지개 표시)',
+    '👑 뽑기 전용 신화 2종: 태초의 정시퇴근 알파 / 무한의 월급날 오메가 (경품 0.02%)',
+    '🧬 신화 합성: 둘을 합치면 「영원의 워라밸 신」 강림 (100,000P)',
+    '🛠 전투 중 모닝커피·엘릭서 사용 가능 — 기절한 동료를 부활/회복',
+    '🛠 합성 시 선두가 엉뚱한 몬스터로 바뀌던 버그 / 손상 세이브 크래시 방어',
+    '⚖ 도핑 너프: 상승폭↓·실패 확률 55%·디톡스 앰플 80,000P',
+    '⚖ 레벨 차 데미지·경험치 양방향 패널티 — 고레벨 사냥이 더 까다로워짐',
+  ]},
+  { ver:'v5.8', title:'클라우드 계정 코드(UUID) 로그인', items:[
+    '☁ ID/PW 없이 UUID 코드 하나로 어느 기기·주소에서나 이어하기',
+    '💾 허브의 [클라우드 저장] 버튼으로 한 번에 저장',
+  ]},
+  { ver:'v5.7', title:'난이도 · 경제 · 경험치 밸런스 + 조합표', items:[
+    '⚖ 앰플 가격 인상 · 야생 난이도 상향 · 레벨 차 경험치 페널티',
+    '🧬 합성 조합표(레시피) 화면 추가',
+  ]},
+  { ver:'v5.5~5.6', title:'단축키 확장 · 진화 타이밍 재배치', items:[
+    '⌨ 선택 단축키 1~9 + Q~H (총 25개)',
+    '🧬 진화 레벨 전면 재조정 — 잡자마자 진화 방지',
+  ]},
+  { ver:'v5.4', title:'경험치 바 · 사내 경품(뽑기)', items:[
+    '📊 전투/파티 화면에 경험치 진행 바 표시',
+    '🎁 사내 경품 응모(뽑기) 추가 — 잉여 포인트 소비처',
+  ]},
+];
+let patchPage = 0;
+function scrPatchNotes(){
+  if(patchPage < 0) patchPage = 0;
+  if(patchPage >= PATCH_NOTES.length) patchPage = PATCH_NOTES.length-1;
+  const p = PATCH_NOTES[patchPage];
+  const lines = [
+    [`― 패치노트 📋 ―  (${patchPage+1}/${PATCH_NOTES.length})`,'bold'],'',
+    [`${p.ver} — ${p.title}`,'hl'],'',
+    ...p.items.map(s=>'· '+s),
+    '',
+    ['전체 변경 내역은 저장소의 CHANGELOG.md에서 볼 수 있습니다.','dim'],
+  ];
+  const choices = [];
+  if(patchPage < PATCH_NOTES.length-1) choices.push(['◀ 이전(과거) 버전', ()=>{ patchPage++; render(); }]);
+  if(patchPage > 0) choices.push(['최신 버전 ▶', ()=>{ patchPage--; render(); }]);
+  choices.push(['돌아간다', ()=>{ G.screen = G.party.length?'hub':'title'; patchPage=0; render(); }]);
+  paint(lines, choices, '=PATCHNOTES()');
+}
+
 /* ── 사내 위키: 게임 내 도움말 (상성/포획/희귀도/성장 규칙) ── */
 function scrWiki(){
   paint([
@@ -2054,7 +2105,7 @@ function scrWiki(){
     '연승 보너스: 승리당 포인트 +3% (최대 +30%), 패배 시 초기화',
     '',
     ['■ 경험치','hl'],
-    '내 레벨이 적보다 3 이상 높으면 경험치가 감소한다 (저레벨 사냥 비효율)',
+    '내 레벨이 적보다 3 이상 높으면 경험치 감소 (저레벨 사냥 비효율) — 반대로 적이 6레벨 이상 높아도 일부 감소',
   ],[
     ['🧬 합성 조합표 보기', ()=>{ G.screen='recipe'; render(); }],
     ['돌아간다', ()=>{ G.screen='hub'; render(); }],
@@ -3123,7 +3174,14 @@ document.addEventListener('keydown', e=>{
 });
 
 /* 부팅: 로컬 캐시가 있으면 타이틀 없이 즉시 이어서 실행 */
+/* 위장 엑셀 파일명의 버전을 실제 최신 패치 버전으로 — 제목만 봐도 현재 버전을 알 수 있다 */
+const GAME_VERSION = PATCH_NOTES[0].ver;   /* 예: 'v5.9' */
+function applyVersionTitle(){
+  const el = document.getElementById('tname');
+  if(el) el.textContent = `월별데이터_정리_${GAME_VERSION}_진짜최종.xlsx - Excel`;
+}
 function bootLoad(){
+  applyVersionTitle();
   localLoadCheck();
   if(!hasCloud && cloudSaveData){ resumeSave(cloudSaveData); return; }
   render();
