@@ -1088,6 +1088,8 @@ async function saveToCloud(){
     return r.ok;
   }catch(e){ return false; }
 }
+/* 발급/저장 전: 올릴 진행이 있는지 (빈 파티면 저장 의미 없음 + 규칙상 불필요한 실패 방지) */
+function hasProgressToSave(){ return Array.isArray(G.party) && G.party.length>0; }
 async function loadFromCloud(code){
   if(!hasCloudSave || !code) return null;
   try{
@@ -2069,7 +2071,12 @@ function scrCloud(){
     lines.push('주소나 기기가 달라도 코드만 입력하면 이어할 수 있습니다.','');
     lines.push(['※ 코드는 비밀번호와 같습니다. 잃어버리면 복구할 수 없으니 꼭 보관하세요.','dim']);
     choices.push(['🆕 새 계정 코드 발급 (현재 진행 업로드)', async ()=>{
-      if(cloudSaving) return; cloudSaving=true;
+      if(cloudSaving) return;
+      if(!hasProgressToSave()){
+        cloudMsg='올릴 진행이 없습니다. 먼저 [이어하기]나 [새 게임]으로 파티를 만든 뒤 발급하세요.\n(기존 진행을 옮기려면 그 진행이 있는 화면에서 발급해야 합니다)';
+        render(); return;
+      }
+      cloudSaving=true;
       const code = makeUUID(); setCloudCode(code); cloudMsg='발급 중…'; render();
       const ok = await saveToCloud(); cloudSaving=false;
       if(ok){ cloudMsg='✅ 코드 발급 + 저장 완료!\n반드시 [내 코드 보기]로 코드를 복사해 보관하세요.'; }
