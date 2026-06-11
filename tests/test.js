@@ -305,11 +305,11 @@ T('전투 수학: 동레벨 TTK 1.2~8턴 (원턴킬 메타 방지)', () => {
     return ttk >= 1.2 && ttk <= 8;
   });
 });
-T('경험치 공유: 선두 100% + 파티원 50%', () => {
+T('경험치 공유: 선두 100% + 파티원 30%', () => {
   newGame(); const a = makeMon('espresso', 30), b = makeMon('gyeoljae', 30);
   G.party = [a, b]; G.active = 0; G.log = [];
   grantExpAndMoney({ lv: 10, rar: 'normal' }, 1);
-  return a.exp === 130 && b.exp === 65;
+  return a.exp === 130 && b.exp === 39;
 });
 T('돌연변이 천장: 3회 실패 누적 후 확정 발동', () => {
   newGame(); G.mutFail = { kingslime: 3 };
