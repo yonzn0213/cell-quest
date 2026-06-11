@@ -718,7 +718,7 @@ const BOSSES = [
     party:[['vending',6],['snackbox',6],['dustbunny',5]], reward:300, mult:1.1,
     win:'"…제법이군. 올라가 봐. 2층 회의실 쪽이 요즘 시끄럽다."' },
   { name:'만년과장 김부재', pre:'"회의 중이야. 아니, 회의가 나를 하고 있는 건가…? 덤벼!"',
-    party:[['ghost',9],['beambat',9],['copytoad',10],['snackware',9]], reward:600, mult:1.15,
+    party:[['ghost',9],['beambat',9],['copytoad',10],['snackware',10]], reward:600, mult:1.15,
     win:'"후련하다… 회의록의 저주가 풀렸어. 3층 영업부를 조심해."' },
   { name:'영업왕 박차장', pre:'"명함 한 장 받지? 아 참, 그 전에 실력부터 보자고!"',
     party:[['cardninja',12],['bellcicada',12],['pigeon',12],['vending',13]], reward:1000, mult:1.2,
@@ -750,51 +750,51 @@ const BOSSES = [
     win:'마왕이 무너지며 속삭였다. "…쉬어라. 두 세계 모두… 이제 정시에 잠들 것이다."' },
   /* ── 이세계 후반 보스 ── */
   { name:'천공시장 그리폰관세사', pre:'"하늘길을 지나는 모든 화물에는 관세가 붙는다. 이방인, 통행세를 몸으로 내겠나?" 거대한 날개가 태양을 가린다.',
-    party:[['stormram',50],['harpyannouncer',49],['cloudsheep',50],['alicornlogis',52]], reward:30000, mult:1.3,
+    party:[['stormram',50],['harpyannouncer',49],['cloudsheep',50],['alicornlogis',56]], reward:30000, mult:1.3,
     win:'"…관세 면제다. 심해 결재국으로 가는 해류 통행증을 발급해 주지. 그곳의 어둠을 조심해라."' },
   { name:'심해군주 크라켄전무', pre:'심해가 끓어오른다. "백 년간 결재되지 못한 서류들의 원한… 그 무게를 아는가?" 여덟 개의 촉수가 도장을 쥐고 있다.',
-    party:[['abysskraken',56],['sirenlead',55],['ghostshipclerk',54],['anglerlamp',54],['deepsiren',55]], reward:40000, mult:1.3,
+    party:[['abysskraken',61],['sirenlead',55],['ghostshipclerk',54],['anglerlamp',54],['deepsiren',55]], reward:40000, mult:1.3,
     win:'"전결… 승인. 화산 야근공단으로 가는 해저 화도를 열겠다. 그곳은 불의 잔업 지옥이다."' },
   { name:'공단장 이프리트', pre:'"우리 공단은 천 년째 무재해… 아니, 무퇴근이다!! 너도 여기서 일해 보겠나?!" 용암이 솟구친다.',
-    party:[['volcanolord',60],['obsidiangolem',59],['ashbird',58],['frostsalamander',59],['ifritmaster',58]], reward:55000, mult:1.35,
+    party:[['volcanolord',64],['obsidiangolem',59],['ashbird',58],['frostsalamander',64],['ifritmaster',58]], reward:55000, mult:1.35,
     win:'"…공장의 불을… 처음으로 꺼 본다. 차원의 탑이 보이는가. 모든 마감의 근원이 그 정상에 있다."' },
   { name:'차원신 데드라인', pre:'탑의 정상. 별들이 멈춘다. "나는 모든 차원의 마감을 관장하는 신. 야근도, 마왕도, 전부 나의 그림자였다. — 최후의 마감을 시작하지."',
     party:[['chronoreaper',64],['voidpanther',64],['paradoxwraith',63],['dimensionbutler',63],['overgod',67]], reward:99999, mult:1.35,
     win:'차원신이 미소 지으며 흩어졌다. "…마감 없는 세계라. 그것도… 나쁘지 않군. 모든 차원에 알리노라 — 데드라인은 폐지되었다."' },
   /* ── 3부: 신계 본사 보스 ── */
   { name:'수석비서 메타트론', pre:'"창세주님의 일정에 \'면담\'은 없습니다. 돌아가시죠." 비서실의 공기가 얼어붙는다. 거대한 날개가 결재판을 펼친다.',
-    party:[['archangelchief',70],['halodrone',69],['nimbushound',69],['metatronsec',72]], reward:70000, mult:1.35,
+    party:[['archangelchief',78],['halodrone',69],['nimbushound',71],['metatronsec',72]], reward:70000, mult:1.35,
     win:'"…일정을 비워 드리죠. 운명관리부부터 통과하셔야 합니다만. 행운을 빕니다, 이방인."' },
   { name:'운명부장 모이라', pre:'"네 운명의 실은 여기서 끊기는 걸로 짜여 있는데… 직접 확인해 보겠나?" 거대한 가위가 빛난다.',
-    party:[['fateweaver',76],['prophetowl',75],['karmacat',75],['moiradirector',78]], reward:90000, mult:1.35,
+    party:[['fateweaver',76],['prophetowl',76],['karmacat',75],['moiradirector',78]], reward:90000, mult:1.35,
     win:'"…실이 다시 이어졌다. 천 년 만의 운명 수정이군. 윤회민원실로 가는 길을 열어 주지."' },
   { name:'윤회실장 염라', pre:'"산 자가 민원실에 줄도 안 서고 들어와?! 업경대 앞에 서라. 네 업보를 전부 비추겠다!"',
     party:[['reaperexec',81],['nirvanaram',80],['reincarnstork',80],['limbojelly',80],['yamamanager',83]], reward:110000, mult:1.4,
     win:'"…업경대가 깨끗하군. 이런 영혼은 처음이다. 시공정비창 출입증을 발급해 주마."' },
   { name:'정비창장 크로노스', pre:'"우주의 시계는 내가 천 년 무사고로 정비해 왔다. 네가 굴러들어 와 톱니를 어지럽히는군!" 시간이 일그러진다.',
-    party:[['clockworkthrone',86],['galaxywhale',85],['cometcourier',85],['chronosforeman',88]], reward:140000, mult:1.4,
+    party:[['clockworkthrone',86],['galaxywhale',86],['cometcourier',85],['chronosforeman',88]], reward:140000, mult:1.4,
     win:'"…내 낫이 멈추다니. 인정한다. 창세연구소가 너를 기다린다. 그곳의 소장은… 세계를 만드는 자다."' },
   { name:'연구소장 데미우르고스', pre:'"오, 완벽한 표본이군! 전 차원을 클리어한 영혼이라니. 해부… 아니, 면접 좀 볼까?" 실험실의 우주들이 끓어오른다.',
-    party:[['supernovaslime',91],['betadragon',90],['quantumferret',90],['bugdragon',90],['demiurgelab',93]], reward:180000, mult:1.4,
+    party:[['supernovaslime',91],['betadragon',91],['quantumferret',90],['bugdragon',91],['demiurgelab',93]], reward:180000, mult:1.4,
     win:'"데이터 수집 완료… 아니, 완패 인정. 옥좌로 가라. 이 모든 우주의 대표이사가 기다린다."' },
   { name:'우주그룹 회장 옴니버스', pre:'무한 옥좌가 돌아본다. "야근도, 마감도, 신도, 전부 내 결재로 만들어졌지. 전 우주를 정시퇴근시키겠다고? — 그 안건, 이 자리에서 심의하지."',
     party:[['thronesentinel',95],['infinitymoth',95],['alphacherub',96],['demiurgelab',96],['omniversceo',99]], reward:999999, mult:1.45,
     win:'옴니버스가 옥좌에서 일어나 박수를 쳤다. "…가결. 전 우주 정시퇴근제, 전격 시행한다. 자네, 신계 임원 자리에 관심 없나?"' },
   /* ── 4부: 공허 컨소시엄 보스 ── */
   { name:'청산처장 데보이드', pre:'"우주그룹의 정시퇴근제로 수익성이 악화됐습니다. 본 컨소시엄은 귀하의 우주에 대한 청산 절차를 개시합니다." 도장이 허공에서 빛난다.',
-    party:[['voidnotary',103],['glitchhare',102],['echophantom',102],['devoidchief',105]], reward:300000, mult:1.45,
+    party:[['voidnotary',104],['glitchhare',105],['echophantom',102],['devoidchief',105]], reward:300000, mult:1.45,
     win:'"…청산 보류. 이런 변수는 처음입니다. 허나 백지 평원의 부장님은 저처럼 관대하지 않습니다."' },
   { name:'백지화부장 화이트아웃', pre:'"제일 깔끔한 청산은 처음부터 없었던 일로 만드는 것. 네 모험도, 네 세계도 — 전부 초안으로 되돌려 주마." 세상의 색이 빠져나간다.',
-    party:[['eraserlord',109],['brainstormking',108],['silencebird',108],['blankgolem',108],['whiteoutdir',111]], reward:400000, mult:1.45,
+    party:[['eraserlord',110],['brainstormking',111],['silencebird',108],['blankgolem',108],['whiteoutdir',111]], reward:400000, mult:1.45,
     win:'"…지워지지 않는 존재라니. 잔향 도서관으로 가라. 거기엔 \'기록\' 그 자체를 다루는 자가 있다."' },
   { name:'기록말소실장 리댁트', pre:'"모든 우주의 기록은 결국 내 검은 줄 아래 잠든다. 네 이름도 ■■■■가 될 운명이지." 서가의 책들이 일제히 검게 물든다.',
-    party:[['archivelich',115],['nostalgiajelly',114],['requiemcricket',114],['redactmaster',117]], reward:550000, mult:1.45,
+    party:[['archivelich',116],['nostalgiajelly',117],['requiemcricket',114],['redactmaster',117]], reward:550000, mult:1.45,
     win:'"…말소 불가 판정. 네 기록은 보존하겠다. 무중력 공장의 공장장은 기록이 아니라 존재를 분해하는 자다. 조심해라."' },
   { name:'해체공장장 브레이커', pre:'"폐업 우주 해체 작업 천만 건 무사고! 네 차원도 부품 단위로 분해해서 경매에 부쳐 주지!!" 거대한 집게가 하늘을 가른다.',
-    party:[['scraptitan',121],['scrapnova',120],['gravityleech',120],['dismantlebot',120],['breakerforeman',123]], reward:700000, mult:1.5,
+    party:[['scraptitan',122],['scrapnova',123],['gravityleech',120],['dismantlebot',120],['breakerforeman',123]], reward:700000, mult:1.5,
     win:'"…해체 라인이 멈췄다. 내 집게가 안 먹히는 물건은 처음이군. 본청의 심의관님께 안건을 올려 주마."' },
   { name:'청산심의관 저지먼트', pre:'"심의 개회. 안건 — 귀하의 우주, 존속이냐 청산이냐. 본 심의관은 1조 년간 단 한 번도 존속 판정을 내린 적이 없다." 법봉이 들린다.',
-    party:[['grandauditor',127],['absoluteslime',126],['voidhornet',126],['liquidjudge',129]], reward:900000, mult:1.5,
+    party:[['grandauditor',128],['absoluteslime',129],['voidhornet',126],['liquidjudge',129]], reward:900000, mult:1.5,
     win:'"…판결. 전례 없는 존속 결정. 허나 최종 결재권자는 따로 있다. 옥상에서… 의장님이 기다리신다."' },
   { name:'공허 의장 널', pre:'옥상의 어둠이 형태를 갖춘다. "신도 우주도 결국 내 발주서 한 장에서 시작됐다. 모든 것은 무(無)로 돌아간다 — 그것이 유일한 정시퇴근이지. 자, 최후의 결재다."',
     party:[['nihilknight',133],['finalmoth',133],['zeropixie',134],['liquidjudge',134],['nullchairman',137]], reward:9999999, mult:1.5,
@@ -863,11 +863,14 @@ function rollRarity(){
   if(r < 0.078) return 'gold';
   return 'normal';
 }
+/* HP에 완만한 등비 보정(HP_CURVE)을 곱한다 — 공격력은 사실상 등비로 크는데
+   HP가 선형이면 lv66부터 원턴킬 게임이 되기 때문 (v5.3 밸런스) */
+const HP_CURVE = 0.025;
 function statsFor(sid, lv, rar){
   const s = SPECIES[sid];
   const mult = RARITY[rar||'normal'].mult;
   return {
-    maxhp: Math.round((s.hp + (lv-1)*6) * mult),
+    maxhp: Math.round((s.hp + (lv-1)*6) * (1 + HP_CURVE*(lv-1)) * mult),
     atk: Math.round(s.atk * (1+0.08*(lv-1)) * mult),
   };
 }
@@ -907,8 +910,8 @@ function fmtPlayTime(ms){
 
 function newGame(){
   G = {
-    v:3, screen:'title', name:'', pid:makePid(),
-    party:[], box:[], active:0,
+    v:4, screen:'title', name:'', pid:makePid(),
+    party:[], box:[], active:0, revN:{}, mutFail:{},
     items:{ clip:5, goldclip:0, prismclip:0, dimclip:0, godclip:0, bacchus:3, hotsix:0, coffee:0, elixir:0, ample:0, detox:0, hair:0 },
     money:200, wins:0, story:0, streak:0, isekai:false, gifts:{},
     dex:{}, rarDex:{}, dexRewards:[],
@@ -942,7 +945,7 @@ const ITEM_DEF = {
   prismclip:{ name:'프리즘클립', desc:'포획률 2.4배', price:420 },
   dimclip: { name:'차원클립',  desc:'포획률 4배 — 전설급도 노려볼 만하다', price:1500 },
   godclip: { name:'신계클립',  desc:'포획률 6배 — 신계의 인사권이 담겨 있다', price:5000 },
-  bacchus: { name:'박카스',    desc:'HP 35 회복', price:70 },
+  bacchus: { name:'박카스',    desc:'최대 HP 35% 회복 (최소 35)', price:70 },
   hotsix:  { name:'핫식스',    desc:'HP 완전 회복', price:180 },
   coffee:  { name:'모닝커피',  desc:'기절 회복 (HP 50%)', price:220 },
   elixir:  { name:'엘릭서',    desc:'1마리 완전 회복 (기절 포함)', price:800 },
@@ -1057,11 +1060,20 @@ function boardKey(){ return G.name + '_' + (G.pid||'0'); }
 const LOCAL_KEY = 'cellquest_save';
 const hasLocal = (()=>{ try{ localStorage.setItem(LOCAL_KEY+'_t','1'); localStorage.removeItem(LOCAL_KEY+'_t'); return true; }catch(e){ return false; } })();
 const canAutoSave = hasCloud || hasLocal;
+/* battle/log는 복원 시 버리는 휘발 상태 — 저장에서 제외 (용량·악용 방지) */
+const SAVE_SKIP_KEYS = ['battle','log'];
+const saveReplacer = (k,v)=> SAVE_SKIP_KEYS.includes(k) ? undefined : v;
+let battleSnapshot = null; /* 전투 시작 직전 상태 — 전투 중 새로고침 악용(보상만 챙기기) 방지 */
 function localSave(){
   /* party가 비어 있으면 아직 시작 전(타이틀) — 기존 저장을 덮어쓰지 않는다 */
   if(!hasLocal || G.party.length===0) return;
   flushPlayTime();
-  try{ localStorage.setItem(LOCAL_KEY, JSON.stringify(G)); }catch(e){}
+  try{
+    const data = (G.battle && !G.battle.over && battleSnapshot)
+      ? battleSnapshot                            /* 전투 중 = 전투 직전 상태로 저장 */
+      : JSON.stringify(G, saveReplacer);
+    localStorage.setItem(LOCAL_KEY, data);
+  }catch(e){}
 }
 function localLoadCheck(){
   if(hasCloud || !hasLocal) return;
@@ -1069,15 +1081,18 @@ function localLoadCheck(){
     const raw = localStorage.getItem(LOCAL_KEY);
     if(!raw) return;
     const obj = JSON.parse(raw);
-    if(obj && (obj.v===2||obj.v===3) && Array.isArray(obj.party)) cloudSaveData = migrateSave(obj);
+    if(obj && (obj.v===2||obj.v===3||obj.v===4) && Array.isArray(obj.party)) cloudSaveData = migrateSave(obj);
   }catch(e){ /* 손상된 캐시는 무시 */ }
 }
+/* 복원 직후 안전하게 그릴 수 있는 화면 화이트리스트.
+   explore처럼 휘발 변수(curArea)에 의존하는 화면은 복원하면 크래시하므로 허브로 보낸다. */
+const RESUME_SAFE_SCREENS = ['hub','bag','party','box','dex','ldex','shop','moveFloor','dope','fusion','academy','wiki'];
 /* 저장 데이터를 현재 게임으로 복원 (이어하기 / 부팅 자동 복원 공용) */
 function resumeSave(d){
   G = d;
   playSessionStart = Date.now();
   if(!G.name) G.name = '사원'+Math.floor(Math.random()*900+100);
-  if(['battle','storyBeat','rank','isekai','gameover','title','starter'].includes(G.screen)) G.screen='hub';
+  if(!RESUME_SAFE_SCREENS.includes(G.screen)) G.screen='hub';
   G.battle = null;
   pendingMsg.push('자동 저장된 진행 상황을 불러왔다!');
   render();
@@ -1097,7 +1112,7 @@ async function cloudLoadCheck(){
     const r = await window.storage.get('savegame');
     if(r && r.value){
       const obj = JSON.parse(r.value);
-      if(obj && (obj.v===2||obj.v===3) && Array.isArray(obj.party)) cloudSaveData = migrateSave(obj);
+      if(obj && (obj.v===2||obj.v===3||obj.v===4) && Array.isArray(obj.party)) cloudSaveData = migrateSave(obj);
     }
   }catch(e){ /* 저장 데이터 없음 */ }
   if(G.screen==='title' && !bossMode) render();
@@ -1116,6 +1131,8 @@ async function updateBoard(force){
     lead:G.active,
     party:G.party.map(m=>({ s:m.sid, l:m.lv, r:m.rar||'normal', t:m.trait||null, d:+((m.dope||1).toFixed(2)) })),
   };
+  /* 서버 인덱스 정렬용 합성 점수 — limitToLast 쿼리로 상위 N명만 받기 위함 */
+  entry.score = entry.story*1e6 + entry.dex*1e3 + Math.min(entry.wins,999);
   try{
     if(hasCloud){
       await window.storage.set('lb:'+G.name, JSON.stringify(entry), true);
@@ -1127,6 +1144,28 @@ async function updateBoard(force){
 }
 
 let rankCache = null;
+/* 공개 write DB라 어떤 값이 와도 화면이 깨지지 않도록 항목을 정규화한다 */
+function normalizeEntry(raw){
+  if(!raw || typeof raw!=='object' || typeof raw.name!=='string') return null;
+  const num = (v,max)=> (typeof v==='number' && isFinite(v) && v>=0) ? Math.min(v,max) : 0;
+  const e = {
+    name: sanitizeName(raw.name) || '???',
+    wins: num(raw.wins, 9999999), dex: num(raw.dex, ALL_SIDS.length),
+    gold: num(raw.gold, 999), prism: num(raw.prism, 999), leg: num(raw.leg, 999),
+    pt: num(raw.pt, 365*24*3600*1000), story: num(raw.story, PROG_LABEL.length-1),
+    lead: num(raw.lead, 5),
+  };
+  if(Array.isArray(raw.party)){
+    e.party = raw.party.slice(0,6)
+      .filter(mm=>mm && typeof mm==='object' && typeof mm.s==='string')
+      .map(mm=>({
+        s:mm.s, l:num(mm.l,999), r:RARITY[mm.r]?mm.r:'normal',
+        t:(typeof mm.t==='string' && TRAITS[mm.t])?mm.t:null,
+        d:(typeof mm.d==='number' && isFinite(mm.d) && mm.d>0)?mm.d:1,
+      }));
+  }
+  return e;
+}
 async function loadRank(){
   if(!hasBoard){ rankCache=[]; if(G.screen==='rank') paintRank(); return; }
   try{
@@ -1140,10 +1179,13 @@ async function loadRank(){
         }catch(e){}
       }
     } else {
-      const res = await fetch(FIREBASE_DB_URL+'/lb.json');
+      /* score 인덱스 쿼리로 상위 N명만 다운로드. 인덱스 미배포 환경은 전체 조회로 폴백 */
+      let res = await fetch(FIREBASE_DB_URL+'/lb.json?orderBy=%22score%22&limitToLast='+RANK_MAX_ROWS);
+      if(!res.ok) res = await fetch(FIREBASE_DB_URL+'/lb.json');
       const data = await res.json();
-      rows = Object.values(data||{}).filter(p=>p && typeof p.name==='string');
+      rows = Object.values(data||{});
     }
+    rows = rows.map(normalizeEntry).filter(Boolean);
     rows.sort((a,b)=>(b.story-a.story)||(b.dex-a.dex)||(b.wins-a.wins));
     rankCache = rows.slice(0,RANK_MAX_ROWS);
   }catch(e){ rankCache = []; }
@@ -1183,14 +1225,16 @@ function paintRankDetail(p, idx){
     ['','파티 몬스터','LV','타입','특성/도핑'].forEach((h,i)=>setCell(5,1+i,h,'hdr'));
     p.party.slice(0,6).forEach((m,i)=>{
       const r = 6+i;
+      if(!m || typeof m!=='object') return;
       const sp = SPECIES[m.s]; /* 알 수 없는 종(버전 차이)은 이름만 표기 */
       const rar = RARITY[m.r] ? m.r : 'normal';
-      const name = RARITY[rar].prefix + (sp ? sp.name : '?'+m.s+'?');
+      const name = RARITY[rar].prefix + (sp ? sp.name : '?'+String(m.s)+'?');
+      const dope = (typeof m.d==='number' && isFinite(m.d)) ? m.d : 1;
       setCell(r,1, i===(p.lead||0) ? '▶ 선두' : '', 'bold');
       setCell(r,2, name, RARITY[rar].cls);
       setCell(r,3, String(m.l||'?'), 'num');
       setCell(r,4, sp ? `[${sp.type}]` : '', 'dim');
-      const extra = [m.t?`특성 ${m.t}`:null, (m.d&&m.d!==1)?`도핑 ×${m.d.toFixed(2)}`:null].filter(Boolean).join(' · ');
+      const extra = [(typeof m.t==='string')?`특성 ${m.t}`:null, (dope!==1)?`도핑 ×${dope.toFixed(2)}`:null].filter(Boolean).join(' · ');
       setCell(r,5, extra, 'dim');
     });
   } else {
@@ -1251,7 +1295,8 @@ function paintPartyPanel(){
   }
   r++;
   setCell(r,7,'도감'); setCell(r,8,`${dexCaughtCount()}/${ALL_SIDS.length}`,'num'); r++;
-  setCell(r,7,'승수'); setCell(r,8,String(G.wins),'num');
+  setCell(r,7,'승수'); setCell(r,8,String(G.wins),'num'); r++;
+  setCell(r,7,'연승'); setCell(r,8,`${G.streak||0} (+${Math.min(G.streak||0,10)*3}%)`, (G.streak||0)>0?'num hl':'num');
 }
 
 function paint(lines, choices, fx){
@@ -1280,7 +1325,8 @@ function render(){
   const map = { title:scrTitle, starter:scrStarter, hub:scrHub, explore:scrExplore,
     battle:scrBattle, bag:scrBag, party:scrParty, box:scrBox, dex:scrDex, shop:scrShop,
     moveFloor:scrMoveFloor, storyBeat:scrStoryBeat, gameover:scrGameover, ending:scrEnding,
-    rank:scrRank, dope:scrDope, fusion:scrFusion, isekai:scrIsekai, ldex:scrLegendDex };
+    rank:scrRank, dope:scrDope, fusion:scrFusion, isekai:scrIsekai, ldex:scrLegendDex,
+    academy:scrAcademy, wiki:scrWiki };
   (map[G.screen]||scrHub)();
 }
 
@@ -1437,7 +1483,7 @@ function scrHub(){
     choices.push([`★ 보스에게 도전: ${BOSSES[bossIdx].name}`, ()=>startBossBattle(bossIdx)]);
   }
   if(bossBeaten){
-    choices.push([`★ ${BOSSES[bossIdx].name} 재대결 — 강화판 (보상 ${Math.round(REVENGE_REWARD_RATE*100)}%)`, ()=>startBossBattle(bossIdx, true)]);
+    choices.push([`★ ${BOSSES[bossIdx].name} 재대결 — 강화판 (보상 ${Math.round(revengeRate(bossIdx)*100)}%)`, ()=>startBossBattle(bossIdx, true)]);
   }
   if(G.story>=6 && !G.isekai){
     choices.push(['★★ …요즘 가슴이 답답하다. (제2부 시작)', ()=>{ G.screen='isekai'; render(); }]);
@@ -1462,6 +1508,10 @@ function scrHub(){
       ]
     : [
         [`${cooler}에서 회복 (무료, 전원 완전 회복)`, ()=>{
+          if(!G.party.some(m=>m.hp<m.maxhp)){
+            pendingMsg.push('파티가 이미 전원 멀쩡하다. 무료 회복은 아껴 두자.');
+            render(); return;
+          }
           G.party.forEach(m=>m.hp=m.maxhp);
           G.coolerCd = COOLER_RECHARGE_WINS;
           pendingMsg.push(`${cooler}의 기운으로 파티가 모두 회복되었다! (${COOLER_RECHARGE_WINS}승 후 재사용 가능)`);
@@ -1469,15 +1519,17 @@ function scrHub(){
         }],
       ];
   choices.push(
-    ['다른 층으로 이동', ()=>{ G.screen='moveFloor'; render(); }],
+    ['다른 층으로 이동', ()=>{ moveDim=-1; G.screen='moveFloor'; render(); }],
     ...coolerChoices,
     ['매점 (복지포인트 사용)', ()=>{ G.screen='shop'; render(); }],
+    ['사내 연수원 (포인트 → 레벨)', ()=>{ G.screen='academy'; render(); }],
     ['합성 실험실 (등급 도전 / 신종 창조)', ()=>{ G.screen='fusion'; render(); }],
     ['가방', ()=>{ G.screen='bag'; render(); }],
     ['파티 관리', ()=>{ G.screen='party'; render(); }],
     ['몬스터 도감', ()=>{ G.screen='dex'; render(); }],
   );
   if(hasBoard) choices.push(['사내 랭킹 보드', ()=>{ G.screen='rank'; render(); }]);
+  choices.push(['사내 위키 (도움말)', ()=>{ G.screen='wiki'; render(); }]);
   choices.push([canAutoSave?'백업 코드 (저장/불러오기 · 기기 이동용)':'백업 코드 (저장/불러오기) — ⚠ 유일한 저장 수단', openSaveDlg]);
   choices.push(['타이틀 화면으로 (새 게임은 여기서)', ()=>{
     localSave(); localLoadCheck(); /* 현재 진행을 저장하고 이어하기 데이터 갱신 */
@@ -1486,25 +1538,39 @@ function scrHub(){
   paint(lines, choices, `=NOW() · ${fl.name}`);
 }
 
+/* 27층을 한 화면에 다 그릴 수 없으므로 차원(부) → 층 2단 메뉴로 나눈다 */
+const DIMENSIONS = [
+  { name:'1부 — 사무실 (+ 야근차원)', from:0, to:5, need:0 },
+  { name:'2부 — 이세계',           from:6, to:14, need:0, isekai:true },
+  { name:'3부 — 신계 본사',         from:15, to:20, need:15, isekai:true },
+  { name:'4부 — 공허 컨소시엄',      from:21, to:26, need:21, isekai:true },
+];
+let moveDim = -1;
+function floorUnlocked(i){
+  if(i<5) return i<=Math.min(G.story,4);
+  if(i===5) return G.story>=5;
+  return G.isekai && i<=G.story;
+}
 function scrMoveFloor(){
-  const unlocked = Math.min(G.story, 4);
   const lines = [[G.isekai?'― 차원 이동 ―':'― 엘리베이터 ―','bold'],'', '어디로 갈까?',''];
   const choices = [];
-  FLOORS.forEach((f,i)=>{
-    if(i<=unlocked) choices.push([f.name + (i===G.floor?' (현재)':''), ()=>{ G.floor=i; G.screen='hub'; render(); }]);
-    else if(i<5) choices.push([f.name+' — 잠김 (보스를 꺾어야 함)', ()=>{}]);
-  });
-  if(G.story>=5) choices.push(['?? 야근차원 — 사무실 구석의 균열', ()=>{ G.floor=5; G.screen='hub'; render(); }]);
-  if(G.isekai){
-    FLOORS.forEach((f,i)=>{
-      if(i<6) return;
-      if(i>=15 && G.story<15) return; /* 신계는 전차원 클리어 전까지 존재 자체를 숨긴다 */
-      if(i>=21 && G.story<21) return; /* 공허는 신계 클리어 전까지 숨긴다 */
-      if(i<=G.story) choices.push([f.name + (i===G.floor?' (현재)':''), ()=>{ G.floor=i; G.screen='hub'; render(); }]);
-      else choices.push([f.name+' — 잠김 (이전 보스를 꺾어야 함)', ()=>{}]);
+  if(moveDim<0){
+    DIMENSIONS.forEach((d,i)=>{
+      if(d.isekai && !G.isekai) return;
+      if(d.need && G.story<d.need) return; /* 해금 전 차원은 존재 자체를 숨긴다 */
+      const cur = (G.floor>=d.from && G.floor<=d.to) ? ' (현재 위치)' : '';
+      choices.push([d.name+cur, ()=>{ moveDim=i; render(); }]);
     });
+    choices.push(['돌아간다', ()=>{ G.screen='hub'; render(); }]);
+  } else {
+    const d = DIMENSIONS[moveDim];
+    for(let i=d.from;i<=d.to;i++){
+      const f = FLOORS[i];
+      if(floorUnlocked(i)) choices.push([f.name + (i===G.floor?' (현재)':''), ()=>{ moveDim=-1; G.floor=i; G.screen='hub'; render(); }]);
+      else if(i!==5) choices.push([f.name+' — 잠김 (이전 보스를 꺾어야 함)', ()=>{}]);
+    }
+    choices.push(['← 차원 선택으로', ()=>{ moveDim=-1; render(); }]);
   }
-  choices.push(['돌아간다', ()=>{ G.screen='hub'; render(); }]);
   paint(lines, choices);
 }
 
@@ -1560,7 +1626,9 @@ function scrParty(){
   const lines = [['― 파티 관리 ―','bold'],''];
   if(partyMsg){ lines.push([partyMsg,'hl'],''); partyMsg=''; }
   G.party.forEach((m,i)=>{
-    lines.push([`${i===G.active?'▶':' '} ${monName(m)}  LV${m.lv} [${monType(m)}]  HP ${m.hp}/${m.maxhp}  공격 ${m.atk}  EXP ${m.exp}/${expNeed(m.lv)}`, monCls(m)]);
+    const evo = SPECIES[m.sid].evo;
+    const evoTag = evo ? `  · 진화 LV${evo.lv}${evo.mut?' (돌연변이 가능)':''}` : '';
+    lines.push([`${i===G.active?'▶':' '} ${monName(m)}  LV${m.lv} [${monType(m)}]  HP ${m.hp}/${m.maxhp}  공격 ${m.atk}  EXP ${m.exp}/${expNeed(m.lv)}${evoTag}`, monCls(m)]);
     lines.push(['    기술: '+knownMoves(m).map(mv=>mv[1]).join(', '),'dim']);
     if(m.trait) lines.push([`    특성: ${m.trait} — ${TRAITS[m.trait]}`,'dim']);
   });
@@ -1694,6 +1762,60 @@ function scrDope(){
   }
   choices.push(['돌아간다', ()=>{ G.screen='party'; render(); }]);
   paint(lines, choices);
+}
+
+/* ── 사내 연수원: 복지포인트 → 즉시 1레벨 (후반 잉여 화폐의 사용처) ── */
+const ACADEMY_COST_PER_LV = 400; /* 수강비 = 현재 레벨 × 이 값 — 야생 사냥보다 약간 비싸게 */
+let academyMsg = '';
+function scrAcademy(){
+  const lines = [['― 사내 연수원 ―','bold'],'',
+    '복지포인트로 몬스터를 교육해 즉시 1레벨 올린다. (진화·기술 습득도 그대로 발동)',
+    [`수강비: 현재 레벨 × ${ACADEMY_COST_PER_LV}P`,'dim'],''];
+  if(academyMsg){ lines.push([academyMsg,'hl'],''); academyMsg=''; }
+  lines.push(`보유 복지포인트: ${G.money.toLocaleString()}P`);
+  const choices = [];
+  G.party.forEach(m=>{
+    const cost = m.lv*ACADEMY_COST_PER_LV;
+    choices.push([`${monName(m)} LV${m.lv} → LV${m.lv+1} 수강 (${cost.toLocaleString()}P)`, ()=>{
+      if(G.money<cost){ academyMsg='복지포인트가 부족하다…'; render(); return; }
+      G.money -= cost;
+      const logStart = G.log.length;
+      gainExp(m, expNeed(m.lv) - m.exp);
+      const msgs = G.log.splice(logStart);
+      academyMsg = '🎓 연수 수료! ' + msgs.join(' · ');
+      render();
+    }]);
+  });
+  choices.push(['돌아간다', ()=>{ G.screen='hub'; render(); }]);
+  paint(lines, choices, '=EDU(파티, 복지포인트)');
+}
+
+/* ── 사내 위키: 게임 내 도움말 (상성/포획/희귀도/성장 규칙) ── */
+function scrWiki(){
+  paint([
+    ['― 사내 위키 (게임 도움말) ―','bold'],'',
+    ['■ 타입 상성','hl'],
+    '카페인 > 서류 > 전자 > 카페인 (정방향 1.5배 / 역방향 0.67배)',
+    '야근 타입은 모든 타입과 서로 1.3배 (주고받는 양방향)',
+    '',
+    ['■ 포획','hl'],
+    '적 HP가 낮을수록 잘 잡힌다! 클립: 집게 1배 → 골드 1.6 → 프리즘 2.4 → 차원 4 → 신계 6배',
+    '희귀 개체·전설급 종은 포획 보정이 크게 깎인다',
+    '',
+    ['■ 희귀도 (야생 출현률)','hl'],
+    '일반 → 황금 6% → 프리즘 1.5% → 레전드 0.3% — 높을수록 능력치 상승, 레전드는 전용 특성',
+    '',
+    ['■ 성장','hl'],
+    '경험치: 선두 100% + 나머지 파티원 50% 공유 / 연수원에서 포인트로 수강 가능',
+    `진화 레벨은 파티 관리에 표시 · 돌연변이는 12% (같은 종 ${MUT_PITY}회 실패 시 다음 확정)`,
+    '',
+    ['■ 강화','hl'],
+    '도핑: 성공 시 영구 강화, 실패 시 약화 — 디톡스 앰플로 초기화 가능',
+    '합성: 동종 2마리=등급 도전 / 레시피 조합=신종 (낮은 확률로 상위 등급이 깃듦)',
+    '연승 보너스: 승리당 포인트 +3% (최대 +30%), 패배 시 초기화',
+  ],[
+    ['돌아간다', ()=>{ G.screen='hub'; render(); }],
+  ],'=HELP()');
 }
 
 /* ── 합성 실험실: 동종 = 등급 도전(저확률) / 이종 = 레시피 신종 ── */
@@ -1982,6 +2104,7 @@ function restoreLead(){
 
 function startWildBattle(enemy){
   const lead = G.active; /* 기절로 임시 교체돼도 전투 후 원래 선두로 복귀 */
+  battleSnapshot = JSON.stringify(G, saveReplacer);
   ensureAliveLead();
   dexSee(enemy.sid);
   G.battle = { enemy, wild:true, over:false, menu:'main', lead };
@@ -1993,10 +2116,15 @@ function startWildBattle(enemy){
   G.screen='battle'; render();
 }
 
-/* revenge: 격파한 보스 재대결 — 레벨·배율이 더 오르고 보상은 80% (파밍용) */
-const REVENGE_LV_BONUS = 8, REVENGE_MULT_BONUS = 0.2, REVENGE_REWARD_RATE = 0.8;
+/* revenge: 격파한 보스 재대결 — 레벨·배율이 더 오르고 보상은 80%에서 반복마다 절반씩 체감 (최저 10%) */
+const REVENGE_LV_BONUS = 8, REVENGE_MULT_BONUS = 0.2, REVENGE_REWARD_RATE = 0.8, REVENGE_REWARD_MIN = 0.1;
+function revengeRate(idx){
+  const n = (G.revN||{})[idx]||0;
+  return Math.max(REVENGE_REWARD_MIN, REVENGE_REWARD_RATE * Math.pow(0.5, n));
+}
 function startBossBattle(idx, revenge){
   const lead = G.active; /* 기절로 임시 교체돼도 전투 후 원래 선두로 복귀 */
+  battleSnapshot = JSON.stringify(G, saveReplacer);
   ensureAliveLead();
   if(aliveMons().length===0){ pendingMsg.push('싸울 수 있는 몬스터가 없다. 먼저 회복하자.'); render(); return; }
   const B = BOSSES[idx];
@@ -2077,41 +2205,53 @@ function enemyTurn(){
   }
 }
 
+const EXP_SHARE_RATE = 0.5; /* 선두 외 파티원이 받는 경험치 비율 */
+const MUT_PITY = 3;         /* 돌연변이 천장: 같은 종 진화 N회 실패 시 다음은 확정 */
+function gainExp(mon, exp){
+  mon.exp += exp;
+  while(mon.exp >= expNeed(mon.lv)){
+    mon.exp -= expNeed(mon.lv);
+    mon.lv++;
+    const before = knownMoves(mon).map(m=>m[1]);
+    const dope = mon.dope||1;
+    const st = statsFor(mon.sid, mon.lv, mon.rar);
+    const newMax = Math.round(st.maxhp*dope);
+    const gain = Math.max(0, newMax - mon.maxhp);
+    mon.maxhp = newMax; mon.atk = Math.round(st.atk*dope);
+    mon.hp = mon.hp<=0 ? 0 : Math.min(mon.maxhp, mon.hp+gain);
+    pushLog(`${monName(mon)} 레벨 업! → LV${mon.lv}`);
+    const evo = SPECIES[mon.sid].evo;
+    if(evo && mon.lv>=evo.lv){
+      const oldName = monName(mon);
+      /* 돌연변이: 진화 순간 낮은 확률 — 단, MUT_PITY회 실패가 쌓이면 확정 발동 */
+      let mutated = false;
+      if(evo.mut){
+        G.mutFail = G.mutFail||{};
+        mutated = (G.mutFail[mon.sid]||0) >= MUT_PITY || Math.random()<evo.mut.p;
+        G.mutFail[mon.sid] = mutated ? 0 : (G.mutFail[mon.sid]||0)+1;
+      }
+      mon.sid = mutated ? evo.mut.to : evo.to;
+      const st2 = statsFor(mon.sid, mon.lv, mon.rar);
+      const ratio = mon.maxhp>0 ? mon.hp/mon.maxhp : 1;
+      mon.maxhp = Math.round(st2.maxhp*dope); mon.atk = Math.round(st2.atk*dope);
+      mon.hp = mon.hp<=0 ? 0 : Math.max(1, Math.round(mon.maxhp*ratio));
+      if(mutated) pushLog(`!!! 돌연변이 진화 !!! ${oldName}이(가) 특별한 개체 ${monName(mon)}(으)로 다시 태어났다!!`);
+      else pushLog(`!! ${oldName}이(가) ${monName(mon)}(으)로 진화했다 !!`);
+      dexCatch(mon.sid, mon.rar);
+    }
+    const after = knownMoves(mon).map(m=>m[1]);
+    after.filter(n=>!before.includes(n)).forEach(n=>pushLog(`새 기술 [${n}]을(를) 배웠다!`));
+  }
+}
 function grantExpAndMoney(e, moneyMult){
   const me = activeMon();
   const exp = e.lv*13;
   const pay = Math.round(e.lv*15*RARITY[e.rar||'normal'].pay*(moneyMult||1)*streakMult());
   G.money += pay;
-  me.exp += exp;
   pushLog(`경험치 ${exp}, 복지포인트 ${pay}P 획득!`);
-  while(me.exp >= expNeed(me.lv)){
-    me.exp -= expNeed(me.lv);
-    me.lv++;
-    const before = knownMoves(me).map(m=>m[1]);
-    const dope = me.dope||1;
-    const st = statsFor(me.sid, me.lv, me.rar);
-    const newMax = Math.round(st.maxhp*dope);
-    const gain = Math.max(0, newMax - me.maxhp);
-    me.maxhp = newMax; me.atk = Math.round(st.atk*dope);
-    me.hp = Math.min(me.maxhp, me.hp+gain);
-    pushLog(`${monName(me)} 레벨 업! → LV${me.lv}`);
-    const evo = SPECIES[me.sid].evo;
-    if(evo && me.lv>=evo.lv){
-      const oldName = monName(me);
-      /* 돌연변이: 진화 순간 낮은 확률로 별개의 특별종이 된다 */
-      const mutated = evo.mut && Math.random()<evo.mut.p;
-      me.sid = mutated ? evo.mut.to : evo.to;
-      const st2 = statsFor(me.sid, me.lv, me.rar);
-      const ratio = me.hp/me.maxhp;
-      me.maxhp = Math.round(st2.maxhp*dope); me.atk = Math.round(st2.atk*dope);
-      me.hp = Math.max(1, Math.round(me.maxhp*ratio));
-      if(mutated) pushLog(`!!! 돌연변이 진화 !!! ${oldName}이(가) 특별한 개체 ${monName(me)}(으)로 다시 태어났다!!`);
-      else pushLog(`!! ${oldName}이(가) ${monName(me)}(으)로 진화했다 !!`);
-      dexCatch(me.sid, me.rar);
-    }
-    const after = knownMoves(me).map(m=>m[1]);
-    after.filter(n=>!before.includes(n)).forEach(n=>pushLog(`새 기술 [${n}]을(를) 배웠다!`));
-  }
+  gainExp(me, exp);
+  /* 경험치 공유: 나머지 파티원도 절반을 받는다 (육성 그라인딩 완화) */
+  G.party.forEach(m=>{ if(m!==me) gainExp(m, Math.round(exp*EXP_SHARE_RATE)); });
 }
 
 function countCoolerWin(){
@@ -2151,9 +2291,10 @@ function onTrainerMonDown(){
     pushLog(`${B.name}이(가) ${monName(b.enemy)}을(를) 내보냈다!`);
   } else {
     b.over=true; G.wins++; countCoolerWin(); countStreakWin();
-    const reward = Math.round(B.reward * (b.revenge ? REVENGE_REWARD_RATE : 1));
+    const reward = Math.round(B.reward * (b.revenge ? revengeRate(b.bossIdx) : 1));
+    if(b.revenge){ G.revN = G.revN||{}; G.revN[b.bossIdx] = (G.revN[b.bossIdx]||0)+1; }
     G.money += reward;
-    pushLog(`★ ${B.name}에게 승리! 보상 ${reward}P!`);
+    pushLog(`★ ${B.name}에게 승리! 보상 ${reward.toLocaleString()}P!${b.revenge?' (재대결 반복 시 보상 체감)':''}`);
     if(!canAutoSave) pushLog('💾 큰 진행을 했다! [백업 코드]를 발급해 보관해 두자.');
     if(!b.revenge && b.bossIdx===G.story){
       G.story++;
@@ -2214,7 +2355,11 @@ function useHeal(kind){
   if(G.items[kind]<=0){ pushLog('아이템이 없다!'); render(); return; }
   if(me.hp>=me.maxhp){ pushLog('HP가 이미 가득하다!'); render(); return; }
   G.items[kind]--;
-  if(kind==='bacchus'){ me.hp=Math.min(me.maxhp, me.hp+35); pushLog(`${monName(me)} HP 35 회복!`); }
+  if(kind==='bacchus'){
+    /* 고정 35는 후반에 무의미 — 최대 HP 비율 회복으로 (최소 35 보장) */
+    const heal = Math.max(35, Math.round(me.maxhp*0.35));
+    me.hp=Math.min(me.maxhp, me.hp+heal); pushLog(`${monName(me)} HP ${heal} 회복!`);
+  }
   else { me.hp=me.maxhp; pushLog(`${monName(me)} HP 완전 회복!`); }
   b.menu='main'; enemyTurn(); render();
 }
@@ -2261,9 +2406,11 @@ function scrBattle(){
     G.party.forEach((m,i)=>{ if(m.hp>0) choices.push([`${monName(m)} 교체 투입 (HP ${m.hp})`, ()=>switchMon(i,true)]); });
   } else if(b.menu==='moves'){
     knownMoves(me).forEach((mv,i)=>{
-      /* 위력은 기술 고유값이라 불변 — 레벨업(공격력) 반영 데미지를 함께 보여준다 */
-      const est = Math.max(1, Math.round(me.atk*mv[2]/40));
-      choices.push([`${mv[1]} (위력 ${mv[2]}${mv[3]?', '+mv[3]:''} · 예상 데미지 ${est}±)`, ()=>playerMove(i)]);
+      /* 예상 데미지에 상성까지 반영 — 표시값과 실제값이 어긋나지 않도록 */
+      const mult = mv[3] ? typeMult(mv[3], monType(e)) : 1;
+      const est = Math.max(1, Math.round(me.atk*mv[2]/40*mult));
+      const mark = mult>1 ? ' ▲굉장' : mult<1 ? ' ▼별로' : '';
+      choices.push([`${mv[1]} (위력 ${mv[2]}${mv[3]?', '+mv[3]:''} · 예상 ${est}±${mark})`, ()=>playerMove(i)]);
     });
     choices.push(['← 뒤로', ()=>{ b.menu='main'; render(); }]);
   } else if(b.menu==='bag'){
@@ -2389,6 +2536,15 @@ function migrateSave(obj){
     obj.v = 3;
   }
   if(!obj.rarDex) obj.rarDex = {};
+  if(!obj.dex) obj.dex = {};
+  if(!Array.isArray(obj.dexRewards)) obj.dexRewards = [];
+  if(!Array.isArray(obj.box)) obj.box = [];
+  if(!Array.isArray(obj.log)) obj.log = [];
+  if(!obj.items) obj.items = {};
+  if(typeof obj.money!=='number' || !isFinite(obj.money)) obj.money = 0;
+  if(obj.name) obj.name = sanitizeName(obj.name) || ('사원'+Math.floor(Math.random()*900+100));
+  if(!obj.revN) obj.revN = {};
+  if(!obj.mutFail) obj.mutFail = {};
   if(!obj.coolerCd) obj.coolerCd = 0;
   if(obj.items && obj.items.ample===undefined) obj.items.ample = 0;
   if(obj.items && obj.items.prismclip===undefined) obj.items.prismclip = 0;
@@ -2402,11 +2558,24 @@ function migrateSave(obj){
   if(!obj.gifts) obj.gifts = {};
   if(!obj.pid) obj.pid = makePid();
   if(typeof obj.playMs!=='number') obj.playMs = 0;
+  /* v4: HP 성장 곡선 변경 — 저장된 모든 개체의 스탯을 새 공식으로 재계산 */
+  if(obj.v!==4){
+    for(const mon of [...(obj.party||[]), ...(obj.box||[])]){
+      if(!SPECIES[mon.sid]) continue;
+      const ratio = mon.maxhp>0 ? mon.hp/mon.maxhp : 1;
+      const st = statsFor(mon.sid, mon.lv, mon.rar);
+      const dope = mon.dope||1;
+      mon.maxhp = Math.max(1, Math.round(st.maxhp*dope));
+      mon.atk = Math.max(1, Math.round(st.atk*dope));
+      mon.hp = mon.hp<=0 ? 0 : Math.max(1, Math.round(mon.maxhp*ratio));
+    }
+    obj.v = 4;
+  }
   return obj;
 }
 function decodeSave(code){
   const obj = JSON.parse(decodeURIComponent(escape(atob(code.trim()))));
-  if(!obj || (obj.v!==2 && obj.v!==3) || !Array.isArray(obj.party)) throw new Error('bad');
+  if(!obj || (obj.v!==2 && obj.v!==3 && obj.v!==4) || !Array.isArray(obj.party)) throw new Error('bad');
   if(!obj.name) obj.name = '사원'+Math.floor(Math.random()*900+100);
   return migrateSave(obj);
 }
@@ -2431,7 +2600,8 @@ function openLoadDlg(){
       G = decodeSave(dlgText.value);
       closeDlg();
       pendingMsg.push('백업 코드에서 진행 상황을 복원했다!');
-      if(G.screen==='battle'||G.screen==='storyBeat') G.screen='hub';
+      if(!RESUME_SAFE_SCREENS.includes(G.screen)) G.screen='hub';
+      G.battle = null;
       render();
     } catch(e){
       document.getElementById('dlgdesc').textContent = '코드를 해석할 수 없습니다. 전체를 정확히 붙여넣었는지 확인하세요.';

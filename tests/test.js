@@ -263,6 +263,89 @@ T('게임오버 화면: 렌더 반복해도 포인트 중복 차감 없음', () 
   render(); const a = G.money; render(); const b = G.money;
   return a === 1000 && b === 1000;
 });
+
+/* ── v5.3: 핫픽스 / 밸런스 / 보안 ── */
+T('탐색 화면 세이브 복원 시 허브로 폴백 (영구 먹통 방지)', () => {
+  newGame(); G.party = [makeMon('espresso', 5)]; G.screen = 'explore';
+  const d = migrateSave(JSON.parse(JSON.stringify(G)));
+  resumeSave(d);
+  return G.screen === 'hub';
+});
+T('마이그레이션: dexRewards·dex·items·log 보충 + 닉네임 정제', () => {
+  const mig = migrateSave({ v: 3, party: [], name: '<b>해커..#$1234567890' });
+  return Array.isArray(mig.dexRewards) && !!mig.dex && !!mig.items && Array.isArray(mig.log)
+    && mig.name.length <= 12 && !mig.name.includes('<') && typeof mig.money === 'number';
+});
+T('마이그레이션 v4: 저장 개체를 새 HP 곡선으로 재계산', () => {
+  const mig = migrateSave({ v: 3, party: [{ sid: 'espresso', lv: 50, rar: 'normal', maxhp: 384, hp: 384, atk: 99, exp: 0 }], box: [] });
+  return mig.v === 4 && mig.party[0].maxhp === statsFor('espresso', 50).maxhp && mig.party[0].hp === mig.party[0].maxhp;
+});
+T('전투 중 저장은 전투 직전 스냅샷 (새로고침 무한 파밍 차단)', () => {
+  newGame(); G.party = [makeMon('espresso', 30)]; G.name = 'T'; G.money = 1000; G.screen = 'hub';
+  startWildBattle(makeMon('mixrat', 5));
+  G.money = 99999; /* 전투 중 보상 획득 가정 */
+  localSave();
+  const saved = JSON.parse(localStorage.getItem('cellquest_save'));
+  const ok = saved.money === 1000 && saved.battle === undefined;
+  G.battle = null; return ok;
+});
+T('차원 이동 2단 메뉴: 4부 해금 상태에서도 렌더 (잘림 방지)', () => {
+  newGame(); G.party = [makeMon('espresso', 99)]; G.isekai = true; G.story = 27; G.floor = 26;
+  moveDim = -1; G.screen = 'moveFloor'; render();
+  moveDim = 3; render();
+  moveDim = -1; return true;
+});
+T('전투 수학: 동레벨 TTK 1.2~8턴 (원턴킬 메타 방지)', () => {
+  const samples = [['mixrat',10],['ghost',20],['manaslime',30],['golemknight',40],['pegasusporter',50],
+    ['timewraith',60],['seraphmanager',75],['bigbangslime',90],['voidclerk',105],['archiveghoul',118],['omegaslime',130]];
+  return samples.every(([sid, lv]) => {
+    const st = statsFor(sid, lv);
+    const power = Math.max(...SPECIES[sid].moves.filter(mv => mv[0] <= lv).map(mv => mv[2]));
+    const ttk = st.maxhp / (st.atk * power / 40);
+    return ttk >= 1.2 && ttk <= 8;
+  });
+});
+T('경험치 공유: 선두 100% + 파티원 50%', () => {
+  newGame(); const a = makeMon('espresso', 30), b = makeMon('gyeoljae', 30);
+  G.party = [a, b]; G.active = 0; G.log = [];
+  grantExpAndMoney({ lv: 10, rar: 'normal' }, 1);
+  return a.exp === 130 && b.exp === 65;
+});
+T('돌연변이 천장: 3회 실패 누적 후 확정 발동', () => {
+  newGame(); G.mutFail = { kingslime: 3 };
+  const mon = makeMon('kingslime', 33); G.party = [mon]; G.log = [];
+  const orig = Math.random; Math.random = () => 0.99; /* 평소라면 12% 실패 */
+  gainExp(mon, expNeed(33) - mon.exp);
+  Math.random = orig;
+  return mon.sid === 'chaosslime' && G.mutFail.kingslime === 0;
+});
+T('재대결 보상 체감: 80% → 40% → … → 최저 10%', () => {
+  newGame();
+  const r0 = revengeRate(3); G.revN = { 3: 1 }; const r1 = revengeRate(3); G.revN = { 3: 10 }; const r2 = revengeRate(3);
+  G.revN = {};
+  return Math.abs(r0 - 0.8) < 1e-9 && Math.abs(r1 - 0.4) < 1e-9 && r2 === 0.1;
+});
+T('연수원 로직: 정확히 1레벨 상승', () => {
+  newGame(); const mon = makeMon('espresso', 20); G.party = [mon]; G.log = [];
+  gainExp(mon, expNeed(20) - mon.exp);
+  return mon.lv === 21;
+});
+T('연수원·위키 화면 렌더 (스모크)', () => {
+  newGame(); G.party = [makeMon('espresso', 20)]; G.money = 99999;
+  G.screen = 'academy'; render(); G.screen = 'wiki'; render(); return true;
+});
+T('보스 파티원은 전부 진화 요구 레벨 이상', () => {
+  const minLv = {};
+  for (const sid of ALL_SIDS) { const e = SPECIES[sid].evo; if (e) { minLv[e.to] = Math.max(minLv[e.to] || 1, e.lv); if (e.mut) minLv[e.mut.to] = Math.max(minLv[e.mut.to] || 1, e.lv); } }
+  return BOSSES.every(B => B.party.every(([sid, lv]) => lv >= (minLv[sid] || 1)));
+});
+T('normalizeEntry: 악성 랭킹 항목 정규화', () => {
+  const e = normalizeEntry({ name: '<b>해커해커해커해커', wins: '많이', story: 9999, pt: -5,
+    party: [{ s: 'espresso', l: '백', r: 'weird', t: { a: 1 }, d: '2.00' }, null, 'x'] });
+  return e.name.length <= 12 && e.wins === 0 && e.story === PROG_LABEL.length - 1 && e.pt === 0
+    && e.party.length === 1 && e.party[0].l === 0 && e.party[0].r === 'normal' && e.party[0].t === null && e.party[0].d === 1;
+});
+T('박카스: 최대 HP 비율 회복 (정의 갱신)', () => ITEM_DEF.bacchus.desc.includes('35%'));
 `;
 vm.runInContext(TESTS, ctx, { filename: 'tests' });
 
@@ -274,6 +357,8 @@ srcTest('야생 AI 똑똑함 확률 0.5/0.8 상향', /G\.floor>=6 \? 0\.8 : 0\.5
 srcTest('이종 합성에 등급 룰렛 적용', /rollFuseRarity\(baseRar\)/.test(html));
 srcTest('랭킹 항목에 프리즘·레전드·플레이타임 포함', /prism:rarCount\('prism'\), leg:rarCount\('legend'\)/.test(html) && /pt:totalPlayMs\(\)/.test(html));
 srcTest('랭킹 항목에 파티 스냅샷·선두 포함', /lead:G\.active/.test(html) && /party:G\.party\.map/.test(html));
+srcTest('예상 데미지에 상성 반영', /typeMult\(mv\[3\], monType\(e\)\)/.test(html));
+srcTest('랭킹 조회에 limitToLast 쿼리 사용', /orderBy=%22score%22&limitToLast/.test(html));
 
 console.log(`\n테스트 결과: ${pass} PASS / ${fail} FAIL`);
 process.exit(fail ? 1 : 0);
