@@ -179,9 +179,9 @@ T('회복 시설 이름 차원별 변화', () => {
 T('도감 보상 단계가 전체 종 수 이내', () => ALL_SIDS.length > 160);
 
 /* ── 전설 도감/랭킹 ── */
-T('전설 종족 22종, 전부 입수처 등록', () => {
+T('전설 종족 37종, 전부 입수처 등록', () => {
   const legends = ALL_SIDS.filter(s => SPECIES[s].legend);
-  return legends.length === 22 && legends.every(s => !!LEGEND_ROUTE[s]);
+  return legends.length === 37 && legends.every(s => !!LEGEND_ROUTE[s]);
 });
 T('legend species rarity multiplier is capped', () => {
   const normalLegendSpecies = statsFor('wontaebo4', 40, 'normal');
@@ -191,6 +191,21 @@ T('legend species rarity multiplier is capped', () => {
   return rareLegendSpecies.atk < Math.round(normalLegendSpecies.atk * RARITY.legend.mult)
     && rareLegendSpecies.atk === Math.round(normalLegendSpecies.atk * LEGEND_SPECIES_RAR_MULT_CAP)
     && rareNormalSpecies.atk === Math.round(normalSpecies.atk * RARITY.legend.mult);
+});
+
+/* ── v6.0 5·6부 (리부트/무한루프) 확장 ── */
+T('5·6부 신규 전설 앵커 15종 존재·legend 플래그', () =>
+  ['rbaCacheadminVoid','rbaRollbackchiefNull','rbaSnapchiefFrost','rbaSudoadminRoot','rbbResetwyrm','rbbFormatlord','rbbRootreset',
+   'lpaDeadlockus','lpaSegfaultor','lpaRacemaster','lpaSingularis','lpbTimeoutreaper','lpbDeadlocklordEternal','lpbPanickingArchon','lpbOmniloop']
+   .every(s => SPECIES[s] && SPECIES[s].legend === true));
+T('진엔딩 최종보스 옴니루프가 공허 의장 널보다 강하다', () =>
+  SPECIES.lpbOmniloop.hp > SPECIES.nullchairman.hp && SPECIES.lpbOmniloop.atk > SPECIES.nullchairman.atk);
+T('5·6부 합성 전용종 4종 존재(fusion 플래그)', () =>
+  ['rbaResetcerberus','rbbPurgewight','lpaSingularitymoth','lpbBusyspecter'].every(s => SPECIES[s] && SPECIES[s].fusion === true));
+T('5·6부 늦은 진화: lv150/175/200 진화 라인 존재', () => {
+  const lv = sid => SPECIES[sid] && SPECIES[sid].evo && SPECIES[sid].evo.lv;
+  return lv('rbbCronwraith') === 150 && lv('lpaNullpointer') === 175 &&
+    ALL_SIDS.some(s => SPECIES[s].evo && SPECIES[s].evo.lv === 200);
 });
 
 /* ── 패치 이벤트 2: 디톡스 + 의문의 머리카락 ── */
