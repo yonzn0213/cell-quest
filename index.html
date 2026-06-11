@@ -1111,7 +1111,10 @@ async function updateBoard(force){
   const entry = {
     name:G.name, wins:G.wins, dex:dexCaughtCount(),
     gold:rarCount('gold'), prism:rarCount('prism'), leg:rarCount('legend'),
-    pt:totalPlayMs(), story:G.isekai?G.story+1:G.story, ts:Date.now()
+    pt:totalPlayMs(), story:G.isekai?G.story+1:G.story, ts:Date.now(),
+    /* 파티 스냅샷: 랭킹 보드에서 클릭하면 다른 플레이어의 파티를 볼 수 있다 */
+    lead:G.active,
+    party:G.party.map(m=>({ s:m.sid, l:m.lv, r:m.rar||'normal', t:m.trait||null, d:+((m.dope||1).toFixed(2)) })),
   };
   try{
     if(hasCloud){
@@ -1147,15 +1150,18 @@ async function loadRank(){
   if(G.screen==='rank' && !bossMode) paintRank();
 }
 const PROG_LABEL = ['1장','2장','3장','4장','최종장','엔딩','진엔딩 ★','이세계 1장','이세계 2장','이세계 3장','이세계 4장','이세계 최종장','이세계 5장 ★★','이세계 6장','이세계 7장','이세계 진최종장','전차원 클리어 ★★★','신계 로비 돌파','신계 운명부 돌파','신계 윤회실 돌파','신계 정비창 돌파','신계 연구소 돌파','전우주 클리어 ★★★★★','공허 수속장 돌파','공허 평원 돌파','공허 도서관 돌파','공허 공장 돌파','공허 본청 돌파','무(無)차원 클리어 ★★★★★★'];
+let rankSel = -1;
 function paintRank(){
   clearGrid();
-  setCell(2,1,'― 사내 랭킹 보드 ―  (함께 플레이하는 전원에게 공개)','bold');
-  ['순위','이름','진행도','도감','황금','프리즘','레전드','승수','플레이'].forEach((h,i)=>setCell(4,1+i,h,'hdr'));
   const rows = rankCache||[];
+  /* 플레이어 상세 (파티 구성) */
+  if(rankSel>=0 && rows[rankSel]){ paintRankDetail(rows[rankSel], rankSel); return; }
+  setCell(2,1,'― 사내 랭킹 보드 ―  (이름 클릭 또는 숫자키 = 파티 구경)','bold');
+  ['순위','이름','진행도','도감','황금','프리즘','레전드','승수','플레이'].forEach((h,i)=>setCell(4,1+i,h,'hdr'));
   rows.slice(0,RANK_MAX_ROWS).forEach((p,i)=>{
     const r = 5+i;
     setCell(r,1,String(i+1),'num');
-    setCell(r,2,p.name, p.name===G.name?'bold':'');
+    setCell(r,2,p.name, p.name===G.name?'bold':'', ()=>{ rankSel=i; paintRank(); });
     setCell(r,3,PROG_LABEL[Math.min(p.story||0,PROG_LABEL.length-1)]);
     setCell(r,4,`${p.dex||0}/${ALL_SIDS.length}`,'num');
     /* 구버전 기록(gold = 희귀종 총수)은 황금 칸에 그대로 표시된다 */
@@ -1166,12 +1172,37 @@ function paintRank(){
     setCell(r,9,p.pt?fmtPlayTime(p.pt):'-','num');
   });
   if(rows.length===0) setCell(5,1, rankCache===null?'불러오는 중…':'아직 기록이 없다. 첫 번째 전설의 사원이 되자!','dim');
-  setCell(ROWS-1,1,'1. 돌아간다','choice',()=>{ G.screen = G.party.length?'hub':'title'; render(); });
-  if(G.party.length) setCell(ROWS-1,3,'2. 내 이름 변경','choice',openRenameDlg);
+  setCell(ROWS-1,1,'돌아간다','choice',()=>{ rankSel=-1; G.screen = G.party.length?'hub':'title'; render(); });
+  if(G.party.length) setCell(ROWS-1,3,'내 이름 변경','choice',openRenameDlg);
   setFx('=RANK(나, 사내랭킹)');
+}
+function paintRankDetail(p, idx){
+  setCell(2,1,`― ${p.name} 사원의 파티 ―  (랭킹 ${idx+1}위)`,'bold');
+  setCell(3,1,`${PROG_LABEL[Math.min(p.story||0,PROG_LABEL.length-1)]} · 도감 ${p.dex||0}/${ALL_SIDS.length} · 승수 ${p.wins||0}${p.pt?' · '+fmtPlayTime(p.pt):''}`,'dim');
+  if(Array.isArray(p.party) && p.party.length){
+    ['','파티 몬스터','LV','타입','특성/도핑'].forEach((h,i)=>setCell(5,1+i,h,'hdr'));
+    p.party.slice(0,6).forEach((m,i)=>{
+      const r = 6+i;
+      const sp = SPECIES[m.s]; /* 알 수 없는 종(버전 차이)은 이름만 표기 */
+      const rar = RARITY[m.r] ? m.r : 'normal';
+      const name = RARITY[rar].prefix + (sp ? sp.name : '?'+m.s+'?');
+      setCell(r,1, i===(p.lead||0) ? '▶ 선두' : '', 'bold');
+      setCell(r,2, name, RARITY[rar].cls);
+      setCell(r,3, String(m.l||'?'), 'num');
+      setCell(r,4, sp ? `[${sp.type}]` : '', 'dim');
+      const extra = [m.t?`특성 ${m.t}`:null, (m.d&&m.d!==1)?`도핑 ×${m.d.toFixed(2)}`:null].filter(Boolean).join(' · ');
+      setCell(r,5, extra, 'dim');
+    });
+  } else {
+    setCell(6,1,'파티 정보가 아직 기록되지 않았다.','dim');
+    setCell(7,1,'(이 플레이어가 새 버전으로 한 번 접속하면 파티가 공개된다)','dim');
+  }
+  setCell(ROWS-1,1,'1. 목록으로','choice',()=>{ rankSel=-1; paintRank(); });
+  setFx(`=VLOOKUP("${p.name}", 사내랭킹, 파티)`);
 }
 function scrRank(){
   rankCache = null;
+  rankSel = -1;
   paintRank();
   loadRank();
 }

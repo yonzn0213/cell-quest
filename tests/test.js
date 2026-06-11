@@ -225,7 +225,21 @@ T('랭킹 보드 렌더: 희귀도 3종·플레이타임 표시 (스모크)', ()
 });
 T('구버전 랭킹 기록도 렌더 가능 (gold만 있는 항목)', () => {
   rankCache = [{ name: 'old', wins: 1, dex: 5, gold: 4, story: 3 }];
-  paintRank(); rankCache = null; return true;
+  rankSel = -1; paintRank(); rankCache = null; return true;
+});
+T('랭킹 상세: 파티 스냅샷 렌더 (선두·등급·특성·도핑)', () => {
+  rankCache = [{ name: 'T', wins: 9, dex: 20, story: 10, pt: 120000, lead: 1,
+    party: [{ s: 'espresso', l: 12, r: 'gold', t: null, d: 1 }, { s: 'phoenix', l: 30, r: 'legend', t: '흡혈', d: 1.21 }] }];
+  rankSel = 0; paintRank(); rankSel = -1; rankCache = null; return true;
+});
+T('랭킹 상세: 알 수 없는 종족·파티 없는 구기록도 안전', () => {
+  rankCache = [
+    { name: 'A', story: 2, party: [{ s: 'not_a_species', l: 5, r: 'weird_rar' }], lead: 0 },
+    { name: 'B', story: 2 },
+  ];
+  rankSel = 0; paintRank();
+  rankSel = 1; paintRank();
+  rankSel = -1; rankCache = null; return true;
 });
 T('플레이타임 포맷', () => fmtPlayTime(3600000) === '1시간 0분' && fmtPlayTime(59000) === '0분');
 
@@ -259,6 +273,7 @@ function srcTest(name, ok) {
 srcTest('야생 AI 똑똑함 확률 0.5/0.8 상향', /G\.floor>=6 \? 0\.8 : 0\.5/.test(html));
 srcTest('이종 합성에 등급 룰렛 적용', /rollFuseRarity\(baseRar\)/.test(html));
 srcTest('랭킹 항목에 프리즘·레전드·플레이타임 포함', /prism:rarCount\('prism'\), leg:rarCount\('legend'\)/.test(html) && /pt:totalPlayMs\(\)/.test(html));
+srcTest('랭킹 항목에 파티 스냅샷·선두 포함', /lead:G\.active/.test(html) && /party:G\.party\.map/.test(html));
 
 console.log(`\n테스트 결과: ${pass} PASS / ${fail} FAIL`);
 process.exit(fail ? 1 : 0);
