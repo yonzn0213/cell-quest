@@ -23,6 +23,7 @@
         "gold":  { ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 500" },
         "prism": { ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 500" },
         "leg":   { ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 500" },
+        "money": { ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 999999999" },
         "pt":    { ".validate": "newData.isNumber() && newData.val() >= 0" },
         "story": { ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 60" },
         "ts":    { ".validate": "newData.isNumber()" },

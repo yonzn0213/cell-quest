@@ -183,6 +183,15 @@ T('전설 종족 22종, 전부 입수처 등록', () => {
   const legends = ALL_SIDS.filter(s => SPECIES[s].legend);
   return legends.length === 22 && legends.every(s => !!LEGEND_ROUTE[s]);
 });
+T('legend species rarity multiplier is capped', () => {
+  const normalLegendSpecies = statsFor('wontaebo4', 40, 'normal');
+  const rareLegendSpecies = statsFor('wontaebo4', 40, 'legend');
+  const normalSpecies = statsFor('espresso', 40, 'normal');
+  const rareNormalSpecies = statsFor('espresso', 40, 'legend');
+  return rareLegendSpecies.atk < Math.round(normalLegendSpecies.atk * RARITY.legend.mult)
+    && rareLegendSpecies.atk === Math.round(normalLegendSpecies.atk * LEGEND_SPECIES_RAR_MULT_CAP)
+    && rareNormalSpecies.atk === Math.round(normalSpecies.atk * RARITY.legend.mult);
+});
 
 /* ── 패치 이벤트 2: 디톡스 + 의문의 머리카락 ── */
 T('디톡스 앰플: 도핑 배율·횟수 초기화', () => {
@@ -220,7 +229,7 @@ T('패치 보상 2탄: 허브 진입 시 디톡스 1개 지급', () => {
 T('전설 도감 화면 렌더 (스모크)', () => { newGame(); G.party = [makeMon('espresso', 5)]; G.screen = 'ldex'; render(); return true; });
 T('랭킹 보드 렌더: 희귀도 3종·플레이타임 표시 (스모크)', () => {
   newGame(); G.party = [makeMon('espresso', 5)]; G.name = 'T';
-  rankCache = [{ name: 'T', wins: 3, dex: 10, gold: 1, prism: 2, leg: 3, pt: 3700000, story: 28 }];
+  rankCache = [{ name: 'T', wins: 3, dex: 10, gold: 1, prism: 2, leg: 3, money: 12345, pt: 3700000, story: 28 }];
   paintRank(); return true;
 });
 T('구버전 랭킹 기록도 렌더 가능 (gold만 있는 항목)', () => {
@@ -228,7 +237,7 @@ T('구버전 랭킹 기록도 렌더 가능 (gold만 있는 항목)', () => {
   rankSel = -1; paintRank(); rankCache = null; return true;
 });
 T('랭킹 상세: 파티 스냅샷 렌더 (선두·등급·특성·도핑)', () => {
-  rankCache = [{ name: 'T', wins: 9, dex: 20, story: 10, pt: 120000, lead: 1,
+  rankCache = [{ name: 'T', wins: 9, dex: 20, story: 10, money: 7777, pt: 120000, lead: 1,
     party: [{ s: 'espresso', l: 12, r: 'gold', t: null, d: 1 }, { s: 'phoenix', l: 30, r: 'legend', t: '흡혈', d: 1.21 }] }];
   rankSel = 0; paintRank(); rankSel = -1; rankCache = null; return true;
 });
@@ -321,6 +330,10 @@ T('경험치 공유: 선두 100% + 파티원 30% (동레벨, 페널티 없음)',
   grantExpAndMoney({ lv: 10, rar: 'normal' }, 1);  /* 적 lv10 = 내 lv10, 페널티 없음 */
   return a.exp === 130 && b.exp === 39;
 });
+T('seraphista keeps four moves after evolution', () => {
+  const mon = makeMon('seraphista', 31, 'prism');
+  return knownMoves(mon).length === 4;
+});
 T('돌연변이 천장: 3회 실패 누적 후 확정 발동', () => {
   newGame(); G.mutFail = { kingslime: 3 };
   const evoLv = SPECIES.kingslime.evo.lv;  /* 재배치로 바뀐 진화 레벨을 직접 참조 */
@@ -351,10 +364,19 @@ T('보스 파티원은 전부 진화 요구 레벨 이상', () => {
   return BOSSES.every(B => B.party.every(([sid, lv]) => lv >= (minLv[sid] || 1)));
 });
 T('normalizeEntry: 악성 랭킹 항목 정규화', () => {
-  const e = normalizeEntry({ name: '<b>해커해커해커해커', wins: '많이', story: 9999, pt: -5,
+  const e = normalizeEntry({ name: '<b>해커해커해커해커', wins: '많이', story: 9999, money: -1, pt: -5,
     party: [{ s: 'espresso', l: '백', r: 'weird', t: { a: 1 }, d: '2.00' }, null, 'x'] });
-  return e.name.length <= 12 && e.wins === 0 && e.story === PROG_LABEL.length - 1 && e.pt === 0
+  return e.name.length <= 12 && e.wins === 0 && e.story === PROG_LABEL.length - 1 && e.money === 0 && e.pt === 0
     && e.party.length === 1 && e.party[0].l === 0 && e.party[0].r === 'normal' && e.party[0].t === null && e.party[0].d === 1;
+});
+T('rankCompare: rarity, wins, money, shorter playtime order', () => {
+  const base = { name: 'A', story: 5, dex: 10, gold: 1, prism: 1, leg: 1, wins: 1, money: 1, pt: 1000, ts: 1 };
+  const betterLegend = { ...base, name: 'B', leg: 2 };
+  const betterWins = { ...base, name: 'C', wins: 2 };
+  const betterMoney = { ...base, name: 'D', money: 2 };
+  const faster = { ...base, name: 'E', pt: 500 };
+  return rankCompare(betterLegend, base) < 0 && rankCompare(betterWins, base) < 0
+    && rankCompare(betterMoney, base) < 0 && rankCompare(faster, base) < 0;
 });
 T('박카스: 최대 HP 비율 회복 (정의 갱신)', () => ITEM_DEF.bacchus.desc.includes('35%'));
 
@@ -513,8 +535,9 @@ function srcTest(name, ok) {
 }
 srcTest('야생 AI 똑똑함 확률 0.5/0.8 상향', /G\.floor>=6 \? 0\.8 : 0\.5/.test(html));
 srcTest('이종 합성에 등급 룰렛 적용', /rollFuseRarity\(baseRar\)/.test(html));
-srcTest('랭킹 항목에 프리즘·레전드·플레이타임 포함', /prism:rarCount\('prism'\), leg:rarCount\('legend'\)/.test(html) && /pt:totalPlayMs\(\)/.test(html));
+srcTest('랭킹 항목에 프리즘·레전드·복지P·플레이타임 포함', /prism:rarCount\('prism'\), leg:rarCount\('legend'\)/.test(html) && /money:G\.money/.test(html) && /pt:totalPlayMs\(\)/.test(html));
 srcTest('랭킹 항목에 파티 스냅샷·선두 포함', /lead:G\.active/.test(html) && /party:G\.party\.map/.test(html));
+srcTest('랭킹 정렬 기준 함수 사용', /function rankCompare/.test(html) && /rows\.sort\(rankCompare\)/.test(html));
 srcTest('예상 데미지에 상성 반영', /typeMult\(mv\[3\], monType\(e\)\)/.test(html));
 srcTest('랭킹 조회에 limitToLast 쿼리 사용', /orderBy=%22score%22&limitToLast/.test(html));
 

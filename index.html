@@ -866,9 +866,11 @@ function rollRarity(){
 /* HP에 완만한 등비 보정(HP_CURVE)을 곱한다 — 공격력은 사실상 등비로 크는데
    HP가 선형이면 lv66부터 원턴킬 게임이 되기 때문 (v5.3 밸런스) */
 const HP_CURVE = 0.025;
+const LEGEND_SPECIES_RAR_MULT_CAP = 1.25;
 function statsFor(sid, lv, rar){
   const s = SPECIES[sid];
-  const mult = RARITY[rar||'normal'].mult;
+  const baseMult = RARITY[rar||'normal'].mult;
+  const mult = s.legend ? Math.min(baseMult, LEGEND_SPECIES_RAR_MULT_CAP) : baseMult;
   return {
     maxhp: Math.round((s.hp + (lv-1)*6) * (1 + HP_CURVE*(lv-1)) * mult),
     atk: Math.round(s.atk * (1+0.08*(lv-1)) * mult),
@@ -887,8 +889,21 @@ function makeMon(sid, lv, rar){
 function monName(m){ return RARITY[m.rar||'normal'].prefix + SPECIES[m.sid].name; }
 function monCls(m){ return RARITY[m.rar||'normal'].cls; }
 function monType(m){ return SPECIES[m.sid].type; }
+function minEvoLevelFor(sid){
+  let min = Infinity;
+  for(const base of ALL_SIDS){
+    const evo = SPECIES[base].evo;
+    if(!evo) continue;
+    if(evo.to===sid || (evo.mut && evo.mut.to===sid)) min = Math.min(min, evo.lv);
+  }
+  return min === Infinity ? 0 : min;
+}
 function knownMoves(m){
-  return SPECIES[m.sid].moves.filter(mv=>mv[0]<=m.lv).slice(-4);
+  const moves = SPECIES[m.sid].moves;
+  const known = moves.filter(mv=>mv[0]<=m.lv).slice(-4);
+  const evoLv = minEvoLevelFor(m.sid);
+  if(evoLv && m.lv>=evoLv && known.length<Math.min(4, moves.length)) return moves.slice(-4);
+  return known;
 }
 /* 비선형 성장 곡선: 초반은 기존과 비슷, 중후반은 확연히 느리게 (v2.0 밸런싱) */
 function expNeed(lv){ return Math.round(lv*16 + lv*lv*1.5); }
@@ -1063,6 +1078,13 @@ function sanitizeName(raw){
 /* 같은 닉네임끼리 서로 기록을 덮어쓰지 않도록 저장 키에 붙이는 플레이어 식별자 */
 function makePid(){ return Math.random().toString(36).slice(2,8); }
 function boardKey(){ return G.name + '_' + (G.pid||'0'); }
+function rankScore(e){
+  return (e.story||0)*1e13 + (e.dex||0)*1e10 + (e.leg||0)*1e7 + (e.prism||0)*1e4 + (e.gold||0)*10 + Math.min(e.wins||0, 9999999)/1e6;
+}
+function rankCompare(a,b){
+  return (b.story-a.story) || (b.dex-a.dex) || (b.leg-a.leg) || (b.prism-a.prism) || (b.gold-a.gold) ||
+    (b.wins-a.wins) || (b.money-a.money) || (a.pt-b.pt) || (b.ts-a.ts) || a.name.localeCompare(b.name);
+}
 
 /* ════════════════ 클라우드 계정 코드 (UUID) — 코드 하나로 어느 기기·주소에서도 이어하기 ════════════════
    ID/PW 대신 추측 불가능한 UUID를 비밀 코드로 사용. RTDB saves/$code 에 저장하고,
@@ -1174,13 +1196,13 @@ async function updateBoard(force){
   const entry = {
     name:G.name, wins:G.wins, dex:dexCaughtCount(),
     gold:rarCount('gold'), prism:rarCount('prism'), leg:rarCount('legend'),
-    pt:totalPlayMs(), story:G.isekai?G.story+1:G.story, ts:Date.now(),
+    money:G.money, pt:totalPlayMs(), story:G.isekai?G.story+1:G.story, ts:Date.now(),
     /* 파티 스냅샷: 랭킹 보드에서 클릭하면 다른 플레이어의 파티를 볼 수 있다 */
     lead:G.active,
     party:G.party.map(m=>({ s:m.sid, l:m.lv, r:m.rar||'normal', t:m.trait||null, d:+((m.dope||1).toFixed(2)) })),
   };
   /* 서버 인덱스 정렬용 합성 점수 — limitToLast 쿼리로 상위 N명만 받기 위함 */
-  entry.score = entry.story*1e6 + entry.dex*1e3 + Math.min(entry.wins,999);
+  entry.score = rankScore(entry);
   try{
     if(hasCloud){
       await window.storage.set('lb:'+G.name, JSON.stringify(entry), true);
@@ -1200,7 +1222,8 @@ function normalizeEntry(raw){
     name: sanitizeName(raw.name) || '???',
     wins: num(raw.wins, 9999999), dex: num(raw.dex, ALL_SIDS.length),
     gold: num(raw.gold, 999), prism: num(raw.prism, 999), leg: num(raw.leg, 999),
-    pt: num(raw.pt, 365*24*3600*1000), story: num(raw.story, PROG_LABEL.length-1),
+    money: num(raw.money, 999999999), pt: num(raw.pt, 365*24*3600*1000), story: num(raw.story, PROG_LABEL.length-1),
+    ts: num(raw.ts, 9999999999999),
     lead: num(raw.lead, 5),
   };
   if(Array.isArray(raw.party)){
@@ -1234,7 +1257,7 @@ async function loadRank(){
       rows = Object.values(data||{});
     }
     rows = rows.map(normalizeEntry).filter(Boolean);
-    rows.sort((a,b)=>(b.story-a.story)||(b.dex-a.dex)||(b.wins-a.wins));
+    rows.sort(rankCompare);
     rankCache = rows.slice(0,RANK_MAX_ROWS);
   }catch(e){ rankCache = []; }
   if(G.screen==='rank' && !bossMode) paintRank();
@@ -1247,7 +1270,8 @@ function paintRank(){
   /* 플레이어 상세 (파티 구성) */
   if(rankSel>=0 && rows[rankSel]){ paintRankDetail(rows[rankSel], rankSel); return; }
   setCell(2,1,'― 사내 랭킹 보드 ―  (이름 클릭 또는 숫자키 = 파티 구경)','bold');
-  ['순위','이름','진행도','도감','황금','프리즘','레전드','승수','플레이'].forEach((h,i)=>setCell(4,1+i,h,'hdr'));
+  setCell(3,1,'기준: 진행도 > 도감 > 레전드 > 프리즘 > 황금 > 승수 > 복지P > 플레이 짧은 순','dim');
+  ['순위','이름','진행도','도감','황금','프리즘','레전드','승수','복지P','플레이'].forEach((h,i)=>setCell(4,1+i,h,'hdr'));
   rows.slice(0,RANK_MAX_ROWS).forEach((p,i)=>{
     const r = 5+i;
     setCell(r,1,String(i+1),'num');
@@ -1259,7 +1283,8 @@ function paintRank(){
     setCell(r,6,String(p.prism||0),'num');
     setCell(r,7,String(p.leg||0),'num');
     setCell(r,8,String(p.wins||0),'num');
-    setCell(r,9,p.pt?fmtPlayTime(p.pt):'-','num');
+    setCell(r,9,`${(p.money||0).toLocaleString()}P`,'num');
+    setCell(r,10,p.pt?fmtPlayTime(p.pt):'-','num');
   });
   if(rows.length===0) setCell(5,1, rankCache===null?'불러오는 중…':'아직 기록이 없다. 첫 번째 전설의 사원이 되자!','dim');
   setCell(ROWS-1,1,'돌아간다','choice',()=>{ rankSel=-1; G.screen = G.party.length?'hub':'title'; render(); });
@@ -1268,7 +1293,7 @@ function paintRank(){
 }
 function paintRankDetail(p, idx){
   setCell(2,1,`― ${p.name} 사원의 파티 ―  (랭킹 ${idx+1}위)`,'bold');
-  setCell(3,1,`${PROG_LABEL[Math.min(p.story||0,PROG_LABEL.length-1)]} · 도감 ${p.dex||0}/${ALL_SIDS.length} · 승수 ${p.wins||0}${p.pt?' · '+fmtPlayTime(p.pt):''}`,'dim');
+  setCell(3,1,`${PROG_LABEL[Math.min(p.story||0,PROG_LABEL.length-1)]} · 도감 ${p.dex||0}/${ALL_SIDS.length} · 승수 ${p.wins||0} · 복지P ${(p.money||0).toLocaleString()}${p.pt?' · '+fmtPlayTime(p.pt):''}`,'dim');
   if(Array.isArray(p.party) && p.party.length){
     ['','파티 몬스터','LV','타입','특성/도핑'].forEach((h,i)=>setCell(5,1+i,h,'hdr'));
     p.party.slice(0,6).forEach((m,i)=>{
