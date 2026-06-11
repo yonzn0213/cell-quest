@@ -267,8 +267,8 @@ T('아레나 화면 렌더 (보드 비었을 때 그림자 폴백)', () => {
 T('migrateSave: arenaWins 기본값 보충', () => {
   const o = {}; migrateSave(o); return o.arenaWins === 0;
 });
-T('v6.1 버전 — 패치노트 최신·위장 제목 자동 반영', () =>
-  PATCH_NOTES[0].ver === 'v6.1' && GAME_VERSION === 'v6.1');
+T('v6.2 버전 — 패치노트 최신·위장 제목 자동 반영', () =>
+  PATCH_NOTES[0].ver === 'v6.2' && GAME_VERSION === 'v6.2');
 
 /* ── v6.1 일일 도전 + 출석 스트릭 ── */
 function ymd(offsetDays) { const d = new Date(); d.setDate(d.getDate() + offsetDays); const p = n => String(n).padStart(2, '0'); return d.getFullYear() + '-' + p(d.getMonth() + 1) + '-' + p(d.getDate()); }
@@ -374,6 +374,12 @@ T('밸런스: 6부 무한루프 보스 mult ≥ 1.7, 옴니루프 최고(≥2.0)
   const six = BOSSES.slice(34);
   return six.length === 8 && six.every(B => B.mult >= 1.7) && BOSSES[41].mult >= 2.0
     && BOSSES[41].mult === Math.max.apply(null, six.map(B => B.mult));
+});
+T('밸런스: 5부 리부트 보스 mult 상향 (≥1.55, 4부<5부≤6부)', () => {
+  const five = BOSSES.slice(27, 34), four = BOSSES.slice(21, 27), six = BOSSES.slice(34);
+  return five.length === 7 && five.every(B => B.mult >= 1.55) && BOSSES[33].mult >= 1.7
+    && Math.max.apply(null, four.map(B => B.mult)) < Math.min.apply(null, five.map(B => B.mult))
+    && Math.max.apply(null, five.map(B => B.mult)) <= Math.min.apply(null, six.map(B => B.mult)) + 1e-9;
 });
 
 /* ── 패치 이벤트 2: 디톡스 + 의문의 머리카락 ── */
@@ -812,7 +818,7 @@ T('패치노트 데이터: 비어있지 않고 각 항목 형식 유효', () =>
   Array.isArray(PATCH_NOTES) && PATCH_NOTES.length >= 1
   && PATCH_NOTES.every(p => typeof p.ver === 'string' && typeof p.title === 'string'
     && Array.isArray(p.items) && p.items.length >= 1));
-T('패치노트 최신 항목은 v6.1', () => /6\.1/.test(PATCH_NOTES[0].ver));
+T('패치노트 최신 항목은 v6.2', () => /6\.2/.test(PATCH_NOTES[0].ver));
 T('패치노트 화면 렌더 (스모크)', () => { newGame(); patchPage = 0; G.screen = 'patchnotes'; render(); return true; });
 T('GAME_VERSION은 최신 패치 버전과 일치', () => GAME_VERSION === PATCH_NOTES[0].ver);
 T('위장 엑셀 제목에 최신 버전 주입', () => {
