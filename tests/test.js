@@ -269,8 +269,8 @@ T('아레나 화면 렌더 (보드 비었을 때 그림자 폴백)', () => {
 T('migrateSave: arenaWins 기본값 보충', () => {
   const o = {}; migrateSave(o); return o.arenaWins === 0;
 });
-T('v6.8 버전 — 패치노트 최신·위장 제목 자동 반영', () =>
-  PATCH_NOTES[0].ver === 'v6.8' && GAME_VERSION === 'v6.8');
+T('v6.9 버전 — 패치노트 최신·위장 제목 자동 반영', () =>
+  PATCH_NOTES[0].ver === 'v6.9' && GAME_VERSION === 'v6.9');
 
 /* ── v6.1 일일 도전 + 출석 스트릭 ── */
 function ymd(offsetDays) { const d = new Date(); d.setDate(d.getDate() + offsetDays); const p = n => String(n).padStart(2, '0'); return d.getFullYear() + '-' + p(d.getMonth() + 1) + '-' + p(d.getDate()); }
@@ -452,6 +452,13 @@ T('보관함: 일반 등급 일괄 방생 — 잠금·고등급 보호', () => {
   const targets = G.box.filter(m => (m.rar || 'normal') === 'normal' && !m.locked);
   G.box = G.box.filter(m => !((m.rar || 'normal') === 'normal' && !m.locked));
   return targets.length === 1 && G.box.length === 2 && G.box.some(m => m.rar === 'gold') && G.box.some(m => m.locked);
+});
+T('보관함: 골드·프리즘 일괄 방생 (잠금·레전드 보호)', () => {
+  newGame(); G.box = [makeMon('latte', 27, 'gold'), makeMon('latte', 27, 'gold'), makeMon('wifi', 20, 'prism'), makeMon('dragon', 20, 'legend'), makeMon('espresso', 5, 'normal')];
+  G.box[1].locked = true;
+  const rel = rars => { const tg = G.box.filter(m => rars.indexOf(m.rar || 'normal') >= 0 && !m.locked); G.box = G.box.filter(m => !(rars.indexOf(m.rar || 'normal') >= 0 && !m.locked)); return tg.length; };
+  const g = rel(['gold']), p = rel(['prism']);
+  return g === 1 && p === 1 && G.box.length === 3 && G.box.some(m => m.rar === 'legend') && G.box.some(m => m.rar === 'normal') && G.box.some(m => m.locked);
 });
 T('보관함: 잠금 개체는 동종 합성 후보에서 제외', () => {
   newGame(); G.party = [makeMon('espresso', 5)]; G.box = [makeMon('latte', 27, 'gold'), makeMon('latte', 27, 'gold')];
@@ -952,7 +959,7 @@ T('패치노트 데이터: 비어있지 않고 각 항목 형식 유효', () =>
   Array.isArray(PATCH_NOTES) && PATCH_NOTES.length >= 1
   && PATCH_NOTES.every(p => typeof p.ver === 'string' && typeof p.title === 'string'
     && Array.isArray(p.items) && p.items.length >= 1));
-T('패치노트 최신 항목은 v6.8', () => /6\.8/.test(PATCH_NOTES[0].ver));
+T('패치노트 최신 항목은 v6.9', () => /6\.9/.test(PATCH_NOTES[0].ver));
 T('패치노트 화면 렌더 (스모크)', () => { newGame(); patchPage = 0; G.screen = 'patchnotes'; render(); return true; });
 T('GAME_VERSION은 최신 패치 버전과 일치', () => GAME_VERSION === PATCH_NOTES[0].ver);
 T('위장 엑셀 제목에 최신 버전 주입', () => {

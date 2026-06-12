@@ -2661,13 +2661,21 @@ function scrBox(){
   }
   /* 일반 등급 일괄 방생 (잠금·고등급 보호) */
   if(boxMode==='bulkrelease'){
-    const targets = G.box.filter(m=>(m.rar||'normal')==='normal' && !m.locked);
-    lines.push([`일반 등급 ${targets.length}마리를 한 번에 풀어줄까?`,'hl'],'');
-    lines.push(['🔒 잠금된 개체·황금 이상 등급은 보호됩니다. 풀어준 몬스터는 돌아오지 않습니다!','dim']);
-    paint(lines, [
-      targets.length>0 ? [`${targets.length}마리 일괄 방생`, ()=>{ G.box = G.box.filter(m=>!((m.rar||'normal')==='normal' && !m.locked)); boxMsg=`일반 등급 ${targets.length}마리를 자연으로 돌려보냈다.`; boxMode='view'; localSave(); render(); }] : ['(방생할 일반 등급이 없다)', ()=>{ boxMode='view'; render(); }],
-      ['그만둔다', ()=>{ boxMode='view'; render(); }],
-    ]); return;
+    lines.push(['일괄 방생 — 등급 선택','hl'],'');
+    lines.push(['🔒 잠금·레전드/신화 등급은 항상 보호됩니다. 풀어준 몬스터는 돌아오지 않습니다!','dim'],'');
+    const choices = [];
+    const rel=(rars,label)=>{
+      const tg=G.box.filter(m=>rars.indexOf(m.rar||'normal')>=0 && !m.locked);
+      if(tg.length>0) choices.push([`${label} 방생 (${tg.length}마리)`, ()=>{
+        G.box = G.box.filter(m=>!(rars.indexOf(m.rar||'normal')>=0 && !m.locked));
+        boxMsg = `${label} ${tg.length}마리를 자연으로 돌려보냈다.`; boxMode='view'; localSave(); render();
+      }]);
+    };
+    rel(['normal'],'일반만'); rel(['gold'],'골드만'); rel(['prism'],'프리즘만');
+    rel(['normal','gold','prism'],'일반+골드+프리즘 전부');
+    if(choices.length===0) lines.push('방생할 일반·골드·프리즘 등급이 없다.');
+    choices.push(['그만둔다', ()=>{ boxMode='view'; render(); }]);
+    paint(lines, choices); return;
   }
   /* 보관함 개체 ↔ 파티원 직접 교체 */
   if(boxMode==='swap' && boxSelMon){
@@ -2721,8 +2729,8 @@ function scrBox(){
   choices.push([`↕ 정렬: ${BOX_SORT_LABEL[boxSort]} → ${BOX_SORT_LABEL[nextSort]}`, ()=>{ boxSort=nextSort; boxPage=0; render(); }]);
   const nextFilter = BOX_FILTERS[(BOX_FILTERS.indexOf(boxFilter)+1)%BOX_FILTERS.length];
   choices.push([`🔎 필터: ${boxFilterLabel(boxFilter)} → ${boxFilterLabel(nextFilter)}`, ()=>{ boxFilter=nextFilter; boxPage=0; render(); }]);
-  const normN = G.box.filter(m=>(m.rar||'normal')==='normal' && !m.locked).length;
-  if(normN>0) choices.push([`🗑 일반 등급 일괄 방생 (${normN}마리)`, ()=>{ boxMode='bulkrelease'; render(); }]);
+  const bulkN = G.box.filter(m=>['normal','gold','prism'].indexOf(m.rar||'normal')>=0 && !m.locked).length;
+  if(bulkN>0) choices.push([`🗑 일괄 방생 (등급 선택 · 최대 ${bulkN}마리)`, ()=>{ boxMode='bulkrelease'; render(); }]);
   choices.push(['돌아간다', ()=>{ boxSelMon=null; boxPage=0; G.screen='party'; render(); }]);
   paint(lines, choices);
 }
@@ -2930,6 +2938,9 @@ function scrGacha(){
 /* ── 인게임 패치노트: 배포 사이트에서도 최근 업데이트를 볼 수 있게.
    전체 이력은 저장소의 CHANGELOG.md, 여기엔 핵심만 요약해 최신순으로 둔다. ── */
 const PATCH_NOTES = [
+  { ver:'v6.9', title:'일괄 방생 등급 선택 (일반·골드·프리즘)', items:[
+    '🗑 일괄 방생에서 등급 선택 — 일반만/골드만/프리즘만/일반+골드+프리즘 전부 (잠금·레전드/신화 보호)',
+  ]},
   { ver:'v6.8', title:'보관함/파티 편의 — 검색·정렬·잠금·일괄 방생', items:[
     '🔎 보관함 검색(타입·잠금 필터) + 정렬(최신순·레벨순·등급순)',
     '🔁 보관함에서 파티원과 바로 교체 — 빼서 다시 넣을 필요 없이',
