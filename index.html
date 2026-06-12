@@ -2912,7 +2912,7 @@ function drawGachaOnce(pools){
 let gachaMsg = '';
 function scrGacha(){
   const lines = [['― 사내 경품 응모 (뽑기) ―','bold'],'',
-    [`1회 ${GACHA_COST.toLocaleString()}P · 10연속 ${(GACHA_COST*10).toLocaleString()}P`,'hl'],
+    [`1회 ${GACHA_COST.toLocaleString()}P · 10연속 ${(GACHA_COST*10).toLocaleString()}P · 100연속 ${(GACHA_COST*100).toLocaleString()}P`,'hl'],
     '경품: 클립류(지금까지 해금한 차원의 클립만) · 박카스 · 그리고…',
     ['초저확률: 레전드 몬스터 1.2% / 특별종 0.25% / 레전드 특별종 0.05% / ✨신화 0.02%✨ (전부 LV1)','dim'],
     ['(특별종 = 합성·돌연변이로만 얻는 종 · 신화 = 뽑기로만 강림하는 최상위 종)','dim'],''];
@@ -2929,13 +2929,18 @@ function scrGacha(){
     else {
       const misses = results.filter(s=>s.startsWith('꽝')).length;
       const hits = results.filter(s=>!s.startsWith('꽝'));
-      gachaMsg = [`[10연속 결과] 꽝 ${misses}회`, ...hits].join('\n');
+      /* 동일 경품은 묶어서 카운트 — 100연속에서도 결과 줄이 넘치지 않게 */
+      const counts = {};
+      hits.forEach(s=>{ counts[s] = (counts[s]||0) + 1; });
+      const summary = Object.entries(counts).map(([s,c])=>c>1?`${s} (×${c})`:s);
+      gachaMsg = [`[${n}연속 결과] 꽝 ${misses}회`, ...summary].join('\n');
     }
     render();
   };
   const choices = [
     [`응모한다 (1회 · ${GACHA_COST.toLocaleString()}P)`, doDraw(1)],
     [`10연속 응모 (${(GACHA_COST*10).toLocaleString()}P)`, doDraw(10)],
+    [`100연속 응모 (${(GACHA_COST*100).toLocaleString()}P)`, doDraw(100)],
     ['돌아간다', ()=>{ G.screen='hub'; render(); }],
   ];
   paint(lines, choices, '=RAND() · 사내복권');
