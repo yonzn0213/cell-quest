@@ -269,8 +269,8 @@ T('아레나 화면 렌더 (보드 비었을 때 그림자 폴백)', () => {
 T('migrateSave: arenaWins 기본값 보충', () => {
   const o = {}; migrateSave(o); return o.arenaWins === 0;
 });
-T('v6.7 버전 — 패치노트 최신·위장 제목 자동 반영', () =>
-  PATCH_NOTES[0].ver === 'v6.7' && GAME_VERSION === 'v6.7');
+T('v6.8 버전 — 패치노트 최신·위장 제목 자동 반영', () =>
+  PATCH_NOTES[0].ver === 'v6.8' && GAME_VERSION === 'v6.8');
 
 /* ── v6.1 일일 도전 + 출석 스트릭 ── */
 function ymd(offsetDays) { const d = new Date(); d.setDate(d.getDate() + offsetDays); const p = n => String(n).padStart(2, '0'); return d.getFullYear() + '-' + p(d.getMonth() + 1) + '-' + p(d.getDate()); }
@@ -433,6 +433,42 @@ T('이스터에그: K30 5번 클릭 → 50만P, 반복 가능', () => {
   const after5 = G.money;
   for (let i = 0; i < 5; i++) eggK30();
   return before === 0 && after5 === 500000 && G.money === 1000000;
+});
+
+/* ── v6.8 보관함/파티 QoL ── */
+T('보관함: boxView 최신순(역순)·타입/잠금 필터', () => {
+  newGame(); G.box = [makeMon('espresso', 5), makeMon('wifi', 5), makeMon('gyeoljae', 5)];
+  G.box[2].locked = true;
+  boxSort = 'recent'; boxFilter = 'all';
+  const v = boxView(); const recentOK = v[0] === G.box[2] && v[2] === G.box[0];
+  boxFilter = '전자'; const t = boxView();
+  boxFilter = 'locked'; const l = boxView();
+  boxSort = 'recent'; boxFilter = 'all';
+  return recentOK && t.length === 1 && t[0].sid === 'wifi' && l.length === 1 && l[0] === G.box[2];
+});
+T('보관함: 일반 등급 일괄 방생 — 잠금·고등급 보호', () => {
+  newGame(); G.box = [makeMon('espresso', 5, 'normal'), makeMon('wifi', 5, 'gold'), makeMon('gyeoljae', 5, 'normal')];
+  G.box[2].locked = true;
+  const targets = G.box.filter(m => (m.rar || 'normal') === 'normal' && !m.locked);
+  G.box = G.box.filter(m => !((m.rar || 'normal') === 'normal' && !m.locked));
+  return targets.length === 1 && G.box.length === 2 && G.box.some(m => m.rar === 'gold') && G.box.some(m => m.locked);
+});
+T('보관함: 잠금 개체는 동종 합성 후보에서 제외', () => {
+  newGame(); G.party = [makeMon('espresso', 5)]; G.box = [makeMon('latte', 27, 'gold'), makeMon('latte', 27, 'gold')];
+  G.box[0].locked = true;
+  const groups = {}; for (const m of [...G.party, ...G.box]) { if (m.locked) continue; const rar = m.rar || 'normal'; if (rar === 'legend' || rar === 'mythic') continue; const k = m.sid + '|' + rar; (groups[k] = groups[k] || []).push(m); }
+  return (groups['latte|gold'] || []).length === 1;
+});
+T('보관함 화면 렌더 — 정렬/필터/잠금/일괄/교체 모드 크래시 없음', () => {
+  newGame(); G.party = [makeMon('espresso', 5), makeMon('wifi', 5), makeMon('gyeoljae', 5), makeMon('latte', 27)];
+  G.box = [makeMon('mixrat', 5, 'normal'), makeMon('americano', 12, 'gold')];
+  G.screen = 'box';
+  boxMode = 'bulkrelease'; boxSelMon = null; render();
+  boxSelMon = G.box[0]; boxMode = 'view'; render();
+  boxMode = 'swap'; render();
+  boxMode = 'release'; render();
+  boxMode = 'view'; boxSelMon = null; boxFilter = 'all'; boxSort = 'recent'; render();
+  return true;
 });
 T('밸런스: 5부 리부트 보스 mult 상향 (≥1.55, 4부<5부≤6부)', () => {
   const five = BOSSES.slice(27, 34), four = BOSSES.slice(21, 27), six = BOSSES.slice(34);
@@ -916,7 +952,7 @@ T('패치노트 데이터: 비어있지 않고 각 항목 형식 유효', () =>
   Array.isArray(PATCH_NOTES) && PATCH_NOTES.length >= 1
   && PATCH_NOTES.every(p => typeof p.ver === 'string' && typeof p.title === 'string'
     && Array.isArray(p.items) && p.items.length >= 1));
-T('패치노트 최신 항목은 v6.7', () => /6\.7/.test(PATCH_NOTES[0].ver));
+T('패치노트 최신 항목은 v6.8', () => /6\.8/.test(PATCH_NOTES[0].ver));
 T('패치노트 화면 렌더 (스모크)', () => { newGame(); patchPage = 0; G.screen = 'patchnotes'; render(); return true; });
 T('GAME_VERSION은 최신 패치 버전과 일치', () => GAME_VERSION === PATCH_NOTES[0].ver);
 T('위장 엑셀 제목에 최신 버전 주입', () => {

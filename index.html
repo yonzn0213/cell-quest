@@ -2604,7 +2604,7 @@ function scrParty(){
   G.party.forEach((m,i)=>{
     const evo = SPECIES[m.sid].evo;
     const evoTag = evo ? `  · 진화 LV${evo.lv}${evo.mut?' (돌연변이 가능)':''}` : '';
-    lines.push([`${i===G.active?'▶':' '} ${monName(m)}  LV${m.lv} [${monType(m)}]  HP ${m.hp}/${m.maxhp}  공격 ${m.atk}${evoTag}`, monCls(m)]);
+    lines.push([`${i===G.active?'▶':' '} ${m.locked?'🔒':''}${monName(m)}  LV${m.lv} [${monType(m)}]  HP ${m.hp}/${m.maxhp}  공격 ${m.atk}${evoTag}`, monCls(m)]);
     lines.push([`    EXP ${expBar(m,16)} ${expPct(m)}%  (다음 레벨까지 ${(expNeed(m.lv)-m.exp).toLocaleString()})`,'dim']);
     lines.push(['    기술: '+knownMoves(m).map(mv=>mv[1]).join(', ')+(m.trait?`  ·  특성: ${m.trait}(${TRAITS[m.trait]})`:''),'dim']);
   });
@@ -2612,6 +2612,7 @@ function scrParty(){
   G.party.forEach((m,i)=>{
     if(i!==G.active && m.hp>0) choices.push([`${monName(m)}을(를) 선두로`, ()=>{ G.active=i; render(); }]);
   });
+  G.party.forEach((m)=>{ choices.push([(m.locked?'🔓 잠금해제: ':'🔒 잠금: ')+monName(m)+(m.locked?'':' (도핑·방생 방지)'), ()=>{ m.locked=!m.locked; localSave(); render(); }]); });
   if(G.items.hair>0){
     lines.push('',[`💇 의문의 머리카락 ×${G.items.hair} ${G.items.hair>=HAIR_REQUIRED?'— 모발이식 원태보에게 무언가 일어날 것 같다!':`(${HAIR_REQUIRED}개 모으면…?)`}`,'dim']);
   }
@@ -2624,83 +2625,105 @@ function scrParty(){
   }
   choices.push([`도핑 실험 (수상한 앰플 ×${G.items.ample||0})`, ()=>{ G.screen='dope'; render(); }]);
   if(G.party.length>1){
-    choices.push(['몬스터를 보관함으로 보낸다', ()=>{ boxMode='deposit'; boxSel=-1; G.screen='box'; render(); }]);
+    choices.push(['몬스터를 보관함으로 보낸다', ()=>{ boxMode='deposit'; boxSelMon=null; G.screen='box'; render(); }]);
   }
-  choices.push([`보관함 열기 (${G.box.length}마리)`, ()=>{ boxMode='view'; boxSel=-1; boxPage=0; G.screen='box'; render(); }]);
+  choices.push([`보관함 열기 (${G.box.length}마리)`, ()=>{ boxMode='view'; boxSelMon=null; boxPage=0; G.screen='box'; render(); }]);
   choices.push(['돌아간다', ()=>{ G.screen='hub'; render(); }]);
   paint(lines, choices);
 }
 
 let boxMode = 'view';
-const BOX_PAGE_SIZE = 7; /* 숫자키(1~9)로 전부 선택 가능하도록 7마리 + 페이지/돌아가기 */
-let boxPage = 0, boxSel = -1, boxMsg = '';
+const BOX_PAGE_SIZE = 7; /* 숫자키(1~9)로 전부 선택 가능하도록 7마리 + 페이지/제어 */
+let boxPage = 0, boxSelMon = null, boxMsg = '';
+let boxSort = 'recent', boxFilter = 'all';
+const BOX_SORTS = ['recent','level','rarity'], BOX_SORT_LABEL = { recent:'최신순', level:'레벨순', rarity:'등급순' };
+const BOX_FILTERS = ['all','카페인','서류','전자','야근','locked'];
+function boxFilterLabel(f){ return f==='all'?'전체':f==='locked'?'🔒잠금':f; }
+function boxView(){
+  let v = G.box.slice();
+  if(boxFilter==='locked') v = v.filter(m=>m.locked);
+  else if(boxFilter!=='all') v = v.filter(m=>monType(m)===boxFilter);
+  if(boxSort==='recent') v.reverse();                                  /* 보관함은 포획 순서 → 뒤집으면 최신순 */
+  else if(boxSort==='level') v.sort((a,b)=>b.lv-a.lv);
+  else if(boxSort==='rarity') v.sort((a,b)=>(RARITY[b.rar||'normal'].rank-RARITY[a.rar||'normal'].rank)||(b.lv-a.lv));
+  return v;
+}
+function boxLine(m){ const mk=rarMark(m.rar); return `${m.locked?'🔒':''}${mk?mk+' ':''}${monName(m)} LV${m.lv} [${monType(m)}]${dexCategory(m.sid)} HP ${m.hp}/${m.maxhp}${m.trait?' · '+m.trait:''}`; }
 function scrBox(){
   const lines = [['― 보관함 (사물함) ―','bold'],''];
+  /* 파티 → 보관함 보내기 */
   if(boxMode==='deposit'){
     lines.push('누구를 보관함에 넣을까? (선두 제외)');
     const choices = [];
-    G.party.forEach((m,i)=>{
-      if(i!==G.active) choices.push([`${monName(m)} LV${m.lv} 보관`, ()=>{
-        G.box.push(m);
-        G.party.splice(i,1);
-        if(G.active>i) G.active--;
-        boxMode='view'; render();
-      }]);
-    });
+    G.party.forEach((m,i)=>{ if(i!==G.active) choices.push([`${monName(m)} LV${m.lv} 보관`, ()=>{ G.box.push(m); G.party.splice(i,1); if(G.active>i) G.active--; boxMode='view'; render(); }]); });
     choices.push(['취소', ()=>{ G.screen='party'; render(); }]);
-    paint(lines, choices);
-    return;
+    paint(lines, choices); return;
   }
-  const selMon = boxSel>=0 ? G.box[boxSel] : null;
+  /* 일반 등급 일괄 방생 (잠금·고등급 보호) */
+  if(boxMode==='bulkrelease'){
+    const targets = G.box.filter(m=>(m.rar||'normal')==='normal' && !m.locked);
+    lines.push([`일반 등급 ${targets.length}마리를 한 번에 풀어줄까?`,'hl'],'');
+    lines.push(['🔒 잠금된 개체·황금 이상 등급은 보호됩니다. 풀어준 몬스터는 돌아오지 않습니다!','dim']);
+    paint(lines, [
+      targets.length>0 ? [`${targets.length}마리 일괄 방생`, ()=>{ G.box = G.box.filter(m=>!((m.rar||'normal')==='normal' && !m.locked)); boxMsg=`일반 등급 ${targets.length}마리를 자연으로 돌려보냈다.`; boxMode='view'; localSave(); render(); }] : ['(방생할 일반 등급이 없다)', ()=>{ boxMode='view'; render(); }],
+      ['그만둔다', ()=>{ boxMode='view'; render(); }],
+    ]); return;
+  }
+  /* 보관함 개체 ↔ 파티원 직접 교체 */
+  if(boxMode==='swap' && boxSelMon){
+    lines.push([`${monName(boxSelMon)}와(과) 교체할 파티원을 선택`,'hl'],'');
+    const choices = [];
+    G.party.forEach((m,i)=>{ choices.push([`${i===G.active?'▶ ':''}${monName(m)} LV${m.lv} ↔ 교체`, ()=>{
+      const bi = G.box.indexOf(boxSelMon); if(bi<0){ boxMode='view'; boxSelMon=null; render(); return; }
+      G.box[bi] = m; G.party[i] = boxSelMon;
+      boxMsg = `${monName(m)} ↔ ${monName(boxSelMon)} 교체 완료.`; boxSelMon=null; boxMode='view'; localSave(); render();
+    }]); });
+    choices.push(['취소', ()=>{ boxMode='view'; render(); }]);
+    paint(lines, choices); return;
+  }
+  const selMon = boxSelMon;
   /* 방생 확인 */
   if(selMon && boxMode==='release'){
     lines.push([`정말 ${monName(selMon)} (LV${selMon.lv})을(를) 풀어줄까?`,'hl'],'');
     lines.push(['풀어준 몬스터는 다시 돌아오지 않는다!','dim']);
     paint(lines,[
-      ['풀어준다', ()=>{
-        boxMsg = `${monName(selMon)}이(가) 자유를 찾아 떠났다…`;
-        G.box.splice(boxSel,1);
-        boxSel=-1; boxMode='view'; render();
-      }],
+      ['풀어준다', ()=>{ const bi=G.box.indexOf(selMon); if(bi>=0) G.box.splice(bi,1); boxMsg=`${monName(selMon)}이(가) 자유를 찾아 떠났다…`; boxSelMon=null; boxMode='view'; localSave(); render(); }],
       ['그만둔다', ()=>{ boxMode='view'; render(); }],
-    ]);
-    return;
+    ]); return;
   }
   /* 상세 보기 */
   if(selMon){
-    lines.push([`${monName(selMon)}  LV${selMon.lv} [${monType(selMon)}]`, monCls(selMon)]);
+    lines.push([`${selMon.locked?'🔒 ':''}${monName(selMon)}  LV${selMon.lv} [${monType(selMon)}]`, monCls(selMon)]);
     lines.push(`HP ${selMon.hp}/${selMon.maxhp} · 공격 ${selMon.atk} · EXP ${selMon.exp}/${expNeed(selMon.lv)}`);
     lines.push(['기술: '+knownMoves(selMon).map(mv=>mv[1]).join(', '),'dim']);
     if(selMon.trait) lines.push([`특성: ${selMon.trait} — ${TRAITS[selMon.trait]}`,'dim']);
     const choices = [];
-    if(G.party.length<4) choices.push(['파티로 꺼낸다', ()=>{
-      G.party.push(selMon); G.box.splice(boxSel,1); boxSel=-1; render();
-    }]);
-    else lines.push('',['파티가 가득 차서 꺼낼 수 없다. (최대 4마리)','dim']);
-    choices.push(['풀어준다 (방생)', ()=>{ boxMode='release'; render(); }]);
-    choices.push(['목록으로', ()=>{ boxSel=-1; render(); }]);
-    paint(lines, choices);
-    return;
+    if(G.party.length<4) choices.push(['파티로 꺼낸다', ()=>{ const bi=G.box.indexOf(selMon); if(bi>=0){ G.party.push(selMon); G.box.splice(bi,1); } boxSelMon=null; localSave(); render(); }]);
+    else choices.push(['파티원과 교체 (바로)', ()=>{ boxMode='swap'; render(); }]);
+    choices.push([selMon.locked?'🔓 잠금 해제':'🔒 잠금 (방생·도핑·합성 방지)', ()=>{ selMon.locked=!selMon.locked; localSave(); render(); }]);
+    if(!selMon.locked) choices.push(['풀어준다 (방생)', ()=>{ boxMode='release'; render(); }]);
+    else lines.push('',['🔒 잠금됨 — 방생하려면 먼저 잠금 해제','dim']);
+    choices.push(['목록으로', ()=>{ boxSelMon=null; render(); }]);
+    paint(lines, choices); return;
   }
-  /* 목록 (페이지) */
+  /* 목록 (검색/정렬/페이지) */
   if(boxMsg){ lines.push([boxMsg,'hl'],''); boxMsg=''; }
-  const totalPages = Math.max(1, Math.ceil(G.box.length/BOX_PAGE_SIZE));
-  if(boxPage>=totalPages) boxPage = totalPages-1;
-  if(G.box.length===0) lines.push('보관함이 비어 있다.');
-  else {
-    lines.push([`보관 중 ${G.box.length}마리 · ${boxPage+1}/${totalPages} 페이지`,'dim']);
-    lines.push('몬스터를 선택하면 꺼내기 / 풀어주기를 할 수 있다.');
-  }
+  const view = boxView();
+  const totalPages = Math.max(1, Math.ceil(view.length/BOX_PAGE_SIZE));
+  if(boxPage>=totalPages) boxPage = totalPages-1; if(boxPage<0) boxPage=0;
+  lines.push([`보관 ${G.box.length}마리 · 보기 ${view.length} · 정렬 ${BOX_SORT_LABEL[boxSort]} · 필터 ${boxFilterLabel(boxFilter)} · ${boxPage+1}/${totalPages}p`,'dim']);
+  if(view.length===0) lines.push('조건에 맞는 몬스터가 없다.');
   const choices = [];
   const start = boxPage*BOX_PAGE_SIZE;
-  G.box.slice(start, start+BOX_PAGE_SIZE).forEach((m,i)=>{
-    const mk = rarMark(m.rar);
-    choices.push([`${mk?mk+' ':''}${monName(m)} LV${m.lv} [${monType(m)}]${dexCategory(m.sid)} HP ${m.hp}/${m.maxhp}${m.trait?' · '+m.trait:''}`,
-      ()=>{ boxSel = start+i; render(); }]);
-  });
-  if(totalPages>1) choices.push([`다음 페이지 ▶ (${(boxPage+1)%totalPages+1}/${totalPages})`,
-    ()=>{ boxPage=(boxPage+1)%totalPages; render(); }]);
-  choices.push(['돌아간다', ()=>{ boxSel=-1; boxPage=0; G.screen='party'; render(); }]);
+  view.slice(start, start+BOX_PAGE_SIZE).forEach(m=>{ choices.push([boxLine(m), ()=>{ boxSelMon=m; boxMode='view'; render(); }]); });
+  if(totalPages>1) choices.push(['다음 페이지 ▶', ()=>{ boxPage=(boxPage+1)%totalPages; render(); }]);
+  const nextSort = BOX_SORTS[(BOX_SORTS.indexOf(boxSort)+1)%BOX_SORTS.length];
+  choices.push([`↕ 정렬: ${BOX_SORT_LABEL[boxSort]} → ${BOX_SORT_LABEL[nextSort]}`, ()=>{ boxSort=nextSort; boxPage=0; render(); }]);
+  const nextFilter = BOX_FILTERS[(BOX_FILTERS.indexOf(boxFilter)+1)%BOX_FILTERS.length];
+  choices.push([`🔎 필터: ${boxFilterLabel(boxFilter)} → ${boxFilterLabel(nextFilter)}`, ()=>{ boxFilter=nextFilter; boxPage=0; render(); }]);
+  const normN = G.box.filter(m=>(m.rar||'normal')==='normal' && !m.locked).length;
+  if(normN>0) choices.push([`🗑 일반 등급 일괄 방생 (${normN}마리)`, ()=>{ boxMode='bulkrelease'; render(); }]);
+  choices.push(['돌아간다', ()=>{ boxSelMon=null; boxPage=0; G.screen='party'; render(); }]);
   paint(lines, choices);
 }
 
@@ -2715,6 +2738,7 @@ function scrDope(){
   const choices = [];
   if(G.items.ample>0){
     G.party.forEach(m=>{
+      if(m.locked){ lines.push([`${monName(m)} — 🔒 잠금 (도핑 보호 중)`,'dim']); return; }
       const n = m.dopeN||0;
       if(n>=DOPE_MAX) lines.push([`${monName(m)} — 도핑 내성 (한계 도달, 배율 ×${(m.dope||1).toFixed(2)})`,'dim']);
       else choices.push([`${monName(m)} LV${m.lv} (HP ${m.maxhp} · 공격 ${m.atk} · ${n}/${DOPE_MAX}회)에게 주사`, ()=>{
@@ -2906,6 +2930,12 @@ function scrGacha(){
 /* ── 인게임 패치노트: 배포 사이트에서도 최근 업데이트를 볼 수 있게.
    전체 이력은 저장소의 CHANGELOG.md, 여기엔 핵심만 요약해 최신순으로 둔다. ── */
 const PATCH_NOTES = [
+  { ver:'v6.8', title:'보관함/파티 편의 — 검색·정렬·잠금·일괄 방생', items:[
+    '🔎 보관함 검색(타입·잠금 필터) + 정렬(최신순·레벨순·등급순)',
+    '🔁 보관함에서 파티원과 바로 교체 — 빼서 다시 넣을 필요 없이',
+    '🔒 몬스터 잠금 — 방생·도핑·합성 재료 사용 방지(실수 보호). 파티·보관함에서 토글',
+    '🗑 일반 등급 일괄 방생 — 잠금·황금 이상 등급은 자동 보호',
+  ]},
   { ver:'v6.7', title:'비주얼 모드 손그림 캐릭터', items:[
     '✏ 전 종족(344+)을 가벼운 손그림(휘갈긴) 스타일로 — 삐뚤빼뚤 펜 외곽선·타입색',
     '🦖 종족 이름에서 종류를 인식해 형태로 그림 — 용·새·벌레·유령·골렘·슬라임·식물·인간형·짐승',
@@ -3222,6 +3252,7 @@ function scrFusion(){
   /* 동종 후보 */
   const groups = {};
   for(const m of allMons()){
+    if(m.locked) continue;                            /* 잠금 개체는 합성 재료 제외 */
     const rar = m.rar||'normal';
     if(rar==='legend' || rar==='mythic') continue;   /* 최상위 등급은 동종 승급 대상이 아니다 */
     const k = m.sid+'|'+rar;
@@ -3257,8 +3288,8 @@ function scrFusion(){
   }
   /* 이종 후보 — 클릭하면 재료 개체 선택 화면으로 (여러 개체 중 선택 + 등급 확인) */
   for(const rc of FUSION_RECIPES){
-    const aN = allMons().filter(m=>m.sid===rc.mats[0]).length;
-    const bN = allMons().filter(m=>m.sid===rc.mats[1]).length;
+    const aN = allMons().filter(m=>m.sid===rc.mats[0] && !m.locked).length;
+    const bN = allMons().filter(m=>m.sid===rc.mats[1] && !m.locked).length;
     const sameMat = rc.mats[0]===rc.mats[1];
     const have = sameMat ? aN>=2 : (aN>=1 && bN>=1);
     if(have){
@@ -3308,7 +3339,7 @@ function scrFuseSelect(){
     [`레시피: ${SPECIES[rc.mats[0]].name} + ${SPECIES[rc.mats[1]].name} → ${rc.mythic?'✨신화✨':'신종 ???'}`,'dim'],''];
   const choices = [];
   if(!sel.a){
-    const cands = allMons().filter(m=>m.sid===rc.mats[0]);
+    const cands = allMons().filter(m=>m.sid===rc.mats[0] && !m.locked);
     if(cands.length===1){ sel.a = cands[0]; return scrFuseSelect(); }
     lines.push(`재료 ① ${SPECIES[rc.mats[0]].name} — 사용할 개체 선택 (소멸):`);
     cands.forEach(m=>choices.push([fuseCandLabel(m), ()=>{ sel.a=m; render(); }]));
@@ -3316,7 +3347,7 @@ function scrFuseSelect(){
     paint(lines, choices, '=FUSE.SELECT()'); return;
   }
   if(!sel.b){
-    const cands = allMons().filter(m=>m.sid===rc.mats[1] && m!==sel.a);
+    const cands = allMons().filter(m=>m.sid===rc.mats[1] && m!==sel.a && !m.locked);
     if(cands.length===0){ fuseMsg='재료가 부족하다.'; fuseSel=null; render(); return; }
     if(cands.length===1){ sel.b = cands[0]; return scrFuseSelect(); }
     lines.push([`① ${fuseCandLabel(sel.a)}`,'dim'], '', `재료 ② ${SPECIES[rc.mats[1]].name} — 사용할 개체 선택 (소멸):`);
