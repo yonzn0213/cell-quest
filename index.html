@@ -2155,22 +2155,67 @@ const HAND_SPRITES = {
   gyeoljae:`<svg viewBox="0 0 100 100"><ellipse cx="50" cy="56" rx="32" ry="34" fill="#caa12a"/><path d="M22 42 Q50 18 78 42 L70 50 Q50 34 30 50z" fill="#a8841f"/><circle cx="40" cy="52" r="8" fill="#fff"/><circle cx="60" cy="52" r="8" fill="#fff"/><circle cx="41" cy="53" r="3.6" fill="#1a1a1a"/><circle cx="59" cy="53" r="3.6" fill="#1a1a1a"/><polygon points="44,62 56,62 50,76" fill="#e8a13a"/><rect x="39" y="80" width="22" height="11" rx="2" fill="#c0392b"/><text x="50" y="89" font-size="7.5" fill="#fff" text-anchor="middle" font-family="sans-serif">결재</text></svg>`,
   wifi:`<svg viewBox="0 0 100 100"><polygon points="28,34 22,6 48,28" fill="#2f9be0"/><polygon points="72,34 78,6 52,28" fill="#2f9be0"/><path d="M30 16 a10 10 0 0 1 13 0" stroke="#fff" stroke-width="2.2" fill="none"/><path d="M70 16 a10 10 0 0 0 -13 0" stroke="#fff" stroke-width="2.2" fill="none"/><ellipse cx="50" cy="58" rx="33" ry="30" fill="#2f9be0"/><ellipse cx="50" cy="66" rx="18" ry="16" fill="#cdeaff"/><circle cx="40" cy="55" r="7" fill="#fff"/><circle cx="60" cy="55" r="7" fill="#fff"/><circle cx="40" cy="56" r="3.3" fill="#10283a"/><circle cx="60" cy="56" r="3.3" fill="#10283a"/><polygon points="46,64 54,64 50,71" fill="#10283a"/></svg>`,
 };
+/* 종족 이름/타입에서 '종류' 추정 → 그 형태로 그린다 */
+function archetypeOf(sid){
+  const s=SPECIES[sid]||{}; const n=(s.name||'')+sid;
+  const has=(...ks)=>ks.some(k=>n.indexOf(k)>=0);
+  if(has('용','드래곤','dragon','wyrm','히드라','hydra','뱀','serpent','웜')) return 'dragon';
+  if(has('유령','망령','ghost','wraith','phantom','reaper','사신','specter','spectre','wight','ghoul','구울','넋','령','revenant','banshee','악령')) return 'ghost';
+  if(has('거미','spider','나방','moth','매미','cicada','벌레','곤충','벌','hornet','귀뚜라미','cricket','개미','beetle','mantis','사마귀','gnat','swarm','fly','larva','애벌레','wasp','지네')) return 'bug';
+  if(has('매','봉황','독수리','콘도르','비둘기','부엉이','올빼미','phoenix','hawk','eagle','owl','griffin','그리핀','페가수스','pegasus','harpy','하피','새','조류','crow','raven','bird')) return 'bird';
+  if(has('골렘','golem','bot','로봇','기계','titan','타이탄','드론','drone','engine','엔진','machine','colossus','콜로서스','자판기','복사기','프로젝터','파쇄','mech','코어','core','서버','자동','컴파일','디버그','커널','스택','메모리','캐시','gpu','노드','패킷','클럭','clock')) return 'golem';
+  if(has('슬라임','slime','점액','젤리','jelly','이끼','blob','액체','거품','포자')) return 'slime';
+  if(has('씨앗','seed','나무','tree','dryad','드리아드','꽃','flower','버섯','mushroom','잎','leaf','plant')) return 'plant';
+  if(has('부장','과장','반장','회장','실장','처장','국장','소장','대제','군주','제왕','지배자','관리자','집정관','의장','심의관','감사','총사령','비서','상담원','관세사','사원','원작자','창조주','천사','angel','세라핌','seraph','cherub','요정','pixie','님프','nymph','마법사','mage','마도사','엘프','elf','기사','knight','마왕','신','god','메타트론','염라','warden','monarch','master','lord','king','administrator','집사','butler','장인','smith','닌자','복서','신부','사제')) return 'humanoid';
+  return 'beast';
+}
+/* 손그림(휘갈긴) 절차적 스프라이트 — 삐뚤빼뚤 펜 외곽선 + 종류별 형태 + 타입색 */
+function vRng(seed){ let s=(seed>>>0)||1; return ()=>{ s=(Math.imul(s,1103515245)+12345)>>>0; return s/4294967296; }; }
 function proceduralSprite(sid){
-  const s=SPECIES[sid]||{type:'서류'}; const c=TYPE_COLOR[s.type]||'#888'; const c2=TYPE_COLOR2[s.type]||'#ccc';
-  const h=vHash(sid);
-  const bw=44+(h%12), bh=38+((h>>4)%16);
-  const earType=h%4, eo=((h>>6)%2)?1:-1, mouth=(h>>8)%3, belly=(h>>10)%2;
-  const ears = earType===0?'' :
-    earType===1?`<polygon points="35,28 30,6 46,24" fill="${c}"/><polygon points="65,28 70,6 54,24" fill="${c}"/>`:
-    earType===2?`<circle cx="34" cy="22" r="9" fill="${c}"/><circle cx="66" cy="22" r="9" fill="${c}"/>`:
-    `<path d="M37 26 Q31 6 43 14" stroke="${c}" stroke-width="5" fill="none"/><path d="M63 26 Q69 6 57 14" stroke="${c}" stroke-width="5" fill="none"/>`;
-  const bellySvg = belly?`<ellipse cx="50" cy="63" rx="${bw*0.55}" ry="${bh*0.62}" fill="${c2}" opacity=".85"/>`:'';
-  const mouthSvg = mouth===0?`<path d="M44 70 Q50 76 56 70" stroke="#22303f" stroke-width="2" fill="none"/>`:
-                   mouth===1?`<ellipse cx="50" cy="72" rx="5" ry="3" fill="#22303f"/>`:
-                   `<path d="M45 71 L55 71" stroke="#22303f" stroke-width="2"/>`;
-  return `<svg viewBox="0 0 100 100">${ears}<ellipse cx="50" cy="58" rx="${bw}" ry="${bh}" fill="${c}"/>${bellySvg}`+
-    `<circle cx="42" cy="54" r="8" fill="#fff"/><circle cx="58" cy="54" r="8" fill="#fff"/>`+
-    `<circle cx="${42+eo*2}" cy="55" r="3.6" fill="#1a1a1a"/><circle cx="${58+eo*2}" cy="55" r="3.6" fill="#1a1a1a"/>${mouthSvg}</svg>`;
+  const s=SPECIES[sid]||{type:'서류'}; const c=TYPE_COLOR[s.type]||'#9a9a9a'; const c2=TYPE_COLOR2[s.type]||'#d8d8d8';
+  const arch=archetypeOf(sid); const rng=vRng(vHash(sid+arch));
+  const O='#2b2b2b', SW=2.4; const R=(a,b)=>a+rng()*(b-a);
+  function blob(cx,cy,rx,ry,wob){ const n=10; const p=[]; for(let i=0;i<n;i++){ const a=i/n*6.2832; const k=1+(rng()*2-1)*0.13; p.push([cx+Math.cos(a)*rx*k+(rng()*2-1)*(wob||1.6), cy+Math.sin(a)*ry*k+(rng()*2-1)*(wob||1.6)]); } let d=`M ${((p[0][0]+p[n-1][0])/2).toFixed(1)} ${((p[0][1]+p[n-1][1])/2).toFixed(1)}`; for(let i=0;i<n;i++){ const q=p[i],nx=p[(i+1)%n]; d+=` Q ${q[0].toFixed(1)} ${q[1].toFixed(1)} ${((q[0]+nx[0])/2).toFixed(1)} ${((q[1]+nx[1])/2).toFixed(1)}`; } return d+' Z'; }
+  const fb=(cx,cy,rx,ry,col,wob)=>`<path d="${blob(cx,cy,rx,ry,wob)}" fill="${col}" stroke="${O}" stroke-width="${SW}" stroke-linejoin="round"/>`;
+  const eyes=(ey,sp,r)=>`<circle cx="${50-sp}" cy="${ey}" r="${r}" fill="#fff" stroke="${O}" stroke-width="1.3"/><circle cx="${50+sp}" cy="${ey}" r="${r}" fill="#fff" stroke="${O}" stroke-width="1.3"/><circle cx="${(50-sp+R(-1,1)).toFixed(1)}" cy="${(ey+0.6).toFixed(1)}" r="${(r*0.46).toFixed(1)}" fill="#1c1c1c"/><circle cx="${(50+sp+R(-1,1)).toFixed(1)}" cy="${(ey+0.6).toFixed(1)}" r="${(r*0.46).toFixed(1)}" fill="#1c1c1c"/>`;
+  const smile=(my,w)=>`<path d="M ${50-w} ${my} Q 50 ${my+w*0.75} ${50+w} ${my}" fill="none" stroke="${O}" stroke-width="${SW}" stroke-linecap="round"/>`;
+  const ln=(x1,y1,x2,y2,sw)=>`<path d="M ${x1} ${y1} Q ${((x1+x2)/2+R(-2,2)).toFixed(1)} ${((y1+y2)/2+R(-2,2)).toFixed(1)} ${x2} ${y2}" stroke="${O}" stroke-width="${sw||SW}" fill="none" stroke-linecap="round"/>`;
+  let g='';
+  if(arch==='dragon'){
+    g+=`<polygon points="22,40 4,30 20,52" fill="${c2}" stroke="${O}" stroke-width="2" stroke-linejoin="round"/><polygon points="78,40 96,30 80,52" fill="${c2}" stroke="${O}" stroke-width="2" stroke-linejoin="round"/>`;
+    g+=fb(50,58,30,27,c,2)+`<polygon points="40,26 44,12 49,26" fill="${c}" stroke="${O}" stroke-width="1.6"/><polygon points="60,26 56,12 51,26" fill="${c}" stroke="${O}" stroke-width="1.6"/>`;
+    g+=eyes(52,11,7)+`<path d="M42 70 L58 70" stroke="${O}" stroke-width="${SW}"/><path d="M45 70 l2 4 M50 70 l0 4 M55 70 l-2 4" stroke="${O}" stroke-width="1.4"/>`;
+  } else if(arch==='bird'){
+    g+=`<path d="M24 60 Q9 50 22 44 Q18 56 33 58 Z" fill="${c2}" stroke="${O}" stroke-width="2" stroke-linejoin="round"/>`;
+    g+=fb(50,56,26,29,c,1.6)+`<path d="M50 35 q3 -10 7 -2" stroke="${O}" stroke-width="2" fill="none"/>`;
+    g+=eyes(52,10,7)+`<polygon points="44,62 56,62 50,76" fill="#e8a13a" stroke="${O}" stroke-width="1.6" stroke-linejoin="round"/>`;
+  } else if(arch==='bug'){
+    g+=ln(40,26,32,10,2)+`<circle cx="32" cy="9" r="2.5" fill="${O}"/>`+ln(60,26,68,10,2)+`<circle cx="68" cy="9" r="2.5" fill="${O}"/>`;
+    for(let i=0;i<3;i++){ g+=ln(28,52+i*7,15,50+i*9,2)+ln(72,52+i*7,85,50+i*9,2); }
+    g+=fb(50,58,26,25,c,1.4)+`<path d="${blob(50,58,17,17,1)}" fill="none" stroke="${O}" stroke-width="1.1" opacity=".45"/>`;
+    g+=eyes(53,11,8)+smile(70,5);
+  } else if(arch==='ghost'){
+    g+=`<path d="M24 50 Q24 24 50 24 Q76 24 76 50 L76 80 Q70 72 64 80 Q58 72 52 80 Q46 72 40 80 Q34 72 28 80 Z" fill="${c}" stroke="${O}" stroke-width="${SW}" stroke-linejoin="round" opacity=".92"/>`;
+    g+=eyes(48,11,7)+`<ellipse cx="50" cy="64" rx="5" ry="6" fill="${O}"/>`;
+  } else if(arch==='golem'){
+    g+=`<path d="M28 36 Q26 33 31 34 L69 34 Q74 33 72 38 L73 76 Q73 80 68 79 L32 79 Q27 80 28 76 Z" fill="${c}" stroke="${O}" stroke-width="${SW}" stroke-linejoin="round"/>`;
+    g+=ln(28,48,14,58,3)+ln(72,48,86,58,3)+`<rect x="10" y="55" width="9" height="7" rx="2" fill="${c}" stroke="${O}" stroke-width="2"/><rect x="81" y="55" width="9" height="7" rx="2" fill="${c}" stroke="${O}" stroke-width="2"/>`;
+    g+=`<rect x="40" y="48" width="8" height="8" rx="1.5" fill="#fff" stroke="${O}" stroke-width="1.4"/><rect x="52" y="48" width="8" height="8" rx="1.5" fill="#fff" stroke="${O}" stroke-width="1.4"/><circle cx="44" cy="52" r="2" fill="${O}"/><circle cx="56" cy="52" r="2" fill="${O}"/><path d="M40 68 L60 68" stroke="${O}" stroke-width="2"/>`;
+  } else if(arch==='slime'){
+    g+=`<path d="M18 70 Q16 44 50 44 Q84 44 82 70 Q82 80 50 80 Q18 80 18 70 Z" fill="${c}" stroke="${O}" stroke-width="${SW}" stroke-linejoin="round"/>`;
+    g+=`<ellipse cx="40" cy="56" rx="5" ry="7" fill="#fff" opacity=".55"/>`+eyes(62,10,6)+smile(72,5);
+  } else if(arch==='plant'){
+    g+=`<path d="M50 40 Q40 20 34 30 Q40 34 48 40 Z" fill="#5bbf5b" stroke="${O}" stroke-width="2" stroke-linejoin="round"/><path d="M50 40 Q60 20 66 30 Q60 34 52 40 Z" fill="#5bbf5b" stroke="${O}" stroke-width="2" stroke-linejoin="round"/>`;
+    g+=fb(50,60,27,24,c,1.6)+eyes(58,10,7)+smile(72,5);
+  } else if(arch==='humanoid'){
+    g+=`<path d="M30 80 Q34 52 50 52 Q66 52 70 80 Z" fill="${c}" stroke="${O}" stroke-width="${SW}" stroke-linejoin="round"/>`;
+    g+=fb(50,38,17,16,c,1.2)+eyes(38,7,5.5)+smile(46,4)+`<ellipse cx="50" cy="22" rx="13" ry="3.5" fill="none" stroke="#ffd24d" stroke-width="2"/>`;
+  } else {
+    g+=`<polygon points="34,30 28,12 46,26" fill="${c}" stroke="${O}" stroke-width="1.6" stroke-linejoin="round"/><polygon points="66,30 72,12 54,26" fill="${c}" stroke="${O}" stroke-width="1.6" stroke-linejoin="round"/>`;
+    g+=fb(50,58,30,28,c,1.6)+`<ellipse cx="50" cy="66" rx="14" ry="12" fill="${c2}" opacity=".7"/>`;
+    g+=eyes(54,11,7.5)+`<path d="M47 64 l3 3 3 -3z" fill="${O}"/>`+smile(72,5)+ln(22,60,34,60,1.3)+ln(22,65,34,64,1.3)+ln(78,60,66,60,1.3)+ln(78,65,66,64,1.3);
+  }
+  return `<svg viewBox="0 0 100 100">${g}</svg>`;
 }
 function monSprite(sid){ return HAND_SPRITES[sid] || proceduralSprite(sid); }
 function spriteHTML(m, big){ return `<div class="spr rar-${m.rar||'normal'}${big?' big':''}">${monSprite(m.sid)}</div>`; }
@@ -2842,6 +2887,10 @@ function scrGacha(){
 /* ── 인게임 패치노트: 배포 사이트에서도 최근 업데이트를 볼 수 있게.
    전체 이력은 저장소의 CHANGELOG.md, 여기엔 핵심만 요약해 최신순으로 둔다. ── */
 const PATCH_NOTES = [
+  { ver:'v6.7', title:'비주얼 모드 손그림 캐릭터', items:[
+    '✏ 전 종족(344+)을 가벼운 손그림(휘갈긴) 스타일로 — 삐뚤빼뚤 펜 외곽선·타입색',
+    '🦖 종족 이름에서 종류를 인식해 형태로 그림 — 용·새·벌레·유령·골렘·슬라임·식물·인간형·짐승',
+  ]},
   { ver:'v6.6', title:'비주얼(디자인) 모드 — 포켓몬식 전투 화면', items:[
     '🎨 엑셀 시트 외에 캐릭터 디자인이 들어간 비주얼 모드 추가 — 허브·타이틀에서 전환(세이브·랭킹·전투 엔진 전부 공유)',
     '⚔ 포켓몬식 전투씬 — 상대/내 몬스터 스프라이트·HP바·로그·기술 버튼',
