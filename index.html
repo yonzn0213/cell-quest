@@ -2761,7 +2761,9 @@ function scrDope(){
   /* 디톡스: 도핑 이력이 있는 몬스터의 배율·횟수를 초기화 (내성 해제 포함) */
   if(G.items.detox>0){
     G.party.forEach(m=>{
-      if((m.dopeN||0)>0) choices.push([`디톡스 — ${monName(m)} 초기화 (배율 ×${(m.dope||1).toFixed(2)} → ×1.00, 횟수 리셋)`, ()=>{
+      if((m.dopeN||0)===0) return;
+      if(m.locked){ lines.push([`${monName(m)} — 🔒 잠금 (디톡스 보호 중)`,'dim']); return; }
+      choices.push([`디톡스 — ${monName(m)} 초기화 (배율 ×${(m.dope||1).toFixed(2)} → ×1.00, 횟수 리셋)`, ()=>{
         G.items.detox--;
         applyDetox(m);
         dopeMsg = `${monName(m)}의 도핑 성분이 완전히 씻겨 나갔다! 다시 처음부터 도핑할 수 있다.`;
