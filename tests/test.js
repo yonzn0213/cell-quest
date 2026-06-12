@@ -892,10 +892,11 @@ T('migrateSave: 손상된 floor/active 범위 보정', () => {
 /* ── v5.9: 도핑 너프 + 레벨차 데미지 패널티 ── */
 T('도핑 너프: 5회 유지·확률 합 1·기대값 1 미만·실패 확률 우세(>50%)', () => {
   const sumP = DOPE_OUTCOMES.reduce((s, o) => s + o.p, 0);
-  const ev = DOPE_OUTCOMES.reduce((s, o) => s + o.p * o.mult, 0);
-  const failP = DOPE_OUTCOMES.filter(o => o.mult < 1).reduce((s, o) => s + o.p, 0);
-  const maxGain = Math.max(...DOPE_OUTCOMES.map(o => o.mult));
-  return DOPE_MAX === 5 && Math.abs(sumP - 1) < 1e-9 && ev < 1 && failP > 0.5 && maxGain <= 1.15;
+  const mid = o => (o.lo + o.hi) / 2;                       /* 효과가 구간 랜덤이므로 기대값은 중앙값으로 */
+  const ev = DOPE_OUTCOMES.reduce((s, o) => s + o.p * mid(o), 0);
+  const failP = DOPE_OUTCOMES.filter(o => o.hi < 1).reduce((s, o) => s + o.p, 0);
+  const maxGain = Math.max(...DOPE_OUTCOMES.map(o => o.hi));
+  return DOPE_MAX === 5 && Math.abs(sumP - 1) < 1e-9 && ev < 1 && failP > 0.5 && maxGain <= 1.25;
 });
 T('레벨차 데미지 패널티 함수: 고레벨 적이면 감소, 동급 이하는 1', () => {
   return levelDmgFactor(10, 10) === 1 && levelDmgFactor(20, 10) === 1

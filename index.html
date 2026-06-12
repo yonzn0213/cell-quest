@@ -1638,16 +1638,20 @@ const ITEM_DEF = {
    실패 확률을 성공보다 높게(55%) 조정 → 기대값 ≈0.968로 음수. 디톡스 가격 인상과 함께
    "올인하면 손해 볼 수도 있는" 진짜 도박이 되어 사냥을 너무 쉽게 만들던 문제를 해소한다. */
 const DOPE_MAX = 5;
+/* 능력치 효과는 고정값이 아니라 구간 내 랜덤 (대성공/심각이 더 크게 흔들린다) */
 const DOPE_OUTCOMES = [
-  { p:0.10, mult:1.15, msg:'★ 대성공!! 온몸에서 빛이 난다! (능력치 +15%)' },
-  { p:0.35, mult:1.08, msg:'성공! 힘이 솟구친다. (능력치 +8%)' },
-  { p:0.35, mult:0.90, msg:'…부작용이다. 몸이 비틀거린다. (능력치 -10%)' },
-  { p:0.20, mult:0.80, msg:'!! 심각한 부작용 !! 몸이 크게 망가졌다… (능력치 -20%)' },
+  { p:0.10, lo:1.16, hi:1.25, tmpl:p=>`★ 대성공!! 온몸에서 빛이 난다! (능력치 +${p}%)` },
+  { p:0.35, lo:1.08, hi:1.15, tmpl:p=>`성공! 힘이 솟구친다. (능력치 +${p}%)` },
+  { p:0.35, lo:0.85, hi:0.92, tmpl:p=>`…부작용이다. 몸이 비틀거린다. (능력치 -${p}%)` },
+  { p:0.20, lo:0.75, hi:0.84, tmpl:p=>`!! 심각한 부작용 !! 몸이 크게 망가졌다… (능력치 -${p}%)` },
 ];
 function rollDope(){
   let r = Math.random();
-  for(const o of DOPE_OUTCOMES){ if(r < o.p) return o; r -= o.p; }
-  return DOPE_OUTCOMES[DOPE_OUTCOMES.length-1];
+  let chosen = DOPE_OUTCOMES[DOPE_OUTCOMES.length-1];
+  for(const o of DOPE_OUTCOMES){ if(r < o.p){ chosen = o; break; } r -= o.p; }
+  const mult = +(chosen.lo + Math.random()*(chosen.hi - chosen.lo)).toFixed(3);
+  const pct = Math.round(Math.abs(1 - mult)*100);
+  return { mult, msg: chosen.tmpl(pct) };
 }
 function recalcMonStats(m){
   const st = statsFor(m.sid, m.lv, m.rar);
@@ -2740,7 +2744,7 @@ let dopeMsg = '';
 function scrDope(){
   const lines = [['― 도핑 실험 ―','bold'],'',
     [`수상한 앰플 ×${G.items.ample} · 디톡스 앰플 ×${G.items.detox||0}`,'hl'],
-    '대성공 10% (+15%) · 성공 35% (+8%) · 부작용 35% (-10%) · 심각 20% (-20%)  ⚠ 실패가 더 잦다!',
+    '대성공 10% (+16~25%) · 성공 35% (+8~15%) · 부작용 35% (-8~15%) · 심각 20% (-16~25%)  ⚠ 실패가 더 잦다!',
     ['효과는 영구적! [디톡스 앰플]로만 초기화 가능 (몬스터당 최대 5회, 이후 내성)','dim'],''];
   if(dopeMsg){ lines.push([dopeMsg,'hl'],''); dopeMsg=''; }
   const choices = [];
